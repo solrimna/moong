@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>#{{ tag_name }} - MOONG!</title>
+    <style>
+        .container { display: flex; margin-top: 20px; }
+        .sidebar { width: 25%; padding: 20px; border-right: 1px solid #eee; }
+        .content { width: 75%; padding: 20px; }
+        .tag-info h2 { color: #007bff; font-size: 2rem; margin-bottom: 10px; }
+        .tag-count { color: #666; font-size: 1rem; }
+    </style>
+</head>
+
+<body>
+    {% include 'moong/navigation.html' %}
+
+    <div class="container">
+
+        <div class="sidebar">
+            <div class="tag-info">
+                <h2>#{{ tag_name }}</h2>
+                <p class="tag-count">게시물 <strong>{{ posts.count }}</strong>개</p>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="feed-list" style="max-width: 600px; margin: 0 auto;">
+                {% for post in posts %}
+                    {% include 'moong/a_post.html' %}
+                {% empty %}
+                    <p style="text-align: center; color: #999; margin-top: 50px;">
+                        이 태그가 달린 게시물이 아직 없습니다.
+                    </p>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

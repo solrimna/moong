@@ -1,0 +1,15 @@
+<div style="background: #f8f9fa; padding: 15px; border-radius: 5px;">
+    <h4 style="margin-top: 0;">AI 추천 해시태그</h4>
+    <p style="color: #666;">원하는 태그를 체크하세요</p>
+    
+    {% if tags %}
+        {% for tag in tags %}
+        <label style="display: inline-block; margin: 5px; padding: 8px 12px; background: #e7f3ff; border: 1px solid #007bff; border-radius: 20px;">
+            <input type="checkbox" name="tags" value="{{ tag }}" checked>
+            #{{ tag }}
+        </label>
+        {% endfor %}
+    {% else %}
+        <p style="color: #999;">해시태그가 아직 생성되지 않았습니다.</p>
+    {% endif %}
+</div>

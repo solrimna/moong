@@ -4,13 +4,13 @@
   "settings": {
     "width": 2000,
     "height": 2000,
-    "scrollTop": -2,
-    "scrollLeft": -137.26,
+    "scrollTop": 0,
+    "scrollLeft": -800,
     "zoomLevel": 0.91,
     "show": 431,
     "database": 4,
     "databaseName": "",
-    "canvasType": "@dineug/erd-editor/builtin-schema-sql",
+    "canvasType": "ERD",
     "language": 1,
     "tableNameCase": 4,
     "columnNameCase": 2,
@@ -287,15 +287,15 @@
           "j_06E759Y4G5UA2eSFsOg"
         ],
         "ui": {
-          "x": 1310.1162,
-          "y": 150.2969,
+          "x": 1277.1491,
+          "y": 114.0332,
           "zIndex": 693,
           "widthName": 68,
           "widthComment": 60,
           "color": ""
         },
         "meta": {
-          "updateAt": 1769393357077,
+          "updateAt": 1769481285467,
           "createAt": 1769390328446
         }
       },
@@ -927,7 +927,7 @@
       "Quzql9Un7eZ_UM9X8HLLq": {
         "id": "Quzql9Un7eZ_UM9X8HLLq",
         "tableId": "nRcoxDzOxlejRYE-Zb-J8",
-        "name": "save",
+        "name": "complete",
         "comment": "임시저장여부(0:임시저장 1:저장)",
         "dataType": "BOOLEAN",
         "default": "",
@@ -940,7 +940,7 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1769387601432,
+          "updateAt": 1769475092650,
           "createAt": 1769387428249
         }
       },
@@ -2053,8 +2053,8 @@
           "columnIds": [
             "T2XtztRi26JODTxJGvkfi"
           ],
-          "x": 1310.1162,
-          "y": 318.2969,
+          "x": 1277.1491,
+          "y": 282.03319999999997,
           "direction": 1
         },
         "meta": {
@@ -2081,8 +2081,8 @@
           "columnIds": [
             "OuPalcIGUzY4JYUwPXNTx"
           ],
-          "x": 1310.1162,
-          "y": 206.2969,
+          "x": 1277.1491,
+          "y": 170.0332,
           "direction": 1
         },
         "meta": {

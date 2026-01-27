@@ -1,0 +1,15 @@
+{% load static %}<nav style="display: flex; justify-content: space-between; padding: 1rem; border-bottom: 1px solid #ddd; height: 50px;">
+    <a href="{% url 'moong:main' %}">
+        <img src="{% static 'images/moonglogo.png' %}" alt="로고" style="height: 60px; background-color: white;">
+    </a>
+
+    <div>
+        {% if user.is_authenticated %}
+            <a href="{% url 'moong:post_add' %}">글 작성</a> | <span>{{ user.nick_name }}님</span>    {# 글작성 url #}
+            <a href="{% url 'moong:main' %}">로그아웃</a>  {# 로그아웃 url #}
+        {% else %}
+            <a href="{% url 'moong:main' %}">로그인</a>     {# 로그인 url #}
+            <a href="{% url 'moong:main' %}">회원가입</a>   {# 회원가입 url #}
+        {% endif %}
+    </div>
+</nav>

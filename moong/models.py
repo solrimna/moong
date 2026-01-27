@@ -26,7 +26,6 @@ class Post(models.Model):
         verbose_name='모임 장소',
         db_column='location_id'
     )
-    models.CharField(max_length=255, verbose_name='모임 장소')
     
     # 작성자
     author = models.ForeignKey(
@@ -42,7 +41,7 @@ class Post(models.Model):
     # 상태 관리
     is_closed = models.BooleanField(null=True, blank=True, default=False, verbose_name='마감 여부')
     is_cancelled = models.BooleanField(null=True, blank=True, default=False, verbose_name='폭파 여부')
-    save = models.BooleanField(null=True, blank=True, default=False, verbose_name='임시저장 여부')
+    complete = models.BooleanField(null=True, blank=True, default=False, verbose_name='임시저장 여부')
     
     # 제한 정보
     gender_restriction = models.IntegerField(
@@ -104,6 +103,19 @@ class Post(models.Model):
         """성별 제한 한글 표시"""
         gender_map = {0: '누구나', 1: '남성만', 2: '여성만'}
         return gender_map.get(self.gender_restriction, '누구나')
+    
+    def get_main_image(self):
+        """대표 이미지 (첫 번째 이미지)"""
+        return self.images.first()
+    
+    def get_image_count(self):
+        """이미지 개수"""
+        return self.images.count()
+    
+    def has_images(self):
+        """이미지 존재 여부"""
+        return self.images.exists()
+
 
 
 class Participation(models.Model):
@@ -295,3 +307,32 @@ class PostHashtag(models.Model):
     
     def __str__(self):
         return f'{self.post.title} - #{self.hashtag.name}'
+    
+
+class Image(models.Model):
+# """게시글 이미지 모델"""
+    
+    post = models.ForeignKey(
+        'Post',
+        on_delete=models.CASCADE,
+        related_name='images',
+        verbose_name='게시글',
+        db_column='post_id'
+    )
+    order = models.IntegerField(default=0, verbose_name='순서')
+    image = models.ImageField(
+        upload_to='post_images/%Y/%m/%d/',
+        null=True,
+        blank=True,
+        verbose_name='이미지'
+    )
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name='업로드 시간')
+    
+    class Meta:
+        ordering = ['order', 'create_time']
+        verbose_name = '게시글 이미지'
+        verbose_name_plural = '게시글 이미지'
+        db_table = 'image'
+    
+    def __str__(self):
+        return f'{self.post.title} - 이미지 {self.order}'    

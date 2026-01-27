@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ post.title }}</title>
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <div class="post-container">
+        <div class="post-header">
+            <h1>{{ post.title }}</h1>
+            <div style="color: #666; font-size: 14px;">
+                작성자: {{ post.author.username }} | {{ post.create_time }}
+            </div>
+        </div>
+        
+        <div class="post-content">
+            {{ post.content }}
+        </div>
+        <div class="post-images">
+        {% for image in post.images.all %}
+            <img src="{{ image.image.url }}" alt="{{ post.title }}" style="max-width: 100%; margin: 10px 0;">
+        {% endfor %}
+        </div>
+        <div class="post-info">
+            <div>
+                <strong>📅 모임 날짜:</strong> 
+                {{ post.moim_date }} {{ post.moim_time }}
+            </div>
+            <div>
+                <strong>📍 모임 장소:</strong>
+                {% if post.location %}
+                    {{ post.location.sido }} {{ post.location.sigungu }} {{ post.location.eupmyeondong }}
+                {% else %}
+                    장소 미정
+                {% endif %}
+            </div>
+            {% if post.max_people %}
+                <div>
+                    <strong>👥 최대 인원:</strong> 
+                    {{ post.max_people }}명
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="button-group">
+            <a href="{% url 'moong:post_list' %}" class="btn btn-secondary">목록으로</a>
+            {% if user == post.author %}
+                <a href="#" class="btn btn-primary">수정</a>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

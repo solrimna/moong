@@ -16,19 +16,16 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import re_path,include
+from django.urls import path, re_path, include
 from django.conf.urls.static import static
 from django.conf import settings
-# from config.views import index
 
 urlpatterns = [
     re_path(r"^admin/", admin.site.urls),
+    re_path('', include('moong.urls')),
     re_path(r"^users/", include('users.urls')),
-    re_path(r"^locations/", include('locations.urls')),
-
+    re_path(r"^locations/", include('locations.urls')),    
 ]
 
-urlpatterns += static(
-    prefix=settings.MEDIA_URL,
-    document_root=settings.MEDIA_ROOT,
-)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

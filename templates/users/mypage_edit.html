@@ -1,0 +1,377 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}프로필 수정 - 뭉이{% endblock %}
+
+{% block extra_css %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+        background: white;
+        min-height: 100vh;
+        padding: 0;
+    }
+    
+    .container {
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        max-width: 500px;
+        width: 100%;
+        overflow: hidden;
+        margin: 40px auto;
+        border: 1px solid #E0E0E0;
+    }
+    
+    /* 헤더 */
+    .header {
+        background: white;
+        padding: 20px;
+        text-align: center;
+        border-bottom: 1px solid #E0E0E0;
+    }
+    
+    .header-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #424242;
+        margin-bottom: 5px;
+    }
+    
+    .header-subtitle {
+        color: #757575;
+        font-size: 13px;
+    }
+    
+    /* 폼 영역 */
+    .form-container {
+        padding: 40px;
+    }
+    
+    .messages {
+        margin-bottom: 20px;
+    }
+    .message {
+        padding: 12px 15px;
+        border-radius: 12px;
+        margin-bottom: 10px;
+        font-size: 14px;
+    }
+    .message.success {
+        background: #E8F5E9;
+        color: #2E7D32;
+        border: 1px solid #A5D6A7;
+    }
+    .message.error {
+        background: #FFEBEE;
+        color: #C62828;
+        border: 1px solid #EF9A9A;
+    }
+    
+    .form-group {
+        margin-bottom: 25px;
+    }
+    .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+    }
+    .form-input, .form-textarea {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #E0E0E0;
+        border-radius: 12px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+        font-family: inherit;
+    }
+    .form-textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+    .form-input:focus, .form-textarea:focus {
+        outline: none;
+        border-color: #4285F4;
+    }
+    .form-input:disabled {
+        background: #F5F5F5;
+        cursor: not-allowed;
+        color: #999;
+    }
+    .form-select {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #E0E0E0;
+        border-radius: 12px;
+        font-size: 16px;
+        background: white;
+        cursor: pointer;
+        font-family: inherit;
+    }
+    .form-select:focus {
+        outline: none;
+        border-color: #4285F4;
+    }
+    .file-input-wrapper {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+    }
+    .file-input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px dashed #4285F4;
+        border-radius: 12px;
+        background: #F8F9FA;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    .current-image {
+        width: 100px;
+        height: 100px;
+        border-radius: 16px;
+        object-fit: cover;
+        border: 3px solid #4285F4;
+        margin-bottom: 10px;
+    }
+    .image-placeholder {
+        width: 100px;
+        height: 100px;
+        border-radius: 16px;
+        background: #E3F2FD;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        color: #4285F4;
+        border: 3px solid #4285F4;
+        margin-bottom: 10px;
+    }
+    .help-text {
+        font-size: 12px;
+        color: #666;
+        margin-top: 5px;
+    }
+    .readonly-badge {
+        display: inline-block;
+        background: #FDD835;
+        color: #333;
+        padding: 3px 8px;
+        border-radius: 8px;
+        font-size: 11px;
+        margin-left: 10px;
+        font-weight: 600;
+    }
+    
+    /* 체크박스 */
+    .checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    .checkbox-input {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+    .checkbox-label {
+        font-size: 14px;
+        color: #333;
+        cursor: pointer;
+    }
+    
+    .btn {
+        display: block;
+        width: 100%;
+        padding: 15px;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 12px;
+        font-weight: 600;
+        margin-bottom: 10px;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        font-family: inherit;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #4285F4 0%, #1E88E5 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(66, 133, 244, 0.4);
+    }
+    .btn-secondary {
+        background: #F5F5F5;
+        color: #616161;
+    }
+    .btn-secondary:hover {
+        background: #EEEEEE;
+    }
+    
+    .char-count {
+        font-size: 12px;
+        color: #999;
+        text-align: right;
+        margin-top: 5px;
+    }
+
+    /* 반응형 */
+    @media (max-width: 768px) {
+        .container {
+            border-radius: 0;
+            margin: 0;
+            border-left: none;
+            border-right: none;
+        }
+        
+        .form-container {
+            padding: 30px 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block myBlock %}
+<div class="container">
+    <!-- 헤더 -->
+    <div class="header">
+        <div class="header-title">프로필 수정</div>
+        <div class="header-subtitle">변경할 정보를 입력해주세요</div>
+    </div>
+
+    <!-- 폼 -->
+    <div class="form-container">
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- 프로필 이미지 -->
+            <div class="form-group">
+                <label class="form-label">📷 프로필 이미지</label>
+                <div style="text-align: center; margin-bottom: 10px;">
+                    {% if user.profile_image %}
+                        <img src="{{ user.profile_image.url }}" alt="현재 프로필" class="current-image">
+                    {% else %}
+                        <div class="image-placeholder">👤</div>
+                    {% endif %}
+                </div>
+                <input type="file" name="profile_image" accept="image/*" class="file-input">
+                <p class="help-text">JPG, PNG 파일만 가능 (최대 10MB)</p>
+            </div>
+
+            <!-- 닉네임 (읽기 전용) -->
+            <div class="form-group">
+                <label class="form-label">
+                    👤 닉네임
+                    <span class="readonly-badge">수정불가</span>
+                </label>
+                <input type="text" value="{{ user.nick_name }}" class="form-input" disabled>
+                <p class="help-text">닉네임은 변경할 수 없습니다</p>
+            </div>
+
+            <!-- 자기소개 -->
+            <div class="form-group">
+                <label class="form-label">💬 자기소개</label>
+                <textarea name="bio" class="form-textarea" maxlength="500" 
+                          placeholder="자신을 소개해주세요 (최대 500자)" 
+                          oninput="updateCharCount(this)">{{ user.bio|default:"" }}</textarea>
+                <div class="char-count">
+                    <span id="charCount">{{ user.bio|length|default:0 }}</span> / 500자
+                </div>
+            </div>
+
+            <!-- 주 활동 지역 -->
+            <div class="form-group">
+                <label class="form-label">📍 주 활동 지역</label>
+                <select name="location" class="form-select">
+                    <option value="">지역을 선택해주세요</option>
+                    {% for location in locations %}
+                        <option value="{{ location.id }}" 
+                                {% if user.location and user.location.id == location.id %}selected{% endif %}>
+                            {{ location }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- 이메일 (읽기 전용) -->
+            <div class="form-group">
+                <label class="form-label">
+                    📧 이메일
+                    <span class="readonly-badge">수정불가</span>
+                </label>
+                <input type="text" value="{{ user.email|default:'등록되지 않음' }}" 
+                       class="form-input" disabled>
+                <p class="help-text">이메일은 변경할 수 없습니다</p>
+            </div>
+
+            <!-- 전화번호 (읽기 전용) -->
+            <div class="form-group">
+                <label class="form-label">
+                    📱 전화번호
+                    <span class="readonly-badge">본인인증 필요</span>
+                </label>
+                <input type="text" value="{{ user.phone|default:'등록되지 않음' }}" 
+                       class="form-input" disabled>
+                <p class="help-text">전화번호 변경은 본인인증 후 가능합니다</p>
+            </div>
+
+            <!-- 성별 (읽기 전용) -->
+            <div class="form-group">
+                <label class="form-label">
+                    ⚧ 성별
+                    <span class="readonly-badge">수정불가</span>
+                </label>
+                <input type="text" 
+                       value="{% if user.gender == 'M' %}남성{% elif user.gender == 'F' %}여성{% elif user.gender == 'O' %}기타{% else %}미설정{% endif %}" 
+                       class="form-input" disabled>
+                
+                <!-- 성별 공개 여부 -->
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" 
+                           name="gender_visible" 
+                           id="gender_visible" 
+                           class="checkbox-input"
+                           {% if user.gender_visible %}checked{% endif %}>
+                    <label for="gender_visible" class="checkbox-label">
+                        마이페이지에서 성별 공개하기
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">💾 저장하기</button>
+            <a href="{% url 'users:mypage' %}" class="btn btn-secondary">취소</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function updateCharCount(textarea) {
+        const charCount = textarea.value.length;
+        document.getElementById('charCount').textContent = charCount;
+    }
+</script>
+{% endblock %}

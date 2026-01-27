@@ -11,11 +11,7 @@ phone_regex = RegexValidator(
     )
 
 class User(AbstractUser):
-    """커스텀 User 모델"""
-    
-    # AbstractUser 기본 제공 필드들:
-    # username, password, email, first_name, last_name
-    # is_staff, is_active, is_superuser, date_joined, last_login, email
+
     
     # 기본 프로필 정보
     nick_name = models.CharField(

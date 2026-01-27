@@ -3,10 +3,12 @@ from django.db.models import Count
 from .models import Post, Hashtag, Image
 from locations.models import Location
 from django.contrib.auth.decorators import login_required
+from .forms import PostForm
+from django.contrib import messages
+from django.http import JsonResponse
 import openai
 import os
 from dotenv import load_dotenv
-
 
 # OpenAI 설정
 load_dotenv()
@@ -115,46 +117,80 @@ def ai_tags(content, location):
         return []
 
 
-
-
-# 게시물 작성 - 테스트용 가상으로 만들었습니다 !!! (location폼 넣는거 귀찮아서 주석처리함)
-@login_required
+# !!!!!!!!로그인 필수 
 def post_add(request):
+    print("post_add 뷰 호출됨!")
     if request.method == 'POST':
-        title = request.POST.get('title', '')
-        content = request.POST.get('content', '')
-        # location = request.POST.get('location', '')
-        max_people = request.POST.get('max_people', 4)
-        
-        # 게시물 생성
-        post = Post.objects.create(
-            author=request.user,
-            title=title,
-            content=content,
-            max_people=max_people,
-            # location=location,
-            complete=True
-        )
-
-        # 이미지 저장
-        images = request.FILES.getlist('images')  # post_add.html에서 name="images"
-        for index, img_file in enumerate(images):
-            Image.objects.create(
-                post=post,
-                image=img_file,
-                order=index
-            )
-
-
-        # AI로 해시태그 자동 생성
-        tags = ai_tags(content, '')   # 두번째인자 공백 아니고 원래 location
+        print("post_add POST 호출됨!")
+        form = PostForm(request.POST)
     
-        # 해시태그 저장
-        for tag_name in tags:
-            if tag_name.strip():
-                tag, created = Hashtag.objects.get_or_create(name=tag_name.strip())
-                post.hashtags.add(tag)
-        
-        return redirect('moong:main')
-    return render(request, 'moong/post_add.html')
+        if form.is_valid():
+            # #임시저장 버튼 선언 필요 
+            # #is_temp = '임시저장' in request.POST
+            # # 선택한 시/도, 시/군/구, 읍/면/동으로 Location 찾기
+            # sido = form.cleaned_data['sido']
+            # sigungu = form.cleaned_data['sigungu']
+            # eupmyeondong = form.cleaned_data.get('eupmyeondong', '')
+            # try:
+            #     location = Location.objects.get(
+            #         sido=sido,
+            #         sigungu=sigungu,
+            #         eupmyeondong=eupmyeondong
+            #     )
+            #     post.location = location
+            # except Location.DoesNotExist:
+            #     messages.error(request, '선택한 지역을 찾을 수 없습니다.')
+            #     return render(request, 'moong/post_add.html', {'form': form})
+            post = form.save(commit=False)
+            post.author = request.user 
 
+            if 'save_temp' in request.POST :
+                post.complete = False
+                post.save()
+                messages.success(request, '임시저장')
+                print("post_add 임시 저장 호출됨!")
+            else : 
+                post.complete = True
+                post.save()
+                messages.success(request, '게시글이 작성 완료되었습니다.')
+                print("post_add 작성 완료 호출됨!")
+
+                # AI로 해시태그 자동 생성
+                tags = ai_tags(post.content, '')   # 두번째인자 공백 아니고 원래 location
+
+                # 해시태그 저장
+                for tag_name in tags:
+                    if tag_name.strip():
+                        tag, created = Hashtag.objects.get_or_create(name=tag_name.strip())
+                        post.hashtags.add(tag)
+                
+                return redirect('moong:main')
+
+            #return redirect('moong:post_detail', post_id=post.id)
+        else:
+            messages.error(request, '입력 내용을 확인하세요.')
+            print("post_add 입력값 확인으로 빠짐!")
+    else:
+        print("post_add else 호출됨!")
+        form = PostForm()
+
+    return render(request, 'moong/post_add.html', {'form' : form })
+
+def post_list(request):
+    """게시글 목록"""
+    posts = Post.objects.filter(
+        save=True,
+        is_cancelled=False
+    ).select_related('author', 'location').order_by('-create_time')
+    
+    return render(request, 'moong/post_list.html', {'posts': posts})
+
+
+def post_detail(request, post_id):
+    """게시글 상세"""
+    post = get_object_or_404(
+        Post.select_related('author', 'location'),
+        id=post_id
+    )
+    
+    return render(request, 'moong/post_detail.html', {'post': post})

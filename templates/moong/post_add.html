@@ -1,56 +1,127 @@
-
-{# 이거 테스트 때문에 가상으로 대충 만든것입니다!! #}
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>모임 만들기 - MOONG!</title>
 </head>
 
 <body>
     {% include 'moong/navigation.html' %}
 
-    <div class="post-form-container" style="max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2>새 모임 만들기</h2>
-       <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-    
-            <input type="hidden" name="post_id" id="final-post-id">
-
-            <div class="form-group">
-                <label>제목:</label><br>
-                <input type="text" name="title" style="width: 100%;">
-            </div>
-
-            <!-- <div style="margin-bottom: 15px;">
-                <label>모임 장소 (지역 태그 기준):</label><br>
-                <input type="text" name="location" id="post-location" placeholder="예: 강남역, 홍대" style="width: 100%;">
+    <form method="POST">
+        {% csrf_token %}
+        <p>
+            <label>제목</label><br>
+            {{ form.title }}
+            <br>
+            <label>내용</label><br>
+            {{ form.content }}
+            <br>
+            <label>모임 날짜</label><br>
+            {{ form.moim_date }}
+            <br>
+            <!-- 장소 (3단계 선택) -->
+            <!-- <div class="form-group">
+                <label>모임 장소</label>
+                <div class="location-group">
+                    <div>
+                        {{ form.sido }}
+                    </div>
+                    <div>
+                        {{ form.sigungu }}
+                    </div>
+                    <div>
+                        {{ form.location_id }}
+                    </div>
+                </div>
             </div> -->
+            <br>
+            <label>시간</label><br>
+            {{ form.moim_time }}
+            <br>
+        </p>
 
-            <div style="margin-bottom: 15px;">
-                <label>글 내용 (키워드 태그 기준):</label><br>
-                <textarea name="content" id="post-content" rows="5" style="width: 100%;"></textarea>
-            </div>
+        
+        <button type="submit">게시</button>
+        <button type="submit" name="save_temp">임시저장</button>
+        <!-- <a href="{% url 'moong:post_list' %}">취소</a> -->
+    </form>
+    
+    <!-- <script>
+        // 페이지 로드 시 시/도 목록 불러오기
+        window.addEventListener('DOMContentLoaded', function() {
+            loadSido();
+        });
 
-            <div style="margin-bottom: 15px;">
-                <label>사진 첨부 (여러 장 가능):</label><br>
-                <input type="file" name="images" id="image-input" multiple accept="image/*" style="width: 100%;">
-                <div id="image-list" style="font-size: 0.8rem; color: #666; margin-top: 5px;"></div>
-            </div>
-            <div style="margin-bottom: 15px;">
-                <label>최대 인원:</label><br>
-                <input type="number" name="max_people" value="4">
-            </div>
-
-            <hr>
-            <div id="tags-section">
-                {% include 'moong/tags_add.html' %}
-            </div>
-            <hr>
-
-            <button type="submit" class="btn-submit">모임 최종 등록하기</button>
-        </form>
-    </div>
-
+        // 시/도 목록 불러오기
+        function loadSido() {
+            fetch('/locations/sido/')  // locations 앱의 URL 사용
+                .then(response => response.json())
+                .then(data => {
+                    const sidoSelect = document.getElementById('id_sido');
+                    sidoSelect.innerHTML = '<option value="">시/도 선택</option>';
+                    
+                    data.forEach(sido => {
+                        const option = document.createElement('option');
+                        option.value = sido;
+                        option.textContent = sido;
+                        sidoSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('시/도 로드 실패:', error));
+        }
+        
+        // 시/도 선택 시 시/군/구 업데이트
+        document.getElementById('id_sido').addEventListener('change', function() {
+            const sido = this.value;
+            const sigunguSelect = document.getElementById('id_sigungu');
+            const locationSelect = document.getElementById('id_location_id');
+            
+            // 시/군/구, 읍/면/동 초기화
+            sigunguSelect.innerHTML = '<option value="">시/군/구 선택</option>';
+            locationSelect.innerHTML = '<option value="">읍/면/동 선택</option>';
+            
+            if (sido) {
+                // AJAX로 시/군/구 목록 가져오기
+                fetch(`/locations/sigungu/?sido=${encodeURIComponent(sido)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(sigungu => {
+                            const option = document.createElement('option');
+                            option.value = sigungu;
+                            option.textContent = sigungu;
+                            sigunguSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('시/군/구 로드 실패:', error));
+            }
+        });
+        
+        // 시/군/구 선택 시 읍/면/동 업데이트
+        document.getElementById('id_sigungu').addEventListener('change', function() {
+            const sido = document.getElementById('id_sido').value;
+            const sigungu = this.value;
+            const locationSelect = document.getElementById('id_location_id');
+            
+            // 읍/면/동 초기화
+            locationSelect.innerHTML = '<option value="">읍/면/동 선택</option>';
+            
+            if (sido && sigungu) {
+                // AJAX로 읍/면/동 목록 가져오기
+                fetch(`/locations/eupmyeondong/?sido=${encodeURIComponent(sido)}&sigungu=${encodeURIComponent(sigungu)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(item => {
+                            const option = document.createElement('option');
+                            option.value = item.id;  // Location의 id 값
+                            option.textContent = item.name;  // eupmyeondong 또는 sigungu
+                            locationSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('읍/면/동 로드 실패:', error));
+            }
+        });
+    </script> -->
 </body>
 </html>

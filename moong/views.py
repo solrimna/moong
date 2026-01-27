@@ -92,7 +92,7 @@ def ai_tags(content, location):
 내용: {content}
 
 조건:
-- # 기호 없이 단어만 출력
+- # 기호 없이 단어, 명사만 출력
 - 쉼표로 구분
 - 한글로 작성
 - 예시: 강남, 맛집, 데이트, 카페, 주말
@@ -101,7 +101,7 @@ def ai_tags(content, location):
 
     try:
         response = openai.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7,
         )

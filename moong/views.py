@@ -156,21 +156,32 @@ def post_add(request):
             else : 
                 post.complete = True
                 post.save()
+
+                images = request.FILES.getlist('images')
+                for idx, image_file in enumerate(images):
+                    Image.objects.create(
+                        post=post,
+                        image=image_file,
+                        order=idx
+                    )
+                try:
+                    # AI로 해시태그 자동 생성
+                    tags = ai_tags(post.content, '')   # 두번째인자 공백 아니고 원래 location
+
+                    # 해시태그 저장
+                    for tag_name in tags:
+                        if tag_name.strip():
+                            tag, created = Hashtag.objects.get_or_create(name=tag_name.strip())
+                            post.hashtags.add(tag)
+                        
+                except Exception as e:
+                    print(f"해시태그 생성 실패: {e}")
+                
                 messages.success(request, '게시글이 작성 완료되었습니다.')
                 print("post_add 작성 완료 호출됨!")
 
-                # AI로 해시태그 자동 생성
-                tags = ai_tags(post.content, '')   # 두번째인자 공백 아니고 원래 location
-
-                # 해시태그 저장
-                for tag_name in tags:
-                    if tag_name.strip():
-                        tag, created = Hashtag.objects.get_or_create(name=tag_name.strip())
-                        post.hashtags.add(tag)
-                
-                return redirect('moong:main')
-
-            #return redirect('moong:post_detail', post_id=post.id)
+                return redirect('moong:post_detail', post_id=post.id)
+            
         else:
             print("="*50)
             print("폼 유효성 검사 실패!")

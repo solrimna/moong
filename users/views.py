@@ -109,18 +109,22 @@ def mypage_activity(request):
     """마이페이지 - 활동 이력"""
     user = request.user
     
-    # 내가 만든 모임 (작성자가 나인 게시글)
-    my_posts = Post.objects.filter(author=user, save=False).order_by('-create_time')
+    # 내가 만든 모임 (임시저장 제외, 완성된 글만)
+    my_posts = Post.objects.filter(
+        author=user,
+        complete=True  # 완성된 글만 (임시저장 제외)
+    ).order_by('-create_time')
     
-    # 내가 참여한 모임 (승인된 참여만)
+    # 내가 참여한 모임 (승인된 참여만, 완성된 글만)
     my_participations = Participation.objects.filter(
         user=user,
-        status='APPROVED'
+        status='APPROVED',
+        post__complete=True  # 완성된 글만
     ).select_related('post').order_by('-create_time')
     
     # 통계
-    total_created = my_posts.count()  # 총 개최한 모임 수
-    total_participated = my_participations.count()  # 총 참여한 모임 수
+    total_created = my_posts.count()
+    total_participated = my_participations.count()
     
     context = {
         'user': user,

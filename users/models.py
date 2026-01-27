@@ -46,10 +46,37 @@ class User(AbstractUser):
         verbose_name='성별'
     )
 
+    # 추가할 필드
+    bio = models.TextField(
+        max_length=500,
+        blank=True,
+        null=True,
+        verbose_name='자기소개'
+    )
+    
+    gender_visible = models.BooleanField(
+        default=True,
+        verbose_name='성별 공개'
+    )
+
+
     class Meta:
         verbose_name = '사용자'
         verbose_name_plural = '사용자'
         db_table = 'users'  # 테이블명을 'users'로 지정  
     def __str__(self):
-        return self.username
+        return self.username if self.username else self.nick_name
     
+    def increase_ddomoong(self):
+        """또뭉 증가"""
+        self.ddomoong += 1
+        self.save()
+    
+    def decrease_ddomoong(self):
+        """또뭉 감소"""
+        if self.ddomoong > 0:
+            self.ddomoong -= 1
+            self.save()
+
+    # hashtags/models.py (또는 posts/models.py 안에)
+

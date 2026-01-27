@@ -5,6 +5,9 @@ from django.shortcuts import render,redirect, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from locations.models import Location
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from moong.models import Post, Participation
 
 
 def signup_view(request):
@@ -41,3 +44,108 @@ def signup_view(request):
     context = {"form":form}
 
     return render(request, "users/signup.html", context)
+
+
+
+# 마이페이지 조회
+@login_required  # 로그인한 사용자만 접근 가능
+def mypage(request):
+    """마이페이지 - 프로필 조회"""
+    user = request.user  # 현재 로그인한 사용자
+    
+    context = {
+        'user': user,
+    }
+    
+    return render(request, 'users/mypage.html', context)
+
+
+# 프로필 수정
+@login_required
+def mypage_edit(request):
+    """마이페이지 - 프로필 수정"""
+    user = request.user
+    locations = Location.objects.all()  # 모든 지역 목록
+    
+    if request.method == 'POST':
+        # 프로필 이미지 수정
+        if 'profile_image' in request.FILES:
+            user.profile_image = request.FILES['profile_image']
+            messages.success(request, '프로필 이미지가 변경되었습니다.')
+        
+        # 자기소개 수정
+        bio = request.POST.get('bio')
+        if bio is not None:  # 빈 문자열도 허용
+            user.bio = bio
+            messages.success(request, '자기소개가 변경되었습니다.')
+        
+        # 지역 수정
+        location_id = request.POST.get('location')
+        if location_id:
+            try:
+                user.location = Location.objects.get(id=location_id)
+                messages.success(request, '주 활동 지역이 변경되었습니다.')
+            except Location.DoesNotExist:
+                messages.error(request, '유효하지 않은 지역입니다.')
+        
+        # 성별 공개 여부 수정
+        gender_visible = request.POST.get('gender_visible')
+        user.gender_visible = (gender_visible == 'on')  # 체크박스는 'on' 또는 None
+        
+        user.save()
+        return redirect('users:mypage')
+    
+    context = {
+        'user': user,
+        'locations': locations,
+    }
+    
+    return render(request, 'users/mypage_edit.html', context)
+
+
+# 활동 이력
+@login_required
+def mypage_activity(request):
+    """마이페이지 - 활동 이력"""
+    user = request.user
+    
+    # 내가 만든 모임 (작성자가 나인 게시글)
+    my_posts = Post.objects.filter(author=user, save=False).order_by('-create_time')
+    
+    # 내가 참여한 모임 (승인된 참여만)
+    my_participations = Participation.objects.filter(
+        user=user,
+        status='APPROVED'
+    ).select_related('post').order_by('-create_time')
+    
+    # 통계
+    total_created = my_posts.count()  # 총 개최한 모임 수
+    total_participated = my_participations.count()  # 총 참여한 모임 수
+    
+    context = {
+        'user': user,
+        'my_posts': my_posts,
+        'my_participations': my_participations,
+        'total_created': total_created,
+        'total_participated': total_participated,
+    }
+    
+    return render(request, 'users/mypage_activity.html', context)
+
+
+# 다른 사용자 프로필 조회
+@login_required
+def user_profile(request, user_id):
+    """다른 사용자 프로필 조회"""
+    # 조회하려는 사용자
+    profile_user = get_object_or_404(User, id=user_id)
+    
+    # 본인 프로필이면 마이페이지로 리다이렉트
+    if profile_user == request.user:
+        return redirect('users:mypage')
+    
+    context = {
+        'profile_user': profile_user,
+    }
+    
+    return render(request, 'users/user_profile.html', context)

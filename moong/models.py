@@ -309,8 +309,8 @@ class PostHashtag(models.Model):
         return f'{self.post.title} - #{self.hashtag.name}'
     
 
-    class Image(models.Model):
-    """게시글 이미지 모델"""
+class Image(models.Model):
+# """게시글 이미지 모델"""
     
     post = models.ForeignKey(
         'Post',

@@ -301,17 +301,23 @@
                 </div>
             </div>
 
-            <!-- 주 활동 지역 -->
+            <!-- 주 활동 지역 (3단계 선택) -->
             <div class="form-group">
                 <label class="form-label">📍 주 활동 지역</label>
-                <select name="location" class="form-select">
-                    <option value="">지역을 선택해주세요</option>
-                    {% for location in locations %}
-                        <option value="{{ location.id }}" 
-                                {% if user.location and user.location.id == location.id %}selected{% endif %}>
-                            {{ location }}
-                        </option>
-                    {% endfor %}
+
+                            <label for="sido">시/도</label>
+                <select id="sido" class="form-select" style="margin-bottom: 10px;">
+                    <option value="">시/도 선택</option>
+                </select>
+
+                <label for="sigungu">시/군/구</label>
+                <select id="sigungu" class="form-select" style="margin-bottom: 10px;">
+                    <option value="">시/군/구 선택</option>
+                </select>
+
+                <label for="eupmyeondong">읍/면/동</label>
+                <select id="eupmyeondong" name="location" required class="form-select">
+                    <option value="">읍/면/동 선택</option>
                 </select>
             </div>
 
@@ -373,5 +379,73 @@
         const charCount = textarea.value.length;
         document.getElementById('charCount').textContent = charCount;
     }
+
+    // ⭐ 지역 선택 3단계 로직
+    document.addEventListener("DOMContentLoaded", function () {
+        const sidoSelect = document.getElementById("sido");
+        const sigunguSelect = document.getElementById("sigungu");
+        const eupSelect = document.getElementById("eupmyeondong");
+
+        // 1️⃣ 시/도 로드
+        fetch("/locations/sido/")
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(sido => {
+                    const opt = document.createElement("option");
+                    opt.value = sido;
+                    opt.textContent = sido;
+                    sidoSelect.appendChild(opt);
+                });
+            })
+            .catch(err => {
+                console.error("시/도 로드 실패", err);
+            });
+
+        // 2️⃣ 시/도 변경 → 시/군/구
+        sidoSelect.addEventListener("change", function () {
+            const sido = this.value;
+            sigunguSelect.innerHTML = `<option value="">시/군/구 선택</option>`;
+            eupSelect.innerHTML = `<option value="">읍/면/동 선택</option>`;
+
+            if (!sido) return;
+
+            fetch(`/locations/sigungu/?sido=${encodeURIComponent(sido)}`)
+                .then(res => res.json())
+                .then(data => {
+                    data.forEach(sigungu => {
+                        const opt = document.createElement("option");
+                        opt.value = sigungu;
+                        opt.textContent = sigungu;
+                        sigunguSelect.appendChild(opt);
+                    });
+                })
+                .catch(err => {
+                    console.error("시/군/구 로드 실패", err);
+                });
+        });
+
+        // 3️⃣ 시/군/구 변경 → 읍/면/동
+        sigunguSelect.addEventListener("change", function () {
+            const sigungu = this.value;
+            const sido = sidoSelect.value;
+            eupSelect.innerHTML = `<option value="">읍/면/동 선택</option>`;
+
+            if (!sido || !sigungu) return;
+
+            fetch(`/locations/eupmyeondong/?sido=${encodeURIComponent(sido)}&sigungu=${encodeURIComponent(sigungu)}`)
+                .then(res => res.json())
+                .then(data => {
+                    data.forEach(obj => {
+                        const opt = document.createElement("option");
+                        opt.value = obj.id;
+                        opt.textContent = obj.name;
+                        eupSelect.appendChild(opt);
+                    });
+                })
+                .catch(err => {
+                    console.error("읍/면/동 로드 실패", err);
+                });
+        });
+    });
 </script>
 {% endblock %}

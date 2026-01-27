@@ -78,7 +78,8 @@ class User(AbstractUser):
         verbose_name = '사용자'
         verbose_name_plural = '사용자'
         db_table = 'users'  # 테이블명을 'users'로 지정
-    
+        ordering = ['-date_joined']  # 역순 정렬 추가  
+
     def __str__(self):
         return self.nick_name 
     

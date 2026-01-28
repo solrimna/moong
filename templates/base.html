@@ -4,10 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!--
-    <title>{% block title %}뭉이 - 번개모임 SNS{% endblock %}</title> 
-    추가 논의 필요2 
-    -->
+    <title>{% block title %}뭉이 - 번개모임 SNS{% endblock %}</title>
     
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -34,44 +31,41 @@
            네비게이션 스타일
            ======================================== */
         nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 2rem;
-            border-bottom: 1px solid #E0E0E0;
-            background: white;
-            height: 70px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            padding: 1rem 2rem !important;
+            border-bottom: 1px solid #E0E0E0 !important;
+            background: white !important;
+            min-height: 60px !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+            flex-wrap: nowrap !important;
         }
 
         nav a {
-            text-decoration: none;
-            color: #424242;
+            text-decoration: none !important;
+            color: #424242 !important;
             font-weight: 500;
             transition: color 0.3s ease;
-            white-space: nowrap;  /* 줄바꿈 방지 */
+            white-space: nowrap !important;
+            display: inline-block !important;
         }
 
         nav a:hover {
-            color: #4285F4;
+            color: #4285F4 !important;
         }
 
         nav img {
-            height: 50px;
-            background-color: white;
+            height: 50px !important;
+            background-color: white !important;
         }
 
         nav > div {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;  /* 간격 줄임 */
-            flex-wrap: nowrap;  /* 줄바꿈 방지 */
-            white-space: nowrap;  /* 줄바꿈 방지 */
-        }
-        
-        nav > div span {
-            color: #ddd;
-            user-select: none;  /* 구분자 선택 방지 */
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+            flex-wrap: nowrap !important;
+            white-space: nowrap !important;
         }
 
         /* ========================================
@@ -310,11 +304,7 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- 네비게이션바 (모든 페이지에 공통) -->
-    <!-- 
-    {% include 'moong/navigation.html' %} 
-    추가 논의 필요
-    -->
+    <!-- 네비게이션은 각 페이지에서 필요할 때만 include -->
     
     <!-- 각 페이지의 내용 -->
     {% block myBlock %}

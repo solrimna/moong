@@ -69,6 +69,15 @@
         background: #FFF9E6;
     }
     
+    .post-card a {
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    .post-card a:hover .post-title {
+        color: #4285F4;
+    }
+    
     .post-title {
         font-size: 18px;
         font-weight: 600;
@@ -134,6 +143,8 @@
 {% endblock %}
 
 {% block myBlock %}
+{% include 'moong/navigation.html' %}
+
 <div class="container">
     <!-- 헤더 -->
     <div class="header">
@@ -161,7 +172,9 @@
             <div class="post-list">
                 {% for post in my_posts %}
                 <div class="post-card">
-                    <div class="post-title">{{ post.title }}</div>
+                    <a href="{% url 'moong:post_detail' post.id %}" style="text-decoration: none; color: inherit;">
+                        <div class="post-title">{{ post.title }}</div>
+                    </a>
                     <div class="post-info">
                         <div class="post-info-item">
                             📅 {{ post.moim_date|date:"Y년 m월 d일" }}
@@ -199,7 +212,9 @@
             <div class="post-list">
                 {% for participation in my_participations %}
                 <div class="post-card">
-                    <div class="post-title">{{ participation.post.title }}</div>
+                    <a href="{% url 'moong:post_detail' participation.post.id %}" style="text-decoration: none; color: inherit;">
+                        <div class="post-title">{{ participation.post.title }}</div>
+                    </a>
                     <div class="post-info">
                         <div class="post-info-item">
                             📅 {{ participation.post.moim_date|date:"Y년 m월 d일" }}

@@ -163,11 +163,13 @@ def post_add(request):
             post.author = request.user 
 
             location = form.cleaned_data.get("location")
-            
+
             if location:
                 print(f"sido: {location.sido}")  
                 print(f"sigungu: {location.sigungu}")  
                 print(f"eupmyeondong: {location.eupmyeondong}") 
+
+                location_text = {location.sido} | {location.sigungu} | {location.sigungu}
                 
             if location and not location.eupmyeondong:
                 fixed_location = Location.objects.filter(
@@ -180,8 +182,10 @@ def post_add(request):
                     location = fixed_location
 
             post.location = location
-
+            
             if 'save_temp' in request.POST :
+                post.author = request.user
+                post.location = location
                 post.complete = False
                 post.save()
                 # 이미지 저장
@@ -244,7 +248,6 @@ def post_add(request):
                 messages.success(request, '게시 완료!')
                 return redirect('moong:post_detail', post_id=post.id)
 
-            #return redirect('moong:post_detail', post_id=post.id)
         else:
             print("="*50)
             print("폼 유효성 검사 실패!")

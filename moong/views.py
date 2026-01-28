@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Count
-from .models import Post, Hashtag, Image
+from .models import Post, Hashtag, Image, Participation
 from locations.models import Location
 from django.contrib.auth.decorators import login_required
 from .forms import PostForm
@@ -214,6 +214,7 @@ def post_add(request):
                     post.content = form.cleaned_data.get('content')
                     post.location = location
                     post.save()
+
                 else:
                     # 바로 게시
                     post = form.save(commit=False)
@@ -226,7 +227,6 @@ def post_add(request):
                     images = request.FILES.getlist('images')
                     for index, img_file in enumerate(images):
                         Image.objects.create(post=post, image=img_file, order=index)
-
 
                 # 해시태그 저장
                 selected_tags = request.POST.getlist('tags')
@@ -247,8 +247,13 @@ def post_add(request):
                             post.hashtags.add(tag)
                 
                 messages.success(request, '게시 완료!')
+                Participation.objects.get_or_create(
+                    post=post,
+                    user=request.user,
+                    defaults={'status': 'APPROVED'}
+                )
                 return redirect('moong:post_detail', post_id=post.id)
-
+                
         else:
             print("="*50)
             print("폼 유효성 검사 실패!")
@@ -265,18 +270,22 @@ def post_add(request):
 
 
 
+
 # ==================== 게시글 상세 ====================
 def post_detail(request, post_id):
     post = get_object_or_404(
         Post.objects.select_related('author', 'location'),
         id=post_id
     )
-    
+    is_applied = False #is_applied 초기화
+    if request.user.is_authenticated:
+        is_applied = post.participations.filter(user=request.user).exists()
+
     comments = post.comments.select_related('author').order_by('create_time')
     images = post.images.all()
     hashtags = post.hashtags.all()
 
-    return render(request, 'moong/post_detail.html', {'post': post})
+    return render(request, 'moong/post_detail.html', {'post': post, 'is_applied': is_applied}) #is_applied 키 추가
 
 # ==================== 게시글 수정 ====================
 def post_mod(request, post_id):
@@ -486,3 +495,22 @@ def moim_finished(request, post_id):
         return redirect('moong:main')
     
     return redirect('moong:post_detail', post_id=post_id)    
+
+#참여 신청, 참여 취소
+@login_required
+def post_apply(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    # 이미 신청했는지 확인 후 없으면 생성
+    participation, created =Participation.objects.get_or_create(post=post, user=request.user, defaults={'status': 'APPROVED'})
+    messages.success(request, '참여 신청이 완료되었습니다.')
+    return redirect('moong:post_detail', post_id=post.id) # 다시 상세페이지로!
+
+@login_required
+def post_cancel(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    # 해당 신청 내역 찾아서 삭제
+    participation = Participation.objects.filter(post=post, user=request.user)
+    if participation.exists():
+        participation.delete()
+        messages.success(request, '참여 신청이 취소되었습니다.')
+    return redirect('moong:post_detail', post_id=post.id) # 다시 상세페이지로!

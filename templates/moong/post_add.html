@@ -4,124 +4,229 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>모임 만들기 - MOONG!</title>
+    <style>
+        .image-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .image-preview img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 2px solid #ddd;
+        }
+    </style>
 </head>
 
 <body>
     {% include 'moong/navigation.html' %}
 
-    <form method="POST">
+    <!-- 메시지 표시 -->
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message {{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- 폼 전체 에러 -->
+    {% if form.non_field_errors %}
+    <div class="form-errors">
+        {{ form.non_field_errors }}
+    </div>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <p>
             <label>제목</label><br>
             {{ form.title }}
+            {% if form.title.errors %}
+                <span style="color: red;">{{ form.title.errors }}</span>
+            {% endif %}
             <br>
             <label>내용</label><br>
             {{ form.content }}
+            {% if form.content.errors %}
+                <span style="color: red;">{{ form.content.errors }}</span>
+            {% endif %}
             <br>
             <label>모임 날짜</label><br>
             {{ form.moim_date }}
+            {% if form.moim_date.errors %}
+                <span style="color: red;">{{ form.moim_date.errors }}</span>
+            {% endif %}
             <br>
             <!-- 장소 (3단계 선택) -->
-            <!-- <div class="form-group">
-                <label>모임 장소</label>
-                <div class="location-group">
-                    <div>
-                        {{ form.sido }}
-                    </div>
-                    <div>
-                        {{ form.sigungu }}
-                    </div>
-                    <div>
-                        {{ form.location_id }}
-                    </div>
-                </div>
-            </div> -->
+            <label for="sido">시/도</label>
+            <select id="sido">
+                <option value="">시/도 선택</option>
+            </select>
+
+            <label for="sigungu">시/군/구</label>
+            <select id="sigungu">
+                <option value="">시/군/구 선택</option>
+            </select>
+
+            <label for="eupmyeondong">읍/면/동</label>
+            <!-- ⭐ Django Form의 location 필드와 연결 -->
+            <select id="eupmyeondong" name="location">
+                <option value="">읍/면/동 선택</option>
+            </select>
+            {% if form.location.errors %}
+                <span style="color: red;">{{ form.location.errors }}</span>
+            {% endif %}
             <br>
             <label>시간</label><br>
             {{ form.moim_time }}
+            {% if form.moim_time.errors %}
+                <span style="color: red;">{{ form.moim_time.errors }}</span>
+            {% endif %}
+            <br>
+
+            <label>이미지 (최대 5개)</label><br>
+            <input type="file" name="images" id="images" multiple accept="image/*">
+            <div id="image-preview" class="image-preview"></div>
             <br>
         </p>
 
-        
         <button type="submit">게시</button>
         <button type="submit" name="save_temp">임시저장</button>
-        <!-- <a href="{% url 'moong:post_list' %}">취소</a> -->
+
+        <hr>
+            <div id="tags-section">
+                {% include 'moong/tags_add.html' %}
+            </div>
+        <hr>
     </form>
     
-    <!-- <script>
-        // 페이지 로드 시 시/도 목록 불러오기
-        window.addEventListener('DOMContentLoaded', function() {
-            loadSido();
-        });
+<!-- ===================== -->
+<!-- AJAX 행정구역 JS -->
+<!-- ===================== -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
 
-        // 시/도 목록 불러오기
-        function loadSido() {
-            fetch('/locations/sido/')  // locations 앱의 URL 사용
-                .then(response => response.json())
-                .then(data => {
-                    const sidoSelect = document.getElementById('id_sido');
-                    sidoSelect.innerHTML = '<option value="">시/도 선택</option>';
-                    
+  const sidoSelect = document.getElementById("sido");
+  const sigunguSelect = document.getElementById("sigungu");
+  const eupSelect = document.getElementById("eupmyeondong");
+
+  // 1️⃣ 시/도 로드
+  fetch("/locations/sido/")
+    .then(res => res.json())
+    .then(data => {
                     data.forEach(sido => {
-                        const option = document.createElement('option');
-                        option.value = sido;
-                        option.textContent = sido;
-                        sidoSelect.appendChild(option);
+        const opt = document.createElement("option");
+        opt.value = sido;
+        opt.textContent = sido;
+        sidoSelect.appendChild(opt);
                     });
                 })
-                .catch(error => console.error('시/도 로드 실패:', error));
-        }
+    .catch(err => {
+      console.error("시/도 로드 실패", err);
+    });
         
-        // 시/도 선택 시 시/군/구 업데이트
-        document.getElementById('id_sido').addEventListener('change', function() {
+  // 2️⃣ 시/도 변경 → 시/군/구
+  sidoSelect.addEventListener("change", function () {
             const sido = this.value;
-            const sigunguSelect = document.getElementById('id_sigungu');
-            const locationSelect = document.getElementById('id_location_id');
             
-            // 시/군/구, 읍/면/동 초기화
-            sigunguSelect.innerHTML = '<option value="">시/군/구 선택</option>';
-            locationSelect.innerHTML = '<option value="">읍/면/동 선택</option>';
+    // 하위 초기화
+    sigunguSelect.innerHTML = `<option value="">시/군/구 선택</option>`;
+    eupSelect.innerHTML = `<option value="">읍/면/동 선택</option>`;
             
-            if (sido) {
-                // AJAX로 시/군/구 목록 가져오기
+    if (!sido) return;
+
                 fetch(`/locations/sigungu/?sido=${encodeURIComponent(sido)}`)
-                    .then(response => response.json())
+      .then(res => res.json())
                     .then(data => {
                         data.forEach(sigungu => {
-                            const option = document.createElement('option');
-                            option.value = sigungu;
-                            option.textContent = sigungu;
-                            sigunguSelect.appendChild(option);
+          const opt = document.createElement("option");
+          opt.value = sigungu;
+          opt.textContent = sigungu;
+          sigunguSelect.appendChild(opt);
                         });
                     })
-                    .catch(error => console.error('시/군/구 로드 실패:', error));
-            }
+      .catch(err => {
+        console.error("시/군/구 로드 실패", err);
+      });
         });
         
-        // 시/군/구 선택 시 읍/면/동 업데이트
-        document.getElementById('id_sigungu').addEventListener('change', function() {
-            const sido = document.getElementById('id_sido').value;
+  // 3️⃣ 시/군/구 변경 → 읍/면/동
+  sigunguSelect.addEventListener("change", function () {
             const sigungu = this.value;
-            const locationSelect = document.getElementById('id_location_id');
+    const sido = sidoSelect.value;
             
-            // 읍/면/동 초기화
-            locationSelect.innerHTML = '<option value="">읍/면/동 선택</option>';
+    eupSelect.innerHTML = `<option value="">읍/면/동 선택</option>`;
             
-            if (sido && sigungu) {
-                // AJAX로 읍/면/동 목록 가져오기
-                fetch(`/locations/eupmyeondong/?sido=${encodeURIComponent(sido)}&sigungu=${encodeURIComponent(sigungu)}`)
-                    .then(response => response.json())
+    if (!sido || !sigungu) return;
+
+    fetch(
+      `/locations/eupmyeondong/?sido=${encodeURIComponent(sido)}&sigungu=${encodeURIComponent(sigungu)}`
+    )
+      .then(res => res.json())
                     .then(data => {
-                        data.forEach(item => {
-                            const option = document.createElement('option');
-                            option.value = item.id;  // Location의 id 값
-                            option.textContent = item.name;  // eupmyeondong 또는 sigungu
-                            locationSelect.appendChild(option);
+        console.log("받은 데이터:", data);
+
+        data.forEach(obj => {
+            console.log("추가하는 option:", obj.id, obj.name);
+            const opt = document.createElement("option");
+            opt.value = obj.id;       // ⭐ Location.id
+            opt.textContent = obj.name;
+            eupSelect.appendChild(opt);
                         });
                     })
-                    .catch(error => console.error('읍/면/동 로드 실패:', error));
-            }
+      .catch(err => {
+        console.error("읍/면/동 로드 실패", err);
+      });
+  });
+
         });
-    </script> -->
+</script>
+<!-- ===================== -->
+<!-- 이미지 미리보기 JS -->
+<!-- ===================== -->
+<script>
+document.getElementById('images').addEventListener('change', function(e) {
+    console.log("선택된 파일 개수:", e.target.files.length); 
+    for (let i = 0; i < files.length; i++) {
+        console.log(`파일 ${i}:`, files[i].name);
+    }
+    const preview = document.getElementById('image-preview');
+    preview.innerHTML = ''; // 기존 미리보기 초기화
+    
+    const files = e.target.files;
+    
+    // 최대 5개 제한
+    if (files.length > 5) {
+        alert('이미지는 최대 5개까지 업로드 가능합니다.');
+        e.target.value = ''; // 선택 취소
+        return;
+    }
+    
+    // 미리보기 생성
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        
+        // 이미지 파일인지 확인
+        if (!file.type.startsWith('image/')) {
+            continue;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            preview.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+    }
+});
+</script>
+
 </body>
 </html>

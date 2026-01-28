@@ -12,7 +12,11 @@
 <body>
     <div class="post-container">
         <div class="post-header">
-            <h1>{{ post.title }}</h1>
+            <h4 style="margin: 5px 0;">
+            <a href="{% url 'moong:post_detail' post.id %}">
+                {{ post.title }}
+            </a> 
+            </h4>
             <div style="color: #666; font-size: 14px;">
                 작성자: {{ post.author.username }} | {{ post.create_time }}
             </div>
@@ -39,6 +43,12 @@
                     장소 미정
                 {% endif %}
             </div>
+            <div>
+                참여 현황: <strong>{{ post.get_approved_count }}</strong> / {{ post.max_people }}명
+                {% if post.is_full %}
+                    <span style="color: red; font-weight: bold;">[마감]</span>
+                {% endif %}
+            </div>
             {% if post.max_people %}
                 <div>
                     <strong>👥 최대 인원:</strong> 
@@ -47,8 +57,25 @@
             {% endif %}
         </div>
         
+        <div class="post-tags" style="margin-top: 10px;">
+            {% for tag in post.hashtags.all %}
+                <a href="{% url 'moong:tag_feeds' tag.name %}" style="text-decoration: none; color: #007bff; font-size: 0.9rem;">#{{ tag.name }}</a>
+            {% endfor %}
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+
+        <div class="post-comments" style="font-size: 1.3rem;">
+            <h6>댓글 {{ post.comments.count }}개</h6>
+            {% for comment in post.comments.all %}
+                <div style="margin-bottom: 5px;">
+                    <strong>{{ comment.author.nick_name }}</strong> {{ comment.content }}
+                </div>
+            {% endfor %}
+        </div>
+
         <div class="button-group">
-            <a href="{% url 'moong:post_list' %}" class="btn btn-secondary">목록으로</a>
+            <a href="{% url 'moong:main' %}" class="btn btn-secondary">목록으로</a>
             {% if user == post.author %}
                 <a href="#" class="btn btn-primary">수정</a>
             {% endif %}

@@ -92,7 +92,7 @@ def ai_tags(content, location):
 내용: {content}
 
 조건:
-- # 기호 없이 단어만 출력
+- # 기호 없이 단어, 명사만 출력
 - 쉼표로 구분
 - 한글로 작성
 - 예시: 강남, 맛집, 데이트, 카페, 주말
@@ -101,7 +101,7 @@ def ai_tags(content, location):
 
     try:
         response = openai.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7,
         )
@@ -117,32 +117,36 @@ def ai_tags(content, location):
         return []
 
 
-# !!!!!!!!로그인 필수 
+@login_required
 def post_add(request):
     print("post_add 뷰 호출됨!")
     if request.method == 'POST':
         print("post_add POST 호출됨!")
-        form = PostForm(request.POST)
+        form = PostForm(data=request.POST, files=request.FILES)
     
         if form.is_valid():
-            # #임시저장 버튼 선언 필요 
-            # #is_temp = '임시저장' in request.POST
-            # # 선택한 시/도, 시/군/구, 읍/면/동으로 Location 찾기
-            # sido = form.cleaned_data['sido']
-            # sigungu = form.cleaned_data['sigungu']
-            # eupmyeondong = form.cleaned_data.get('eupmyeondong', '')
-            # try:
-            #     location = Location.objects.get(
-            #         sido=sido,
-            #         sigungu=sigungu,
-            #         eupmyeondong=eupmyeondong
-            #     )
-            #     post.location = location
-            # except Location.DoesNotExist:
-            #     messages.error(request, '선택한 지역을 찾을 수 없습니다.')
-            #     return render(request, 'moong/post_add.html', {'form': form})
             post = form.save(commit=False)
             post.author = request.user 
+
+            location = form.cleaned_data.get("location")
+            
+            if location:
+                print(f"sido: {location.sido}")  # 가능!
+                print(f"sigungu: {location.sigungu}")  # 가능!
+                print(f"eupmyeondong: {location.eupmyeondong}")  # 가능!
+                
+            # ✅ 2단계까지만 있는 지역 자동 보정 (세종 새롬동 케이스)
+            if location and not location.eupmyeondong:
+                fixed_location = Location.objects.filter(
+                    sido=location.sido,
+                    sigungu=location.sigungu,
+                    eupmyeondong=location.sigungu
+                ).first()
+
+                if fixed_location:
+                    location = fixed_location
+
+            post.location = location
 
             if 'save_temp' in request.POST :
                 post.complete = False
@@ -152,23 +156,45 @@ def post_add(request):
             else : 
                 post.complete = True
                 post.save()
+
+                images = request.FILES.getlist('images')
+                for idx, image_file in enumerate(images):
+                    Image.objects.create(
+                        post=post,
+                        image=image_file,
+                        order=idx
+                    )
+                try:
+                    # AI로 해시태그 자동 생성
+                    tags = ai_tags(post.content, '')   # 두번째인자 공백 아니고 원래 location
+
+                    # 해시태그 저장
+                    for tag_name in tags:
+                        if tag_name.strip():
+                            tag, created = Hashtag.objects.get_or_create(name=tag_name.strip())
+                            post.hashtags.add(tag)
+                        
+                except Exception as e:
+                    print(f"해시태그 생성 실패: {e}")
+                
                 messages.success(request, '게시글이 작성 완료되었습니다.')
                 print("post_add 작성 완료 호출됨!")
 
-                # AI로 해시태그 자동 생성
-                tags = ai_tags(post.content, '')   # 두번째인자 공백 아니고 원래 location
-
-                # 해시태그 저장
-                for tag_name in tags:
-                    if tag_name.strip():
-                        tag, created = Hashtag.objects.get_or_create(name=tag_name.strip())
-                        post.hashtags.add(tag)
-                
-                return redirect('moong:main')
-
-            #return redirect('moong:post_detail', post_id=post.id)
+                return redirect('moong:post_detail', post_id=post.id)
+            
         else:
+            print("="*50)
+            print("폼 유효성 검사 실패!")
+            print("에러:", form.errors)
+            print("에러 (JSON):", form.errors.as_json())
+            print("="*50)
+
             messages.error(request, '입력 내용을 확인하세요.')
+            # 각 필드별 에러도 메시지로 추가
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{field}: {error}')
+
             print("post_add 입력값 확인으로 빠짐!")
     else:
         print("post_add else 호출됨!")
@@ -176,21 +202,15 @@ def post_add(request):
 
     return render(request, 'moong/post_add.html', {'form' : form })
 
-def post_list(request):
-    """게시글 목록"""
-    posts = Post.objects.filter(
-        save=True,
-        is_cancelled=False
-    ).select_related('author', 'location').order_by('-create_time')
-    
-    return render(request, 'moong/post_list.html', {'posts': posts})
-
-
 def post_detail(request, post_id):
     """게시글 상세"""
     post = get_object_or_404(
-        Post.select_related('author', 'location'),
+        Post.objects.select_related('author', 'location'),
         id=post_id
     )
     
+    comments = post.comments.select_related('author').order_by('create_time')
+    images = post.images.all()
+    hashtags = post.hashtags.all()
+
     return render(request, 'moong/post_detail.html', {'post': post})

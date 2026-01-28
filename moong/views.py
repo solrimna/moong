@@ -49,7 +49,12 @@ def main(request):
             location_keywords.add(name)
             
             # 2. "서울특별시" → "서울"
-            clean_name = name.replace('특별시', '').replace('광역시', '').replace('특별자치시', '').replace('특별자치도', '')
+            clean_name = name.replace('특별시', '').replace('광역시', '').replace('특별자치시', '').replace('특별자치도', '').replace('도', '')
+            # "전라남도" -> "전남", "경상북도" -> "경북" 처럼 앞글자+세번째글자 조합
+            if '남도' in name or '북도' in name:
+                short_name = name[0] + name[2] # 예: '전' + '남'
+                location_keywords.add(short_name)
+            
             location_keywords.add(clean_name)
             
             # 3. "강남구" → "강남"
@@ -65,20 +70,9 @@ def main(request):
     keyword_tags = []
     
     for tag in active_tags:
-        # 정확히 일치하거나 부분 일치 확인
-        is_location = False
-        
-        # 정확 일치
+        # '부분 일치'를 빼고 '정확히 일치'하는지만. 운동 이런것도 '동'으로 인식함 ㅜㅜ
+       
         if tag.name in location_keywords:
-            is_location = True
-        else:
-            # 부분 일치
-            for loc_keyword in location_keywords:
-                if tag.name in loc_keyword or loc_keyword in tag.name:
-                    is_location = True
-                    break
-        
-        if is_location:
             location_tags.append(tag)
         else:
             keyword_tags.append(tag)
@@ -133,7 +127,6 @@ def ai_tags(content, location):
     2. B (시/군/구): 마지막 글자 제외 (예: 순천, 강남, 의왕 등)
     3. C (읍/면/동): 전체 단어 그대로 (예: 정자동 등)
 
-
 답변:"""
 
     try:
@@ -147,7 +140,7 @@ def ai_tags(content, location):
         result = response.choices[0].message.content.strip()
         tags = [tag.strip().replace('#', '') for tag in result.split(',') if tag.strip()]
         
-        return tags[:6]  # 최대 5개만
+        return tags[:6]  # 최대 6개만
         
     except Exception as e:
         print(f"AI 해시태그 생성 오류: {e}")
@@ -172,7 +165,7 @@ def post_add(request):
                 print(f"sigungu: {location.sigungu}")  
                 print(f"eupmyeondong: {location.eupmyeondong}") 
 
-                location_text = {location.sido} | {location.sigungu} | {location.sigungu}
+                location_text = {location.sido} | {location.sigungu} | {location.eupmyeondong}
                 
             if location and not location.eupmyeondong:
                 fixed_location = Location.objects.filter(
@@ -218,6 +211,8 @@ def post_add(request):
                     # 임시저장된 글
                     post = Post.objects.get(id=temp_post_id, author=request.user)
                     post.complete = True
+                    post.content = form.cleaned_data.get('content')
+                    post.location = location
                     post.save()
                 else:
                     # 바로 게시
@@ -237,9 +232,12 @@ def post_add(request):
                 selected_tags = request.POST.getlist('tags')
                 
                 if selected_tags:
+                    post.hashtags.clear()
                     for tag_name in selected_tags:
-                        if tag_name.strip():
-                            tag, created = Hashtag.objects.get_or_create(name=tag_name.strip())
+                        tag_name = tag_name.strip()
+                        if tag_name:
+                            tag_name = tag_name.replace("#", "")
+                            tag, created = Hashtag.objects.get_or_create(name=tag_name)
                             post.hashtags.add(tag)
                 else:
                     tags = ai_tags(post.content, location_text)

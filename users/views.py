@@ -1,5 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignupForm, LoginForm
+from .forms import SignupForm, LoginForm, ProfileEditForm  # ProfileEditForm 추가
 from .models import User
 from django.shortcuts import render,redirect, get_object_or_404
 from django.http import HttpResponseRedirect
@@ -60,44 +60,35 @@ def mypage(request):
     return render(request, 'users/mypage.html', context)
 
 
-# 프로필 수정
+# 프로필 수정 (ProfileEditForm 사용)
 @login_required
 def mypage_edit(request):
     """마이페이지 - 프로필 수정"""
     user = request.user
-    locations = Location.objects.all()  # 모든 지역 목록
     
     if request.method == 'POST':
-        # 프로필 이미지 수정
-        if 'profile_image' in request.FILES:
-            user.profile_image = request.FILES['profile_image']
-            messages.success(request, '프로필 이미지가 변경되었습니다.')
-        
-        # 자기소개 수정
-        bio = request.POST.get('bio')
-        if bio is not None:  # 빈 문자열도 허용
-            user.bio = bio
-            messages.success(request, '자기소개가 변경되었습니다.')
-        
-        # 지역 수정
-        location_id = request.POST.get('location')
-        if location_id:
-            try:
-                user.location = Location.objects.get(id=location_id)
-                messages.success(request, '주 활동 지역이 변경되었습니다.')
-            except Location.DoesNotExist:
-                messages.error(request, '유효하지 않은 지역입니다.')
-        
-        # 성별 공개 여부 수정
-        gender_visible = request.POST.get('gender_visible')
-        user.gender_visible = (gender_visible == 'on')  # 체크박스는 'on' 또는 None
-        
-        user.save()
-        return redirect('users:mypage')
+        form = ProfileEditForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            # 지역 정보는 따로 처리 (3단계 선택에서 전송됨)
+            location_id = request.POST.get('location')
+            if location_id:
+                try:
+                    user.location = Location.objects.get(id=location_id)
+                except Location.DoesNotExist:
+                    messages.error(request, '유효하지 않은 지역입니다.')
+                    return redirect('users:mypage_edit')
+            
+            form.save()
+            messages.success(request, '프로필이 수정되었습니다.')
+            return redirect('users:mypage')
+        else:
+            messages.error(request, '입력 내용을 확인해주세요.')
+    else:
+        form = ProfileEditForm(instance=user)
     
     context = {
         'user': user,
-        'locations': locations,
+        'form': form,
     }
     
     return render(request, 'users/mypage_edit.html', context)
@@ -183,5 +174,3 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect("users:login")
-    
-    

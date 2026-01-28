@@ -7,10 +7,10 @@
         {% if user.is_authenticated %}
             <a href="{% url 'moong:post_add' %}">글 작성</a> | 
             <a href="{% url 'users:mypage' %}">{{ user.nick_name }}님</a> | 
-            <a href="{% url 'moong:main' %}">로그아웃</a>  {# 로그아웃 url 생기면 넣기 #}
+            <a href="{% url 'users:logout' %}">로그아웃</a>  {# 로그아웃 url #}
         {% else %}
-            <a href="{% url 'moong:main' %}">로그인</a>     {# 로그인 url #}
-            <a href="{% url 'users:signup' %}">회원가입</a>  
+            <a href="{% url 'users:login' %}">로그인</a>     {# 로그인 url #}
+            <a href="{% url 'users:signup' %}">회원가입</a>   {# 회원가입 url #}
         {% endif %}
     </div>
 </nav>

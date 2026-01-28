@@ -73,8 +73,9 @@
         {% endif %}      
     </div>
     
-    
-      <!-- <h3>휴대전화번호</h3>
+
+    <div>    
+      <h3>휴대전화번호</h3>
       {{ form.phone }}
 
         {% if form.phone.errors %}
@@ -84,7 +85,7 @@
                 {% endfor %}
             </ul>
         {% endif %}
-    </div>    -->
+    </div>   
 
    
     
@@ -92,6 +93,20 @@
       <h3>프로필 이미지</h3>
       {{ form.profile_image }}
     </div>
+
+    <div>
+      <h3>성별</h3>
+      {{ form.gender }}
+
+        {% if form.gender.errors %}
+            <ul class="field-error">
+                {% for error in form.gender.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>    
+    
 
     <!-- 활동 지역 선택 (AJAX) -->
     <div>

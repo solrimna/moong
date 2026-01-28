@@ -1,0 +1,10 @@
+    {% include 'moong/navigation.html' %}
+
+    <div id="login">
+        <form method="POST">
+            <h1>Moong! Login</h1>
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-login">로그인</button>
+        </form>
+    </div>

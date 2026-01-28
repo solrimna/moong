@@ -44,6 +44,11 @@
 
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
+
+        {% if temp_post_id %}
+        <input type="hidden" name="temp_post_id" value="{{ temp_post_id }}">
+        {% endif %}
+
         <p>
             <label>제목</label><br>
             {{ form.title }}
@@ -63,6 +68,7 @@
                 <span style="color: red;">{{ form.moim_date.errors }}</span>
             {% endif %}
             <br>
+
             <label>시간</label><br>
             {{ form.moim_time }}
             {% if form.moim_time.errors %}
@@ -99,15 +105,22 @@
             <div id="image-preview" class="image-preview"></div>
             <br>
         </p>
+        <!-- AI 추천 해시태그 영역 (임시저장 후에만 보임) -->
+        {% if tags %}
+        <div id="tags-section">
+            {% include 'moong/tags_add.html' %}
+        </div>
+        {% endif %}
 
-        <hr>
-            <div id="tags-section">
-                {% include 'moong/tags_add.html' %}
-            </div>
-        <hr>
-
-        <button type="submit">게시</button>
-        <button type="submit" name="save_temp">임시저장</button>
+        <!-- 버튼 -->
+        {% if temp_post_id %}
+            <!-- 임시저장 후: 게시 버튼만 -->
+            <button type="submit" style="background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px;">게시하기</button>
+        {% else %}
+            <!-- 처음: 둘 다 보임 -->
+            <button type="submit">게시</button>
+            <button type="submit" name="save_temp">임시저장</button>
+        {% endif %}
     </form>
     
 <!-- ===================== -->

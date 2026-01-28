@@ -44,6 +44,24 @@
                 {% endif %}
             </div>
             <div>
+                {% if request.user.is_authenticated %}
+                    {% if is_applied %}
+                        <form action="{% url 'moong:post_cancel' post.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" clsss="btn btn-danger">참여 취소하기</button>
+                        </form>
+                    {% else %}
+                        <form action="{% url 'moong:post_apply' post.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary" {% if post.is_full %}disabled{% endif %}>
+                                {% if post.is_full %}정원 초과{% else %}참여 신청하기{% endif %}
+                            </button>
+                        </form>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+            <div>
                 참여 현황: <strong>{{ post.get_approved_count }}</strong> / {{ post.max_people }}명
                 {% if post.is_full %}
                     <span style="color: red; font-weight: bold;">[마감]</span>

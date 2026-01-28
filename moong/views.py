@@ -276,11 +276,15 @@ def post_detail(request, post_id):
         id=post_id
     )
     
+    is_applied = False #is_applied 초기화
+    if request.user.is_authenticated:
+        is_applied = post.participations.filter(user=request.user).exists()
+
     comments = post.comments.select_related('author').order_by('create_time')
     images = post.images.all()
     hashtags = post.hashtags.all()
 
-    return render(request, 'moong/post_detail.html', {'post': post})
+    return render(request, 'moong/post_detail.html', {'post': post, 'is_applied': is_applied}) #is_applied 키 추가
 
 # ==================== 게시글 수정 ====================
 def post_mod(request, post_id):

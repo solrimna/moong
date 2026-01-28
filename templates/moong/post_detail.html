@@ -13,7 +13,7 @@
     {% include 'moong/navigation.html' %}
     <div class="post-container">
         <!-- 배너 -->
-        {% if post.moim_finished %}
+        {% if post.is_closed %}
         <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 20px; margin-bottom: 20px; border-radius: 10px; text-align: center;">
             <h2 style="margin: 0; font-size: 24px;">🔒 모집이 확정되었습니다</h2>
             <p style="margin: 10px 0 0 0;">
@@ -26,6 +26,8 @@
                 📅 {{ post.moim_date }} {{ post.moim_time }}에 진행 예정입니다
             </p>
         </div>
+        {% elif post.moim_finished %}
+            <span style="color: #28a745;">✅ 완료된 모임</span>
         {% elif post.is_cancelled %}
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; margin-bottom: 20px; border-radius: 10px; text-align: center;">
             <h2 style="margin: 0; font-size: 24px;">💥 이 모임은 폭파되었습니다</h2>
@@ -119,12 +121,21 @@
             <a href="{% url 'moong:main' %}" class="btn btn-secondary">목록으로</a>
             {% if user == post.author %}
                 <a href="{% url 'moong:post_mod' post.id %}" class="btn btn-primary"> 모임글 수정</a>
-                <form method="POST" action="{% url 'moong:post_closed' post.id %}" >
-                    {% csrf_token %}
-                    <button type="submit">
-                        모임 확정
-                    </button>
-                </form>
+                {% if not post.is_closed %}
+                    <form method="POST" action="{% url 'moong:post_closed' post.id %}" >
+                        {% csrf_token %}
+                        <button type="submit">
+                            모집 확정
+                        </button>
+                    </form>
+                {% else %}
+                    <form method="POST" action="{% url 'moong:moim_finished' post.id %}" >
+                        {% csrf_token %}
+                        <button type="submit">
+                            모임 완료
+                        </button>
+                    </form>
+                {% endif %}
                 <form method="POST" action="{% url 'moong:post_delete' post.id %}" >
                     {% csrf_token %}
                     {% comment %} 참여자 확정 처리 개발 이후 추가 수정 필요  {% endcomment %}

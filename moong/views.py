@@ -451,7 +451,7 @@ def post_closed(request, post_id):
         # case2. 승인된 참여자가 있는 case
         else:
             print(f"게시글 모집 확정 처리 - (확정 참여자: {approved_count}명)으로 진행")
-            post.moim_finished = True
+            post.is_closed = True
             post.save()
             messages.warning(request, f'확정 참여자({approved_count}명) 상태로 모임이 확정되었습니다.')
             print("게시글 모집 확정 완료!")
@@ -461,3 +461,30 @@ def post_closed(request, post_id):
     else:
         # GET 요청은 거부
         return redirect('moong:post_detail', post_id=post_id)
+
+# ==================== 모임 완료(확정 뒤에) ====================
+@login_required
+def moim_finished(request, post_id):
+    print("moim_finished 호출됨!")
+    post = get_object_or_404(Post, id=post_id)
+    
+    # 권한 체크
+    if post.author != request.user:
+        messages.error(request, '권한이 없습니다.')
+        return redirect('moong:post_detail', post_id=post_id)
+    
+    # 모집 확정되지 않은 모임은 완료 불가
+    if not post.is_closed:
+        messages.error(request, '모집이 확정되지 않은 모임입니다.')
+        return redirect('moong:post_detail', post_id=post_id)
+    
+    # POST 요청만 허용
+    if request.method == 'POST':
+        post.moim_finished = True  # 모임 완료 필드 (추가 필요)
+        post.save()
+        
+        messages.success(request, '모임이 완료 처리되었습니다.')
+        print("모임 완료 처리 완료!")
+        return redirect('moong:main')
+    
+    return redirect('moong:post_detail', post_id=post_id)    

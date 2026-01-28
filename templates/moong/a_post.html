@@ -6,14 +6,6 @@
         <span style="color: #888; font-size: 0.8rem; margin-left: 10px;">{{ post.create_time|date:"Y-m-d" }}</span>
     </div>
     <br>
-    <div class="post-images">
-        {% if post.images.first %}
-            <a href="{% url 'moong:post_detail' post.id %}" style="display: block;">
-                <img src="{{ post.images.first.image.url }}" style="width: 100%; max-width: 500px; height: 500px; margin: 0 auto; object-fit: cover; display: block; cursor: pointer;">
-            </a>
-        {% endif %}
-    </div>
-    <br>
     <div class="post-content">
         <h4 style="margin: 5px 0;">
             <a href="{% url 'moong:post_detail' post.id %}">
@@ -23,11 +15,20 @@
         <p>{{ post.content }}</p>
     </div>
 
+    <div class="post-images">
+        {% if post.images.first %}
+            <a href="{% url 'moong:post_detail' post.id %}" style="display: block;">
+                <img src="{{ post.images.first.image.url }}" style="width: 100%; max-width: 500px; height: 500px; margin: 0 auto; object-fit: cover; display: block; cursor: pointer;">
+            </a>
+        {% endif %}
+    </div>
+    <br>
+
     <div class="post-info" style="background: #f8f9fa; padding: 8px; border-radius: 5px; font-size: 0.9rem;">
         장소: {{ post.location }} <br>
         참여 현황: <strong>{{ post.get_approved_count }}</strong> / {{ post.max_people }}명
         {% if post.is_full %}
-            <span style="color: red; font-weight: bold;">[마감]</span>
+            <span style="color: red; font-weight: bold;">[인원 마감]</span>
         {% endif %}
     </div>
 

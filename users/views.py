@@ -1,5 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignupForm
+from .forms import SignupForm, LoginForm
 from .models import User
 from django.shortcuts import render,redirect, get_object_or_404
 from django.http import HttpResponseRedirect
@@ -34,7 +34,7 @@ def signup_view(request):
 
 
             print("✅ USER SAVED:", user)
-            return redirect("/admin/")   # 임시 확인용
+            return redirect("users:login")
         else:
             print("❌ FORM ERRORS:", form.errors)
 
@@ -153,3 +153,35 @@ def user_profile(request, user_id):
     }
     
     return render(request, 'users/user_profile.html', context)
+
+
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('moong:main')
+    
+    if request.method == "POST":
+        my_form = LoginForm(data=request.POST)
+        if my_form.is_valid():
+            username = my_form.cleaned_data["username"]
+            password = my_form.cleaned_data["password"]
+            my_user = authenticate(username=username, password=password)
+
+            if my_user:
+                login(request, my_user)
+                return redirect('moong:main')
+            else:
+                my_form.add_error(None, "이메일과 비밀번호를 확인하세요.")
+
+        context = {'form':my_form}
+        return render(request, "users/login.html", context)
+    
+    else:
+        my_form = LoginForm()
+        context = {'form':my_form}
+        return render(request, "users/login.html", context)
+    
+def logout_view(request):
+    logout(request)
+    return redirect("users:login")
+    
+    

@@ -69,15 +69,29 @@ class SignupForm(UserCreationForm): # UsercreationForm은 ModelForm
         )
     )
 
+    gender = forms.ChoiceField(
+        choices=[("","성별 선택")] + list(
+            User._meta.get_field("gender").choices
+        ),
+        label="성별",      
+        required=False,
+        widget=forms.Select(
+            attrs={"class": "form-select"}
+        ),
+    )
+
  
     class Meta(UserCreationForm.Meta):
         model = User
-        fields = UserCreationForm.Meta.fields + (
+        fields = (
+            "password1",
+            "password2",
             "nick_name",
             "location",
             "profile_image",
             "email",
             "phone",
+            "gender",
             )
     
     
@@ -89,4 +103,30 @@ class SignupForm(UserCreationForm): # UsercreationForm은 ModelForm
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError("이미 사용 중인 이메일입니다.")
 
-        return email    
+        return email
+
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+
+        # ⭐ 핵심: username에 email 넣기
+        user.username = self.cleaned_data["email"]
+
+        if commit:
+            user.save()
+        return user    
+
+
+class LoginForm(forms.Form):
+    username = forms.EmailField(
+        label = "이메일 주소",
+        widget=forms.EmailInput(
+            attrs={"placeholder": "example@email.com"},
+        ),
+    )
+    password = forms.CharField(
+        label = "비밀번호",
+        widget=forms.PasswordInput(
+            attrs={"placeholder": "비밀번호를 입력하세요."},
+        ),
+    )

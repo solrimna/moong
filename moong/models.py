@@ -12,12 +12,12 @@ class Post(models.Model):
     ]
     
     # 게시글 기본 정보
-    title = models.CharField(max_length=200, null=True, blank=True, verbose_name='제목')
-    content = models.TextField(null=True, blank=True, verbose_name='내용')
+    title = models.CharField(max_length=200, null=False, blank=False, verbose_name='제목')
+    content = models.TextField(null=False, blank=False, verbose_name='내용')
     
     # 모임 정보
-    moim_date = models.DateField(null=True, blank=True, verbose_name='모임 날짜')
-    moim_time = models.TimeField(null=True, blank=True, verbose_name='모임 시간')
+    moim_date = models.DateField(null=False, blank=False, verbose_name='모임 날짜')
+    moim_time = models.TimeField(null=False, blank=False, verbose_name='모임 시간')
     location = models.ForeignKey(
         'locations.Location',
         on_delete=models.SET_NULL,
@@ -32,11 +32,11 @@ class Post(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         verbose_name='작성자',
-        db_column='author'
+        db_column='author_id'
     )
     
     # 인원 관리
-    max_people = models.IntegerField(null=True, blank=True, verbose_name='최대 인원')
+    max_people = models.PositiveIntegerField(null=True, blank=True, default=0, verbose_name='최대 인원')
     
     # 상태 관리
     is_closed = models.BooleanField(null=True, blank=True, default=False, verbose_name='마감 여부')
@@ -97,7 +97,7 @@ class Post(models.Model):
     
     def is_published(self):
         """게시 여부 (임시저장 아님)"""
-        return self.save == True
+        return self.complete == True
     
     def get_gender_restriction_display_custom(self):
         """성별 제한 한글 표시"""
@@ -205,7 +205,7 @@ class Comment(models.Model):
     )
     
     # 댓글 내용
-    content = models.TextField(null=True, blank=True, verbose_name='댓글 내용')
+    content = models.TextField(null=False, blank=False, verbose_name='댓글 내용')
     
     # 주최자 여부
     is_author = models.BooleanField(null=True, blank=True, verbose_name='주최자 댓글 여부')
@@ -257,8 +257,8 @@ class Hashtag(models.Model):
     name = models.CharField(
         max_length=50,
         unique=True,
-        null=True,
-        blank=True,
+        null=False,
+        blank=False,
         verbose_name='해시태그명'
     )
     create_time = models.DateTimeField(auto_now_add=True, verbose_name='생성 시간')
@@ -309,9 +309,7 @@ class PostHashtag(models.Model):
         return f'{self.post.title} - #{self.hashtag.name}'
     
 
-class Image(models.Model):
-# """게시글 이미지 모델"""
-    
+class Image(models.Model):  
     post = models.ForeignKey(
         'Post',
         on_delete=models.CASCADE,

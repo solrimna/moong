@@ -61,8 +61,8 @@
                 {% endif %}
             </div>
 
-            <div>
-                참여 현황: <strong>{{ post.get_approved_count }}</strong> / {{ post.max_people }}명
+            <div class="info-box">
+                <span>참여 현황: <strong>{{ post.get_approved_count }}</strong> / {{ post.max_people }}명</span>
                 {% if post.is_full %}
                     <span style="color: red; font-weight: bold;">[마감]</span>
                 {% endif %}

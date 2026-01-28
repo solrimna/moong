@@ -9,4 +9,6 @@ urlpatterns = [
     re_path(r'^post/(?P<post_id>\d+)/edit/', views.post_mod, name='post_mod') ,
     re_path(r'^tags/(?P<tag_name>[^/]+)/$', views.tag_feeds, name='tag_feeds'),
     re_path(r'^$', views.main, name='main'),
+    re_path(r'^post/(?P<post_id>\d+)/apply/$', views.post_apply, name='post_apply'),
+    re_path(r'^post/(?P<post_id>\d+)/cancel/$', views.post_cancel, name='post_cancel'),
 ]

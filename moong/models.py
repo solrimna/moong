@@ -36,7 +36,7 @@ class Post(models.Model):
     )
     
     # 인원 관리
-    max_people = models.PositiveIntegerField(null=True, blank=True, verbose_name='최대 인원')
+    max_people = models.PositiveIntegerField(null=True, blank=True, default=0, verbose_name='최대 인원')
     
     # 상태 관리
     is_closed = models.BooleanField(null=True, blank=True, default=False, verbose_name='마감 여부')

@@ -63,7 +63,17 @@
                 <span style="color: red;">{{ form.moim_date.errors }}</span>
             {% endif %}
             <br>
+            <label>시간</label><br>
+            {{ form.moim_time }}
+            {% if form.moim_time.errors %}
+                <span style="color: red;">{{ form.moim_time.errors }}</span>
+            {% endif %}
+            <br>
+            <label>최대 인원</label><br>
+            {{ form.max_people }}
+            <br>
             <!-- 장소 (3단계 선택) -->
+             <label>장소</label><br>
             <label for="sido">시/도</label>
             <select id="sido">
                 <option value="">시/도 선택</option>
@@ -83,12 +93,6 @@
                 <span style="color: red;">{{ form.location.errors }}</span>
             {% endif %}
             <br>
-            <label>시간</label><br>
-            {{ form.moim_time }}
-            {% if form.moim_time.errors %}
-                <span style="color: red;">{{ form.moim_time.errors }}</span>
-            {% endif %}
-            <br>
 
             <label>이미지 (최대 5개)</label><br>
             <input type="file" name="images" id="images" multiple accept="image/*">
@@ -96,14 +100,14 @@
             <br>
         </p>
 
-        <button type="submit">게시</button>
-        <button type="submit" name="save_temp">임시저장</button>
-
         <hr>
             <div id="tags-section">
                 {% include 'moong/tags_add.html' %}
             </div>
         <hr>
+
+        <button type="submit">게시</button>
+        <button type="submit" name="save_temp">임시저장</button>
     </form>
     
 <!-- ===================== -->

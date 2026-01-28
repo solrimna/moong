@@ -100,7 +100,7 @@
             {% endif %}
             <br>
 
-            <label>이미지 (최대 5개)</label><br>
+            <label>이미지 (Ctrl+클릭으로 여러 개 선택)</label><br>
             <input type="file" name="images" id="images" multiple accept="image/*">
             <div id="image-preview" class="image-preview"></div>
             <br>
@@ -209,15 +209,16 @@ document.addEventListener("DOMContentLoaded", function () {
 <!-- ===================== -->
 <script>
 document.getElementById('images').addEventListener('change', function(e) {
-    console.log("선택된 파일 개수:", e.target.files.length); 
-    for (let i = 0; i < files.length; i++) {
-        console.log(`파일 ${i}:`, files[i].name);
-    }
     const preview = document.getElementById('image-preview');
     preview.innerHTML = ''; // 기존 미리보기 초기화
     
     const files = e.target.files;
     
+    console.log("선택된 파일 개수:", e.target.files.length); 
+    for (let i = 0; i < files.length; i++) {
+        console.log(`파일 ${i}:`, files[i].name);
+    }
+
     // 최대 5개 제한
     if (files.length > 5) {
         alert('이미지는 최대 5개까지 업로드 가능합니다.');

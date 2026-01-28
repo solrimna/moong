@@ -20,3 +20,9 @@ users/tests.py
 
 # open ai key 파일 제외 ^^
 .env
+
+# reset_db 배치파일 제외
+reset_db.bat
+
+# 이미지 파일 제외
+media/profile_images/*/*/*/*.png

@@ -4,7 +4,7 @@
 
 {% block title %}활동 이력 - 뭉이{% endblock %}
 
-{% block extra_css %}
+{% block extra_head %}
 <style>
     /* ===========================================
        활동 이력 페이지 고유 스타일
@@ -145,11 +145,11 @@
 {% block myBlock %}
 {% include 'moong/navigation.html' %}
 
-<div class="container">
+<div class="mypage_container">
     <!-- 헤더 -->
-    <div class="header">
-        <div class="header-title">활동 이력</div>
-        <div class="header-subtitle">{{ user.nick_name }}님의 모임 활동 기록</div>
+    <div class="mypage_header">
+        <div class="mypage_header-title">활동 이력</div>
+        <div class="mypage_header-subtitle">{{ user.nick_name }}님의 모임 활동 기록</div>
     </div>
 
     <!-- 통계 -->

@@ -1,17 +1,15 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>게시글 수정 - MOONG!</title>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
     <style>
-        .image-preview {
+        .imagePreview {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             margin-top: 10px;
         }
-        .image-preview img {
+        .imagePreview img {
             width: 100px;
             height: 100px;
             object-fit: cover;
@@ -38,9 +36,11 @@
             padding: 2px;
         }
     </style>
-</head>
+    <script src="{% static 'js/img_view.js' %}"></script>
+    <script src="{% static 'js/location_select.js' %}"></script>
+{% endblock %}
 
-<body>
+{% block myBlock %}
     {% include 'moong/navigation.html' %}
 
     <h1>게시글 수정</h1>
@@ -139,7 +139,7 @@
             <!-- 새 이미지 추가 -->
             <label>새 이미지 추가 (Ctrl+클릭으로 여러 개 선택)</label><br>
             <input type="file" name="images" id="images" multiple accept="image/*">
-            <div id="image-preview" class="image-preview"></div>
+            <div id="imagePreview" class="imagePreview"></div>
             <br>
         </p>
 
@@ -153,145 +153,4 @@
         <button type="submit" name="save_temp">임시저장</button>
         <a href="{% url 'moong:post_detail' post.id %}">취소</a>
     </form>
-    
-<!-- ===================== -->
-<!-- AJAX 행정구역 JS -->
-<!-- ===================== -->
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const sidoSelect = document.getElementById("sido");
-    const sigunguSelect = document.getElementById("sigungu");
-    const eupSelect = document.getElementById("eupmyeondong");
-
-    // 기존 location 값 설정
-    {% if post.location %}
-    const existingLocationId = {{ post.location.id }};
-    const existingSido = "{{ post.location.sido }}";
-    const existingSigungu = "{{ post.location.sigungu }}";
-    const existingEup = "{{ post.location.eupmyeondong }}";
-    {% else %}
-    const existingLocationId = null;
-    {% endif %}
-
-    // 1️⃣ 시/도 로드
-    fetch("/locations/sido/")
-        .then(res => res.json())
-        .then(data => {
-            data.forEach(sido => {
-                const opt = document.createElement("option");
-                opt.value = sido;
-                opt.textContent = sido;
-                sidoSelect.appendChild(opt);
-            });
-            
-            // 기존 값 설정
-            {% if post.location %}
-            sidoSelect.value = existingSido;
-            loadSigungu(existingSido);
-            {% endif %}
-        })
-        .catch(err => console.error("시/도 로드 실패", err));
-
-    // 시/군/구 로드 함수
-    function loadSigungu(sido) {
-        fetch(`/locations/sigungu/?sido=${encodeURIComponent(sido)}`)
-            .then(res => res.json())
-            .then(data => {
-                data.forEach(sigungu => {
-                    const opt = document.createElement("option");
-                    opt.value = sigungu;
-                    opt.textContent = sigungu;
-                    sigunguSelect.appendChild(opt);
-                });
-                
-                // 기존 값 설정
-                {% if post.location %}
-                sigunguSelect.value = existingSigungu;
-                loadEup(existingSido, existingSigungu);
-                {% endif %}
-            })
-            .catch(err => console.error("시/군/구 로드 실패", err));
-    }
-
-    // 읍/면/동 로드 함수
-    function loadEup(sido, sigungu) {
-        fetch(`/locations/eupmyeondong/?sido=${encodeURIComponent(sido)}&sigungu=${encodeURIComponent(sigungu)}`)
-            .then(res => res.json())
-            .then(data => {
-                data.forEach(obj => {
-                    const opt = document.createElement("option");
-                    opt.value = obj.id;
-                    opt.textContent = obj.name;
-                    eupSelect.appendChild(opt);
-                });
-                
-                // 기존 값 설정
-                {% if post.location %}
-                eupSelect.value = existingLocationId;
-                {% endif %}
-            })
-            .catch(err => console.error("읍/면/동 로드 실패", err));
-    }
-
-    // 2️⃣ 시/도 변경 이벤트
-    sidoSelect.addEventListener("change", function () {
-        const sido = this.value;
-        sigunguSelect.innerHTML = `<option value="">시/군/구 선택</option>`;
-        eupSelect.innerHTML = `<option value="">읍/면/동 선택</option>`;
-        if (!sido) return;
-        loadSigungu(sido);
-    });
-
-    // 3️⃣ 시/군/구 변경 이벤트
-    sigunguSelect.addEventListener("change", function () {
-        const sigungu = this.value;
-        const sido = sidoSelect.value;
-        eupSelect.innerHTML = `<option value="">읍/면/동 선택</option>`;
-        if (!sido || !sigungu) return;
-        loadEup(sido, sigungu);
-    });
-});
-</script>
-
-<!-- ===================== -->
-<!-- 이미지 미리보기 JS -->
-<!-- ===================== -->
-<script>
-document.getElementById('images').addEventListener('change', function(e) {
-    console.log("선택된 파일 개수:", e.target.files.length);
-    
-    const preview = document.getElementById('image-preview');
-    preview.innerHTML = '';
-    
-    const files = e.target.files;
-    
-    for (let i = 0; i < files.length; i++) {
-        console.log(`파일 ${i}:`, files[i].name);
-    }
-    
-    if (files.length > 5) {
-        alert('이미지는 최대 5개까지 업로드 가능합니다.');
-        e.target.value = '';
-        return;
-    }
-    
-    for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        
-        if (!file.type.startsWith('image/')) {
-            continue;
-        }
-        
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            preview.appendChild(img);
-        };
-        reader.readAsDataURL(file);
-    }
-});
-</script>
-
-</body>
-</html>
+{% endblock %}

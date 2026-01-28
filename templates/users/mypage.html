@@ -4,7 +4,7 @@
 
 {% block title %}뭉이 - 마이페이지{% endblock %}
 
-{% block extra_css %}
+{% block extra_head %}
 <style>
     /* ===========================================
        마이페이지 고유 스타일만 작성
@@ -144,15 +144,16 @@
         }
     }
 </style>
+<script src="{% static 'js/img_view.js' %}"></script>
 {% endblock %}
 
 {% block myBlock %}
 {% include 'moong/navigation.html' %}
 
-<div class="container">
+<div class="mypage_container">
     <!-- 헤더 -->
-    <div class="header">
-        <div class="header-title">마이페이지</div>
+    <div class="mypage_header">
+        <div class="mypage_header-title">마이페이지</div>
     </div>
 
     <!-- 프로필 섹션 -->
@@ -254,25 +255,3 @@
 </div>
 {% endblock %}
 
-{% block extra_js %}
-<script>
-    function openImageModal(imageSrc) {
-        const modal = document.getElementById('imageModal');
-        const modalImg = document.getElementById('modalImage');
-        modal.classList.add('active');
-        modalImg.src = imageSrc;
-    }
-
-    function closeImageModal() {
-        const modal = document.getElementById('imageModal');
-        modal.classList.remove('active');
-    }
-
-    // ESC 키로 모달 닫기
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            closeImageModal();
-        }
-    });
-</script>
-{% endblock %}

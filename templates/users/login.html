@@ -1,3 +1,8 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block myBlock %}
     {% include 'moong/navigation.html' %}
 
     <div id="login">
@@ -8,3 +13,4 @@
             <button type="submit" class="btn btn-login">로그인</button>
         </form>
     </div>
+{% endblock %}    

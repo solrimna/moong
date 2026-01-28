@@ -4,7 +4,7 @@
 
 {% block title %}프로필 수정 - 뭉이{% endblock %}
 
-{% block extra_css %}
+{% block extra_head %}
 <style>
     /* ===========================================
        프로필 수정 페이지 고유 스타일
@@ -187,11 +187,11 @@
 {% block myBlock %}
 {% include 'moong/navigation.html' %}
 
-<div class="container">
+<div class="mypage_container">
     <!-- 헤더 -->
-    <div class="header">
-        <div class="header-title">프로필 수정</div>
-        <div class="header-subtitle">내 정보를 수정하세요</div>
+    <div class="mypage_header">
+        <div class="mypage_header-title">프로필 수정</div>
+        <div class="mypage_header-subtitle">내 정보를 수정하세요</div>
     </div>
     
     <!-- 폼 영역 -->

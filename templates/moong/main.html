@@ -1,16 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>MOONG! 번개모임 SNS</title>
+{% extends 'base.html' %}
+
+{% block extra_head %}
     <style>
         .container { display: flex; margin-top: 20px; }
         .sidebar { width: 25%; padding: 20px; border-right: 1px solid #eee; }
         .content { width: 75%; padding: 20px; }
         .search-bar { margin-bottom: 20px; }
     </style>
-</head>
+{% endblock %}
 
-<body>
+{% block myBlock %}
     {% include 'moong/navigation.html' %}
      <!-- 왼쪽: 검색창, 해시태그 목록 -->
     <br>
@@ -61,3 +60,4 @@
 
 </body>
 </html>
+{% endblock %}

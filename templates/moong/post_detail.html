@@ -1,15 +1,10 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ post.title }}</title>
-    <style>
+{% extends 'base.html' %}
+{% load static %}
 
-    </style>
-</head>
+{% block extra_head %}
+{% endblock %}
 
-<body>
+{% block myBlock %}
     {% include 'moong/navigation.html' %}
     <div class="post-container">
         <!-- 배너 -->
@@ -51,8 +46,12 @@
                 {{ post.title }}
             </a> 
             </h4>
-            <div style="color: #666; font-size: 14px;">
-                작성자: {{ post.author.username }} | {{ post.create_time }}
+            <div class="profile-image-wrapper">
+                {% if post.author.profile_image %}
+                    <img src="{{ post.author.profile_image.url }}" 
+                    style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                    작성자: {{ post.author.username }} | {{ post.create_time }}
+                {% endif %}
             </div>
         </div>
         <div class="post-info">
@@ -164,5 +163,4 @@
             {% endif %}
         </div>
     </div>
-</body>
-</html>
+{% endblock %}

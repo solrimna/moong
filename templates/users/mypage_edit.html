@@ -6,49 +6,9 @@
 
 {% block extra_css %}
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-    
-    body {
-        font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-        background: white;
-        min-height: 100vh;
-        padding: 0;
-    }
-    
-    .container {
-        background: white;
-        border-radius: 24px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        max-width: 500px;
-        width: 100%;
-        overflow: hidden;
-        margin: 40px auto;
-        border: 1px solid #E0E0E0;
-    }
-    
-    /* 헤더 */
-    .header {
-        background: white;
-        padding: 20px;
-        text-align: center;
-        border-bottom: 1px solid #E0E0E0;
-    }
-    
-    .header-title {
-        font-size: 18px;
-        font-weight: 600;
-        color: #424242;
-        margin-bottom: 5px;
-    }
-    
-    .header-subtitle {
-        color: #757575;
-        font-size: 13px;
-    }
+    /* ===========================================
+       프로필 수정 페이지 고유 스타일
+       =========================================== */
     
     /* 폼 영역 */
     .form-container {
@@ -58,17 +18,20 @@
     .messages {
         margin-bottom: 20px;
     }
+    
     .message {
         padding: 12px 15px;
         border-radius: 12px;
         margin-bottom: 10px;
         font-size: 14px;
     }
+    
     .message.success {
         background: #E8F5E9;
         color: #2E7D32;
         border: 1px solid #A5D6A7;
     }
+    
     .message.error {
         background: #FFEBEE;
         color: #C62828;
@@ -78,6 +41,7 @@
     .form-group {
         margin-bottom: 25px;
     }
+    
     .form-label {
         display: block;
         font-size: 14px;
@@ -85,6 +49,7 @@
         color: #333;
         margin-bottom: 8px;
     }
+    
     .form-input, .form-textarea {
         width: 100%;
         padding: 12px 15px;
@@ -94,19 +59,23 @@
         transition: border-color 0.3s;
         font-family: inherit;
     }
+    
     .form-textarea {
         min-height: 100px;
         resize: vertical;
     }
+    
     .form-input:focus, .form-textarea:focus {
         outline: none;
         border-color: #4285F4;
     }
+    
     .form-input:disabled {
         background: #F5F5F5;
         cursor: not-allowed;
         color: #999;
     }
+    
     .form-select {
         width: 100%;
         padding: 12px 15px;
@@ -117,15 +86,18 @@
         cursor: pointer;
         font-family: inherit;
     }
+    
     .form-select:focus {
         outline: none;
         border-color: #4285F4;
     }
+    
     .file-input-wrapper {
         position: relative;
         display: inline-block;
         width: 100%;
     }
+    
     .file-input {
         width: 100%;
         padding: 12px 15px;
@@ -135,6 +107,7 @@
         cursor: pointer;
         font-size: 14px;
     }
+    
     .current-image {
         width: 100px;
         height: 100px;
@@ -143,103 +116,64 @@
         border: 3px solid #4285F4;
         margin-bottom: 10px;
     }
+    
     .image-placeholder {
         width: 100px;
         height: 100px;
         border-radius: 16px;
         background: #E3F2FD;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 40px;
-        color: #4285F4;
-        border: 3px solid #4285F4;
-        margin-bottom: 10px;
-    }
-    .help-text {
-        font-size: 12px;
-        color: #666;
-        margin-top: 5px;
-    }
-    .readonly-badge {
-        display: inline-block;
-        background: #FDD835;
-        color: #333;
-        padding: 3px 8px;
-        border-radius: 8px;
-        font-size: 11px;
-        margin-left: 10px;
-        font-weight: 600;
-    }
-    
-    /* 체크박스 */
-    .checkbox-wrapper {
         display: flex;
         align-items: center;
-        gap: 10px;
-        margin-top: 10px;
-    }
-    .checkbox-input {
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
-    }
-    .checkbox-label {
-        font-size: 14px;
-        color: #333;
-        cursor: pointer;
-    }
-    
-    .btn {
-        display: block;
-        width: 100%;
-        padding: 15px;
-        text-align: center;
-        text-decoration: none;
-        border-radius: 12px;
-        font-weight: 600;
+        justify-content: center;
+        font-size: 48px;
         margin-bottom: 10px;
-        border: none;
-        cursor: pointer;
-        font-size: 16px;
-        transition: all 0.3s ease;
-        font-family: inherit;
-    }
-    .btn-primary {
-        background: linear-gradient(135deg, #4285F4 0%, #1E88E5 100%);
-        color: white;
-        box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
-    }
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(66, 133, 244, 0.4);
-    }
-    .btn-secondary {
-        background: #F5F5F5;
-        color: #616161;
-    }
-    .btn-secondary:hover {
-        background: #EEEEEE;
+        border: 2px dashed #4285F4;
     }
     
-    .char-count {
+    .helper-text {
         font-size: 12px;
-        color: #999;
-        text-align: right;
+        color: #757575;
         margin-top: 5px;
     }
-
+    
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 8px;
+    }
+    
+    .checkbox-group input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: #4285F4;
+    }
+    
+    .checkbox-group label {
+        font-size: 14px;
+        color: #616161;
+        cursor: pointer;
+    }
+    
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 30px;
+    }
+    
+    .button-group .btn {
+        flex: 1;
+    }
+    
     /* 반응형 */
     @media (max-width: 768px) {
-        .container {
-            border-radius: 0;
-            margin: 0;
-            border-left: none;
-            border-right: none;
-        }
-        
         .form-container {
             padding: 30px 20px;
+        }
+        
+        .button-group {
+            flex-direction: column;
         }
     }
 </style>
@@ -250,202 +184,94 @@
     <!-- 헤더 -->
     <div class="header">
         <div class="header-title">프로필 수정</div>
-        <div class="header-subtitle">변경할 정보를 입력해주세요</div>
+        <div class="header-subtitle">내 정보를 수정하세요</div>
     </div>
-
-    <!-- 폼 -->
+    
+    <!-- 폼 영역 -->
     <div class="form-container">
         {% if messages %}
         <div class="messages">
             {% for message in messages %}
-                <div class="message {{ message.tags }}">{{ message }}</div>
+            <div class="message {{ message.tags }}">{{ message }}</div>
             {% endfor %}
         </div>
         {% endif %}
-
+        
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-
+            
             <!-- 프로필 이미지 -->
             <div class="form-group">
-                <label class="form-label">📷 프로필 이미지</label>
-                <div style="text-align: center; margin-bottom: 10px;">
-                    {% if user.profile_image %}
-                        <img src="{{ user.profile_image.url }}" alt="현재 프로필" class="current-image">
-                    {% else %}
-                        <div class="image-placeholder">👤</div>
-                    {% endif %}
+                <label class="form-label">📸 프로필 사진</label>
+                {% if user.profile_image %}
+                    <img src="{{ user.profile_image.url }}" alt="현재 프로필" class="current-image">
+                {% else %}
+                    <div class="image-placeholder">👤</div>
+                {% endif %}
+                <div class="file-input-wrapper">
+                    {{ form.profile_image }}
                 </div>
-                <input type="file" name="profile_image" accept="image/*" class="file-input">
-                <p class="help-text">JPG, PNG 파일만 가능 (최대 10MB)</p>
+                <p class="helper-text">JPG, PNG 파일만 가능 (최대 5MB)</p>
             </div>
-
-            <!-- 닉네임 (읽기 전용) -->
+            
+            <!-- 닉네임 -->
             <div class="form-group">
-                <label class="form-label">
-                    👤 닉네임
-                    <span class="readonly-badge">수정불가</span>
-                </label>
-                <input type="text" value="{{ user.nick_name }}" class="form-input" disabled>
-                <p class="help-text">닉네임은 변경할 수 없습니다</p>
+                <label class="form-label">👤 닉네임</label>
+                {{ form.nick_name }}
+                <p class="helper-text">2-20자 이내, 특수문자 사용 불가</p>
+                {% if form.nick_name.errors %}
+                    <div class="message error">{{ form.nick_name.errors.0 }}</div>
+                {% endif %}
             </div>
-
+            
+            <!-- 이메일 -->
+            <div class="form-group">
+                <label class="form-label">📧 이메일</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <div class="message error">{{ form.email.errors.0 }}</div>
+                {% endif %}
+            </div>
+            
             <!-- 자기소개 -->
             <div class="form-group">
-                <label class="form-label">💬 자기소개</label>
-                <textarea name="bio" class="form-textarea" maxlength="500" 
-                          placeholder="자신을 소개해주세요 (최대 500자)" 
-                          oninput="updateCharCount(this)">{{ user.bio|default:"" }}</textarea>
-                <div class="char-count">
-                    <span id="charCount">{{ user.bio|length|default:0 }}</span> / 500자
+                <label class="form-label">✏️ 자기소개</label>
+                {{ form.bio }}
+                <p class="helper-text">간단한 자기소개를 작성해주세요 (최대 200자)</p>
+            </div>
+            
+            <!-- 전화번호 -->
+            <div class="form-group">
+                <label class="form-label">📱 전화번호</label>
+                {{ form.phone }}
+                <p class="helper-text">하이픈(-) 없이 숫자만 입력 (예: 01012345678)</p>
+                {% if form.phone.errors %}
+                    <div class="message error">{{ form.phone.errors.0 }}</div>
+                {% endif %}
+            </div>
+            
+            <!-- 활동 지역 -->
+            <div class="form-group">
+                <label class="form-label">📍 활동 지역</label>
+                {{ form.location }}
+            </div>
+            
+            <!-- 성별 -->
+            <div class="form-group">
+                <label class="form-label">⚧ 성별</label>
+                {{ form.gender }}
+                <div class="checkbox-group">
+                    {{ form.gender_visible }}
+                    <label for="{{ form.gender_visible.id_for_label }}">프로필에 성별 공개</label>
                 </div>
             </div>
-
-            <!-- 주 활동 지역 (3단계 선택) -->
-            <div class="form-group">
-                <label class="form-label">📍 주 활동 지역</label>
-
-                            <label for="sido">시/도</label>
-                <select id="sido" class="form-select" style="margin-bottom: 10px;">
-                    <option value="">시/도 선택</option>
-                </select>
-
-                <label for="sigungu">시/군/구</label>
-                <select id="sigungu" class="form-select" style="margin-bottom: 10px;">
-                    <option value="">시/군/구 선택</option>
-                </select>
-
-                <label for="eupmyeondong">읍/면/동</label>
-                <select id="eupmyeondong" name="location" required class="form-select">
-                    <option value="">읍/면/동 선택</option>
-                </select>
+            
+            <!-- 버튼 그룹 -->
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">💾 저장하기</button>
+                <a href="{% url 'users:mypage' %}" class="btn btn-back">취소</a>
             </div>
-
-            <!-- 이메일 (읽기 전용) -->
-            <div class="form-group">
-                <label class="form-label">
-                    📧 이메일
-                    <span class="readonly-badge">수정불가</span>
-                </label>
-                <input type="text" value="{{ user.email|default:'등록되지 않음' }}" 
-                       class="form-input" disabled>
-                <p class="help-text">이메일은 변경할 수 없습니다</p>
-            </div>
-
-            <!-- 전화번호 (읽기 전용) -->
-            <div class="form-group">
-                <label class="form-label">
-                    📱 전화번호
-                    <span class="readonly-badge">본인인증 필요</span>
-                </label>
-                <input type="text" value="{{ user.phone|default:'등록되지 않음' }}" 
-                       class="form-input" disabled>
-                <p class="help-text">전화번호 변경은 본인인증 후 가능합니다</p>
-            </div>
-
-            <!-- 성별 (읽기 전용) -->
-            <div class="form-group">
-                <label class="form-label">
-                    ⚧ 성별
-                    <span class="readonly-badge">수정불가</span>
-                </label>
-                <input type="text" 
-                       value="{% if user.gender == 'M' %}남성{% elif user.gender == 'F' %}여성{% elif user.gender == 'O' %}기타{% else %}미설정{% endif %}" 
-                       class="form-input" disabled>
-                
-                <!-- 성별 공개 여부 -->
-                <div class="checkbox-wrapper">
-                    <input type="checkbox" 
-                           name="gender_visible" 
-                           id="gender_visible" 
-                           class="checkbox-input"
-                           {% if user.gender_visible %}checked{% endif %}>
-                    <label for="gender_visible" class="checkbox-label">
-                        마이페이지에서 성별 공개하기
-                    </label>
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-primary">💾 저장하기</button>
-            <a href="{% url 'users:mypage' %}" class="btn btn-secondary">취소</a>
         </form>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    function updateCharCount(textarea) {
-        const charCount = textarea.value.length;
-        document.getElementById('charCount').textContent = charCount;
-    }
-
-    // ⭐ 지역 선택 3단계 로직
-    document.addEventListener("DOMContentLoaded", function () {
-        const sidoSelect = document.getElementById("sido");
-        const sigunguSelect = document.getElementById("sigungu");
-        const eupSelect = document.getElementById("eupmyeondong");
-
-        // 1️⃣ 시/도 로드
-        fetch("/locations/sido/")
-            .then(res => res.json())
-            .then(data => {
-                data.forEach(sido => {
-                    const opt = document.createElement("option");
-                    opt.value = sido;
-                    opt.textContent = sido;
-                    sidoSelect.appendChild(opt);
-                });
-            })
-            .catch(err => {
-                console.error("시/도 로드 실패", err);
-            });
-
-        // 2️⃣ 시/도 변경 → 시/군/구
-        sidoSelect.addEventListener("change", function () {
-            const sido = this.value;
-            sigunguSelect.innerHTML = `<option value="">시/군/구 선택</option>`;
-            eupSelect.innerHTML = `<option value="">읍/면/동 선택</option>`;
-
-            if (!sido) return;
-
-            fetch(`/locations/sigungu/?sido=${encodeURIComponent(sido)}`)
-                .then(res => res.json())
-                .then(data => {
-                    data.forEach(sigungu => {
-                        const opt = document.createElement("option");
-                        opt.value = sigungu;
-                        opt.textContent = sigungu;
-                        sigunguSelect.appendChild(opt);
-                    });
-                })
-                .catch(err => {
-                    console.error("시/군/구 로드 실패", err);
-                });
-        });
-
-        // 3️⃣ 시/군/구 변경 → 읍/면/동
-        sigunguSelect.addEventListener("change", function () {
-            const sigungu = this.value;
-            const sido = sidoSelect.value;
-            eupSelect.innerHTML = `<option value="">읍/면/동 선택</option>`;
-
-            if (!sido || !sigungu) return;
-
-            fetch(`/locations/eupmyeondong/?sido=${encodeURIComponent(sido)}&sigungu=${encodeURIComponent(sigungu)}`)
-                .then(res => res.json())
-                .then(data => {
-                    data.forEach(obj => {
-                        const opt = document.createElement("option");
-                        opt.value = obj.id;
-                        opt.textContent = obj.name;
-                        eupSelect.appendChild(opt);
-                    });
-                })
-                .catch(err => {
-                    console.error("읍/면/동 로드 실패", err);
-                });
-        });
-    });
-</script>
 {% endblock %}

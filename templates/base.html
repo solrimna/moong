@@ -9,7 +9,301 @@
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- 추가 CSS -->
+    <!-- 공통 CSS -->
+    <style>
+        /* ========================================
+           기본 리셋 및 전역 스타일
+           ======================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: white;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* ========================================
+           네비게이션 스타일
+           ======================================== */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #E0E0E0;
+            background: white;
+            height: 70px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #424242;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            white-space: nowrap;  /* 줄바꿈 방지 */
+        }
+
+        nav a:hover {
+            color: #4285F4;
+        }
+
+        nav img {
+            height: 50px;
+            background-color: white;
+        }
+
+        nav > div {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;  /* 간격 줄임 */
+            flex-wrap: nowrap;  /* 줄바꿈 방지 */
+            white-space: nowrap;  /* 줄바꿈 방지 */
+        }
+        
+        nav > div span {
+            color: #ddd;
+            user-select: none;  /* 구분자 선택 방지 */
+        }
+
+        /* ========================================
+           공통 컨테이너
+           ======================================== */
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border: 1px solid #E0E0E0;
+        }
+
+        /* ========================================
+           공통 헤더
+           ======================================== */
+        .header {
+            background: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            border-bottom: 1px solid #E0E0E0;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #424242;
+        }
+
+        .header-subtitle {
+            color: #757575;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        /* ========================================
+           공통 버튼 스타일
+           ======================================== */
+        .btn {
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4285F4 0%, #1E88E5 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(66, 133, 244, 0.4);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #4285F4;
+            border: 2px solid #4285F4;
+        }
+
+        .btn-secondary:hover {
+            background: #E3F2FD;
+            color: #4285F4;
+        }
+
+        .btn-back {
+            background: #F5F5F5;
+            color: #616161;
+        }
+
+        .btn-back:hover {
+            background: #EEEEEE;
+            color: #616161;
+        }
+
+        /* ========================================
+           공통 섹션 스타일
+           ======================================== */
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1A237E;
+            margin: 30px 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4285F4;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ========================================
+           공통 상세 정보 스타일
+           ======================================== */
+        .detail-row {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid #E0E0E0;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .detail-label {
+            min-width: 100px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #424242;
+        }
+
+        .detail-value {
+            flex: 1;
+            font-size: 14px;
+            color: #616161;
+        }
+
+        .privacy-hidden {
+            color: #BDBDBD;
+            font-style: italic;
+        }
+
+        /* ========================================
+           공통 빈 상태 스타일
+           ======================================== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .empty-state-text {
+            font-size: 16px;
+        }
+
+        /* ========================================
+           공통 이미지 모달
+           ======================================== */
+        .image-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 8px;
+            animation: zoomIn 0.3s ease;
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-modal:hover {
+            color: #FDD835;
+        }
+
+        /* ========================================
+           반응형 디자인
+           ======================================== */
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 0;
+                margin: 0;
+                border-left: none;
+                border-right: none;
+            }
+
+            nav {
+                padding: 1rem;
+            }
+
+            .detail-row {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .detail-label {
+                min-width: auto;
+            }
+        }
+    </style>
+    
+    <!-- 각 페이지 고유 CSS -->
     {% block extra_css %}{% endblock %}
 </head>
 <body>

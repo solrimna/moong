@@ -5,7 +5,7 @@
     "width": 2000,
     "height": 2000,
     "scrollTop": 0,
-    "scrollLeft": -800,
+    "scrollLeft": -683,
     "zoomLevel": 0.91,
     "show": 431,
     "database": 4,
@@ -128,6 +128,7 @@
           "wkVpEaqeA4CHBER-oYHiQ",
           "HlHpi3_OAUNXmmU4wWnxc",
           "_aTRXv9u0dhYf76CjQULA",
+          "RO1rcGUDcXrciF3rlIZ11",
           "Yve7OMgsmzdM04llkifeK",
           "Quzql9Un7eZ_UM9X8HLLq",
           "F3a5StJjUsZ2qgild7sLR",
@@ -147,6 +148,7 @@
           "wkVpEaqeA4CHBER-oYHiQ",
           "HlHpi3_OAUNXmmU4wWnxc",
           "_aTRXv9u0dhYf76CjQULA",
+          "RO1rcGUDcXrciF3rlIZ11",
           "Yve7OMgsmzdM04llkifeK",
           "Quzql9Un7eZ_UM9X8HLLq",
           "F3a5StJjUsZ2qgild7sLR",
@@ -163,7 +165,7 @@
           "color": ""
         },
         "meta": {
-          "updateAt": 1769395630966,
+          "updateAt": 1769577962264,
           "createAt": 1769386405145
         }
       },
@@ -888,19 +890,19 @@
         "id": "_aTRXv9u0dhYf76CjQULA",
         "tableId": "nRcoxDzOxlejRYE-Zb-J8",
         "name": "is_closed",
-        "comment": "마감여부 (0:마감X, 1:마감)",
+        "comment": "모집 마감여부 (0:마감X, 1:마감)",
         "dataType": "BOOLEAN",
-        "default": "",
+        "default": "0",
         "options": 0,
         "ui": {
           "keys": 0,
           "widthName": 60,
-          "widthComment": 140,
+          "widthComment": 167,
           "widthDataType": 60,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1769387410710,
+          "updateAt": 1769578281246,
           "createAt": 1769387298349
         }
       },
@@ -910,7 +912,7 @@
         "name": "is_cancelled",
         "comment": "폭파여부 (0:활성화, 1:비활성화)",
         "dataType": "BOOLEAN",
-        "default": "",
+        "default": "0",
         "options": 0,
         "ui": {
           "keys": 0,
@@ -920,7 +922,7 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1769387458274,
+          "updateAt": 1769578366244,
           "createAt": 1769387352230
         }
       },
@@ -930,7 +932,7 @@
         "name": "complete",
         "comment": "임시저장여부(0:임시저장 1:저장)",
         "dataType": "BOOLEAN",
-        "default": "",
+        "default": "0",
         "options": 0,
         "ui": {
           "keys": 0,
@@ -940,7 +942,7 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1769475092650,
+          "updateAt": 1769578368589,
           "createAt": 1769387428249
         }
       },
@@ -1863,6 +1865,26 @@
           "updateAt": 1769400347115,
           "createAt": 1769400317333
         }
+      },
+      "RO1rcGUDcXrciF3rlIZ11": {
+        "id": "RO1rcGUDcXrciF3rlIZ11",
+        "tableId": "nRcoxDzOxlejRYE-Zb-J8",
+        "name": "moim_finished",
+        "comment": "모임 완료여부 (0:모임미완료, 1: 모임완료)",
+        "dataType": "BOOLEAN",
+        "default": "0",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 79,
+          "widthComment": 223,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1769578311443,
+          "createAt": 1769577960355
+        }
       }
     },
     "relationshipEntities": {
@@ -1886,7 +1908,7 @@
             "wkVpEaqeA4CHBER-oYHiQ"
           ],
           "x": 595.198,
-          "y": 433.4236,
+          "y": 439.4236,
           "direction": 1
         },
         "meta": {
@@ -1905,7 +1927,7 @@
             "xpcWgpdQ6a_SGXYrDdsF3"
           ],
           "x": 595.198,
-          "y": 641.4236000000001,
+          "y": 659.4236000000001,
           "direction": 1
         },
         "end": {
@@ -2016,8 +2038,8 @@
           "columnIds": [
             "xpcWgpdQ6a_SGXYrDdsF3"
           ],
-          "x": 855.698,
-          "y": 745.4236000000001,
+          "x": 879.698,
+          "y": 769.4236000000001,
           "direction": 8
         },
         "end": {
@@ -2044,8 +2066,8 @@
           "columnIds": [
             "xpcWgpdQ6a_SGXYrDdsF3"
           ],
-          "x": 1116.1979999999999,
-          "y": 433.4236,
+          "x": 1164.1979999999999,
+          "y": 439.4236,
           "direction": 2
         },
         "end": {
@@ -2100,8 +2122,8 @@
           "columnIds": [
             "xpcWgpdQ6a_SGXYrDdsF3"
           ],
-          "x": 1116.1979999999999,
-          "y": 641.4236000000001,
+          "x": 1164.1979999999999,
+          "y": 659.4236000000001,
           "direction": 2
         },
         "end": {
@@ -2193,7 +2215,7 @@
           "columnIds": [
             "7NGm-l5QJFmS8TSyxtFi4"
           ],
-          "x": 855.698,
+          "x": 879.698,
           "y": 329.4236,
           "direction": 4
         },

@@ -21,16 +21,19 @@ def main(request):
     # 검색하면 필터링해서 메인페이지에서 바로
     search = request.GET.get('search', '')
     
+    posts = Post.objects.filter(
+        complete=True,
+        is_cancelled=False,
+        moim_finished=False
+    ).prefetch_related('images', 'hashtags')
+
+    # 검색어가 있으면 추가 필터
     if search:
-        posts = Post.objects.filter(
-            complete=True,
-            content__icontains=search
-        ).prefetch_related('images', 'hashtags').order_by('-create_time')
-    else:
-        posts = Post.objects.filter(
-            complete=True
-        ).prefetch_related('images', 'hashtags').order_by('-create_time')
-    
+        posts = posts.filter(content__icontains=search)
+
+    # 정렬
+    posts = posts.order_by('-create_time')
+
     # 해시태그 리스트
     active_tags = Hashtag.objects.annotate(
         num_posts=Count('posts')
@@ -254,11 +257,6 @@ def post_add(request):
             print("="*50)
 
             messages.error(request, '입력 내용을 확인하세요.')
-            # 각 필드별 에러도 메시지로 추가
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f'{field}: {error}')
-
             print("post_add 입력값 확인으로 빠짐!")
     else:
         form = PostForm()
@@ -391,3 +389,100 @@ def post_mod(request, post_id):
     }
 
     return render(request, 'moong/post_mod.html', context)
+
+# ==================== 게시글 삭제 ====================
+@login_required
+def post_delete(request, post_id):
+    print("post_delete 게시글 삭제 호출됨!")
+    post = get_object_or_404(Post, id=post_id)
+    
+    # 권한 체크
+    if post.author != request.user:
+        messages.error(request, '삭제 권한이 없습니다.')
+        return redirect('moong:post_detail', post_id=post_id)
+    
+    # POST 요청만 허용
+    if request.method == 'POST':
+        approved_count = post.get_approved_count()
+
+        # case1. 승인된 참여자가 없는 case
+        if approved_count == 0:
+            # 이미지 파일 삭제
+            for image in post.images.all():
+                if image.image:
+                    image.image.delete()
+            
+            post.delete()
+        # case2. 승인된 참여자가 있는 case
+        else:
+            print(f"게시글 폭파 처리 - (확정 참여자: {approved_count}명)으로 인해 진행")
+            post.is_cancelled = True
+            post.save()
+            messages.warning(request, f'확정 참여자({approved_count}명)가 있어 모임글이 비활성화 되었습니다.')
+            print("post_delete 폭파 처리 완료!")
+
+        messages.success(request, '게시글이 삭제되었습니다.')
+        return redirect('moong:main')
+    else:
+        # GET 요청은 거부
+        return redirect('moong:post_detail', post_id=post_id)
+       
+# ==================== 모집 확정 ====================
+@login_required
+def post_closed(request, post_id):
+    print("post_closed 모집 확정 호출됨!")
+    post = get_object_or_404(Post, id=post_id)
+    
+    # 권한 체크
+    if post.author != request.user:
+        messages.error(request, '모집 확정 권한이 없습니다.')
+        return redirect('moong:post_detail', post_id=post_id)
+    
+    # POST 요청만 허용
+    if request.method == 'POST':
+        approved_count = post.get_approved_count()
+
+        # # case1. 승인된 참여자가 없는 case
+        if approved_count == 0:
+            print(f"게시글 모집 확정 불가 - 확정 참여자 없음")
+            messages.warning(request, f'모임 참여자가 없어 모집 확정이 불가능합니다.')
+        # case2. 승인된 참여자가 있는 case
+        else:
+            print(f"게시글 모집 확정 처리 - (확정 참여자: {approved_count}명)으로 진행")
+            post.is_closed = True
+            post.save()
+            messages.warning(request, f'확정 참여자({approved_count}명) 상태로 모임이 확정되었습니다.')
+            print("게시글 모집 확정 완료!")
+
+        # 모임이 확정되던 아니던 post_detail로 
+        return redirect('moong:post_detail', post_id=post_id)
+    else:
+        # GET 요청은 거부
+        return redirect('moong:post_detail', post_id=post_id)
+
+# ==================== 모임 완료(확정 뒤에) ====================
+@login_required
+def moim_finished(request, post_id):
+    print("moim_finished 호출됨!")
+    post = get_object_or_404(Post, id=post_id)
+    
+    # 권한 체크
+    if post.author != request.user:
+        messages.error(request, '권한이 없습니다.')
+        return redirect('moong:post_detail', post_id=post_id)
+    
+    # 모집 확정되지 않은 모임은 완료 불가
+    if not post.is_closed:
+        messages.error(request, '모집이 확정되지 않은 모임입니다.')
+        return redirect('moong:post_detail', post_id=post_id)
+    
+    # POST 요청만 허용
+    if request.method == 'POST':
+        post.moim_finished = True  # 모임 완료 필드 (추가 필요)
+        post.save()
+        
+        messages.success(request, '모임이 완료 처리되었습니다.')
+        print("모임 완료 처리 완료!")
+        return redirect('moong:main')
+    
+    return redirect('moong:post_detail', post_id=post_id)    

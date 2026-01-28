@@ -39,8 +39,10 @@ class Post(models.Model):
     max_people = models.PositiveIntegerField(null=True, blank=True, default=0, verbose_name='최대 인원')
     
     # 상태 관리
-    is_closed = models.BooleanField(null=True, blank=True, default=False, verbose_name='마감 여부')
+    is_closed = models.BooleanField(null=True, blank=True, default=False, verbose_name='모임 마감 여부')
     is_cancelled = models.BooleanField(null=True, blank=True, default=False, verbose_name='폭파 여부')
+    moim_finished = models.BooleanField(null=True, blank=True, default=False, verbose_name='모집 완료 여부')
+
     complete = models.BooleanField(null=True, blank=True, default=False, verbose_name='임시저장 여부')
     
     # 제한 정보

@@ -130,3 +130,46 @@ class LoginForm(forms.Form):
             attrs={"placeholder": "비밀번호를 입력하세요."},
         ),
     )
+
+
+# ===== 프로필 수정 전용 폼 (닉네임, 이메일, 전화번호 수정 불가) =====
+class ProfileEditForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['profile_image', 'bio', 'gender_visible']  # location 제거 (HTML에서 직접 전송)
+        widgets = {
+            'profile_image': forms.FileInput(
+                attrs={
+                    'class': 'file-input',
+                    'accept': 'image/jpeg,image/png'
+                }
+            ),
+            'bio': forms.Textarea(
+                attrs={
+                    'class': 'form-textarea',
+                    'rows': 4,
+                    'placeholder': '간단한 자기소개를 작성해주세요'
+                }
+            ),
+            'gender_visible': forms.CheckboxInput(
+                attrs={'class': 'checkbox-input'}
+            ),
+        }
+        labels = {
+            'profile_image': '프로필 사진',
+            'bio': '자기소개',
+            'gender_visible': '성별 공개',
+        }
+    
+    # 프로필 이미지 검증
+    profile_image = forms.ImageField(
+        required=False,
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=['jpg', 'jpeg', 'png']
+            )
+        ],
+        error_messages={
+            'invalid': '이미지 파일만 업로드할 수 있습니다.',
+        },
+    )

@@ -4,8 +4,8 @@
   "settings": {
     "width": 2000,
     "height": 2000,
-    "scrollTop": 0,
-    "scrollLeft": -683,
+    "scrollTop": -300,
+    "scrollLeft": -410.1922,
     "zoomLevel": 0.91,
     "show": 431,
     "database": 4,
@@ -989,40 +989,40 @@
       "i3Cw8oxgXk-KUrcrZ5d9k": {
         "id": "i3Cw8oxgXk-KUrcrZ5d9k",
         "tableId": "nRcoxDzOxlejRYE-Zb-J8",
-        "name": "created_time",
+        "name": "create_time",
         "comment": "생성 시간",
         "dataType": "DATETIME",
         "default": "",
         "options": 0,
         "ui": {
           "keys": 0,
-          "widthName": 70,
+          "widthName": 63,
           "widthComment": 60,
           "widthDataType": 60,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1769387817417,
+          "updateAt": 1769661017774,
           "createAt": 1769387733088
         }
       },
       "vw887Wi7_Ttd8xmjKyVxH": {
         "id": "vw887Wi7_Ttd8xmjKyVxH",
         "tableId": "nRcoxDzOxlejRYE-Zb-J8",
-        "name": "updated_time",
+        "name": "update_time",
         "comment": "수정 시간",
         "dataType": "DATETIME",
         "default": "",
         "options": 0,
         "ui": {
           "keys": 0,
-          "widthName": 75,
+          "widthName": 68,
           "widthComment": 60,
           "widthDataType": 60,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1769387837898,
+          "updateAt": 1769661020834,
           "createAt": 1769387819154
         }
       },

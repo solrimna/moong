@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block myHead %}
+{% block myHead %}  
+<script src="{% static 'js/img_view.js' %}"></script>
 {% endblock %}
 
 {% block myBlock %}
@@ -46,12 +47,12 @@
                 {{ post.title }}
             </a> 
             </h4>
-            <div class="profile-image-wrapper">
+            <div class="post-profile-image-wrapper">
                 {% if post.author.profile_image %}
-                    <img src="{{ post.author.profile_image.url }}" 
-                    style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
-                    작성자: {{ post.author.username }} | {{ post.create_time }}
+                    <img src="{{ post.author.profile_image.url }}" alt="프로필" 
+                    class="post-profile-image" onclick="openImageModal(this.src);">
                 {% endif %}
+                작성자: {{ post.author.username }} | {{ post.create_time }}
             </div>
         </div>
         <div class="post-info">
@@ -165,4 +166,9 @@
             {% endif %}
         </div>
     </div>
+<!-- 이미지 모달 -->
+<div class="image-modal" id="imageModal" onclick="closeImageModal()">
+    <span class="close-modal">&times;</span>
+    <img class="modal-content" id="modalImage">
+</div>    
 {% endblock %}

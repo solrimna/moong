@@ -36,6 +36,14 @@
             padding: 2px;
         }
     </style>
+    {% if post and post.location %}
+        <div id="saved_location"
+            data-sido="{{ post.location.sido }}"
+            data-sigungu="{{ post.location.sigungu }}"
+            data-eupmyeondong="{{ post.location.eupmyeondong }}"
+            data-location-id="{{ post.location.id }}">
+        </div>
+    {% endif %}
     <script src="{% static 'js/img_view.js' %}"></script>
     <script src="{% static 'js/location_select.js' %}"></script>
 {% endblock %}
@@ -150,7 +158,6 @@
         <hr>
 
         <button type="submit">수정 완료</button>
-        <button type="submit" name="save_temp">임시저장</button>
         <a href="{% url 'moong:post_detail' post.id %}">취소</a>
     </form>
 {% endblock %}

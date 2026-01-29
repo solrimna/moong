@@ -106,6 +106,30 @@
                     <span style="color: red; font-weight: bold;">[마감]</span>
                 {% endif %}
             </div>
+
+            <div>
+                <details>
+                    <summary>
+                        참여자 목록 보기 (현재 {{ approved_participants.count }}명)
+                    </summary>
+        
+                    <ul>
+                        {% for participant in approved_participants %}
+                            <li>
+                                {{ participant.user.nick_name|default:participant.user.username }}
+                    
+                                {% if participant.user == post.author %}
+                                    (주최자)
+                                {% endif %}
+                    
+                                <small>- {{ participant.create_time|date:"Y-m-d H:i" }} 신청</small>
+                            </li>
+                        {% empty %}
+                            <li>참여자가 없습니다.</li>
+                        {% endfor %}
+                    </ul>
+                </details>
+            </div>
         </div>
         
         <div class="post-tags" style="margin-top: 10px;">

@@ -332,6 +332,7 @@ def post_detail(request, post_id):
         Post.objects.select_related('author', 'location'),
         id=post_id
     )
+    approved_participants = post.participations.filter(status='APPROVED').select_related('user')
     is_applied = False #is_applied 초기화
     if request.user.is_authenticated:
         is_applied = post.participations.filter(user=request.user).exists()
@@ -346,6 +347,7 @@ def post_detail(request, post_id):
                                                       'comments':comments,
                                                       'comment_form':comment_form,
                                                       'is_applied': is_applied,
+                                                      'approved_participants': approved_participants,
                                                       })
 
 # ==================== 게시글 수정 ====================

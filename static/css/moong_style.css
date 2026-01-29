@@ -252,6 +252,95 @@
     margin-top: 5px;
 }
 
+
+/* ========================================
+    메인페이지
+    ======================================== */
+
+/* ========================================
+    메인페이지 -> 피드 목록 -> 포스트 하나
+    ======================================== */
+/* 수정 가능합니다. 그냥 백업 개념 */
+
+
+.a-post-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #fff;
+}
+
+/* 헤더 */
+.a-post-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.a-post-header .author-link {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+.a-post-header .post-date {
+    color: #888;
+    font-size: 0.8rem;
+    margin-left: 10px;
+}
+
+/* 내용, 사진 */
+.a-post-content h4 {
+    margin: 5px 0;
+}
+
+
+.a-post-images .image-link {
+    display: block;
+}
+
+.a-post-images .post-image {
+    width: 100%;
+    max-width: 500px;
+    height: 500px;
+    margin: 0 auto;
+    object-fit: cover;
+    display: block;
+    cursor: pointer;
+}
+
+/* 정보 */
+.a-post-info {
+    background: #f8f9fa;
+    padding: 8px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+
+.a-post-info .full-badge {
+    color: red;
+    font-weight: bold;
+}
+
+/* 태그 */
+.a-post-tags {
+    margin-top: 10px;
+}
+
+.a-post-tags .tag-link {
+    text-decoration: none;
+    color: #007bff;
+    font-size: 0.9rem;
+}
+
+/* 구분선 */
+.a-post-divider {
+    border: 0;
+    border-top: 1px solid #eee;
+    margin: 15px 0;
+}
+
 /* ========================================
     POST (moim 게시글)
     ======================================== */

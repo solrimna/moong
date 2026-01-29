@@ -9,7 +9,7 @@ from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseRedire
 import openai
 import os
 from dotenv import load_dotenv
-
+from django.utils import timezone
 # OpenAI 설정
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -289,10 +289,17 @@ def post_detail(request, post_id):
         Post.objects.select_related('author', 'location'),
         id=post_id
     )
-    approved_participants = post.participations.filter(status='APPROVED').select_related('user')
+    approved_participants = post.participations.select_related('user')
     is_applied = False #is_applied 초기화
     if request.user.is_authenticated:
         is_applied = post.participations.filter(user=request.user).exists()
+    
+    user_participation = None
+    if request.user.is_authenticated:
+        user_participation = Participation.objects.filter(
+            post=post,
+            user=request.user
+        ).first()
 
     comments = post.comments.select_related('author').order_by('create_time')
     images = post.images.all()
@@ -300,12 +307,16 @@ def post_detail(request, post_id):
 
     comment_form = CommentForm()
 
-    return render(request, 'moong/post_detail.html', {'post': post,
-                                                      'comments':comments,
-                                                      'comment_form':comment_form,
-                                                      'is_applied': is_applied,
-                                                      'approved_participants': approved_participants,
-                                                      })
+    context = {
+        'post': post,
+        'comments':comments,
+        'comment_form':comment_form,
+        'is_applied': is_applied,
+        'approved_participants': approved_participants,
+        'user_participation': user_participation,
+    }
+    
+    return render(request, 'moong/post_detail.html', context)
 
 # ==================== 게시글 수정 ====================
 def post_mod(request, post_id):
@@ -520,15 +531,18 @@ def moim_finished(request, post_id):
 @login_required
 def post_apply(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    # 이미 신청했는지 확인 후 없으면 생성
+    # 이미 신청했는지 확인 후 없으면 생성    
+    
     participation, created =Participation.objects.get_or_create(
         post=post, 
         user=request.user, 
-        defaults={'status': 'PENDING'}, 
-        #approve_time=models.DateTimeField(null=True, blank=True, verbose_name='승인 시간')
+        defaults={'status': 'PENDING',
+                  'approve_time' : timezone.now()
+                  }, 
         )
+    print(f"참여 확인 :  {participation}, created : {created}")
     messages.success(request, '참여 신청이 완료되었습니다.')
-    return redirect('moong:post_detail', post_id=post.id) # 다시 상세페이지로!
+    return redirect('moong:post_detail', post_id = post.id) # 다시 상세페이지로!
 
 @login_required
 def participant_manage(request, participation_id):
@@ -552,6 +566,7 @@ def participant_manage(request, participation_id):
 
 @login_required
 def post_cancel(request, post_id):
+    print("참여 취소 호출")
     post = get_object_or_404(Post, id=post_id)
     # 해당 신청 내역 찾아서 삭제
     participation = Participation.objects.filter(post=post, user=request.user)

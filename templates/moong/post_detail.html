@@ -115,16 +115,9 @@
 
         <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
 
-        <!-- <div class="post-comments" style="font-size: 1.3rem;">
-            <h6>댓글 {{ post.comments.count }}개</h6>
-            {% for comment in post.comments.all %}
-                <div style="margin-bottom: 5px;">
-                    <strong>{{ comment.author.nick_name }}</strong> {{ comment.content }}
-                </div>
-            {% endfor %}
-        </div> -->
 
-            {% include "moong/comments.html" %}
+        <!--댓글-->
+        {% include "moong/comments.html" with is_a_post=False %}
 
         <!-- 메시지 표시 -->
         {% if messages %}

@@ -77,14 +77,14 @@ def main(request):
         else:
             keyword_tags.append(tag)
 
-    # comment_form = CommentForm()        
+    comment_form = CommentForm()        
     
     return render(request, 'moong/main.html', {
         'posts': posts,
         'location_tags': location_tags[:10],  # 상위 10개만
         'keyword_tags': keyword_tags[:10],    # 상위 10개만
         'search': search,
-        # 'comment_form': comment_form,
+        # 'comment_form': comment_form,  # 메인 페이지 댓글 작성폼 노출 여부
     })
 
 
@@ -293,7 +293,13 @@ def post_detail(request, post_id):
     if request.user.is_authenticated:
         is_applied = post.participations.filter(user=request.user).exists()
 
-    comments = post.comments.select_related('author').order_by('create_time')
+    comments = (
+        post.comments
+        .filter(parent__isnull=True)
+        .select_related('author')
+        .prefetch_related('replies__author')
+        .order_by('create_time'))
+    
     images = post.images.all()
     hashtags = post.hashtags.all()
 
@@ -541,20 +547,24 @@ def comment_add(request, post_id):
     
     post = get_object_or_404(Post, id=post_id)
     form = CommentForm(data=request.POST)
+    parent_id = request.POST.get("parent_id")
 
     if form.is_valid():
         comment = form.save(commit=False)
         comment.post = post
         comment.author = request.user
-        comment.save()
-        # url_next = reverse("moong:post_detail",
-        #                    kwargs={"post_id":comment.post_id}
-        #                    ) + f"#post-{comment.post.id}"
-        # return HttpResponseRedirect(url_next)
+        if parent_id:
+            comment.parent = Comment.objects.get(id=parent_id)
+        comment.save()    
+
+        url_next = reverse("moong:post_detail",
+                           kwargs={"post_id":comment.post_id}
+                           ) + f"#post-{comment.post.id}"
+        return HttpResponseRedirect(url_next)
     else:
         return HttpResponseBadRequest("댓글 내용 오류")
     
-    return redirect("moong:post_detail", post_id=post.id)
+    # return redirect("moong:post_detail", post_id=post.id)
 
 
 # ==================== 댓글 삭제 ====================    

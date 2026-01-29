@@ -2,20 +2,100 @@
     댓글 {{ post.comments.count }}개
         <ul>
             {% for comment in post.comments.all %}
-                <li>
+                <li style="margin-bottom: 12px;">
+
                     <!-- comment_list -->
-                    <strong>{{ comment.author.nick_name }}</strong> <small>님의 댓글</small> : <span>{{ comment.content }}</span>
-                    <small>{{ comment.create_time }}</small>
+               
+                        <img src="{{ comment.author.profile_image.url }}"
+                            alt="profile"
+                            class="comment-profile"
+                            style=
+                                "width: 24px;
+                                height: 24px;
+                                border-radius: 50%;
+                                border: 2px solid #d8aac3;
+                                object-fit: cover;">
+
+              
+                        <strong>{{ comment.author.nick_name }}</strong>
+                        <small>님의 댓글</small> : 
+                        <span>
+                            {% if is_a_post %}  
+                                {{ comment.content|truncatechars:20 }}
+                            {% else %}
+                                {{ comment.content }}
+                            {% endif %}
+                        </span>
+
+                    <small>
+                        {{ comment.display_time }}
+                        {% if not is_a_post %}
+
+                            <button type="button"
+                                    class="reply-toggle"
+                                    data-comment-id="{{ comment.id }}">
+                                Re ↳
+                            </button>
+                                
+                        {% endif %}                   
+                    </small>
+                   
+               
+
                     <!-- comment_delete -->
-                    {% if comment_form %}
-                    {% if user == comment.author %}
+                    {% if comment_form and user == comment.author %}
                         <form method="POST" 
-                              action="{% url 'moong:comment_delete' comment_id=comment.id %}">
+                              action="{% url 'moong:comment_delete' comment_id=comment.id %}"
+                              style="display:inline;">
                             {% csrf_token %}
-                            <button type="submit">삭제</button>
+                            <button type="submit">Del</button>
                         </form>
                     {% endif %}
-                    {% endif %}
+
+                    <!-- replies list -->
+                    {% for reply in comment.replies.all %}
+
+                        <div style="margin-left:20px; margin-top:6px;">
+                            <strong>↳ 
+                            <img src="{{ reply.author.profile_image.url }}"
+                            alt="profile"
+                            class="comment-profile"
+                            style=
+                                "width: 24px;
+                                height: 24px;
+                                border-radius: 50%;
+                                border: 2px solid #d8aac3;
+                                object-fit: cover;">
+                                
+                                {{ reply.author.nick_name }}</strong>
+                            <small>님의 댓글</small> : 
+                            <span>
+                                {% if is_a_post %}
+                                    {{ reply.content|truncatechars:20 }}
+                                {% else %}
+                                    {{ reply.content }}
+                                {% endif %}
+                            </span>
+                            <small>{{ reply.display_time }}</small>
+                        </div>
+                    {% endfor %}
+
+                    <!-- replies add -->
+                
+                    {% if comment_form and not is_a_post %}
+                    <div class="reply-form"
+                        id="reply-form-{{ comment.id }}"
+                        style="display:none; margin-left:20px; margin-top:8px;">
+                        <form method="POST"
+                            action="{% url 'moong:comment_add' post_id=post.id %}">
+                            {% csrf_token %}
+                            {{ comment_form.content }}
+                            <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                            <button type="submit">대댓글 등록</button>                
+                        </form>
+                    </div>  
+                    {% endif %}                                 
+                    
                 </li>
             {% empty %}
                 <li>댓글이 없습니다.</li>
@@ -23,14 +103,33 @@
         </ul>
 </div>
 
-      
+<!-- comment add -->      
+
 {% if comment_form %}
-<div>
+<div style="margin-top:16px;">
     <form method="POST" action="{% url 'moong:comment_add' post_id=post.id %}">
         {% csrf_token %}
         {{ comment_form.content }}
         <button type="submit">댓글 등록</button>
-
     </form>
 </div>
 {% endif %}
+
+<!-- 🔽 JS: 대댓글 폼 토글 -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".reply-toggle").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            const commentId = this.dataset.commentId;
+            const form = document.getElementById("reply-form-" + commentId);
+
+            if (!form) return;
+
+            form.style.display =
+                (form.style.display === "none" || form.style.display === "")
+                ? "block"
+                : "none";
+        });
+    });
+});
+</script>

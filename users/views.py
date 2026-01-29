@@ -106,11 +106,10 @@ def mypage_activity(request):
         complete=True  # 완성된 글만 (임시저장 제외)
     ).order_by('-create_time')
     
-    # 내가 참여한 모임 (승인된 참여만, 완성된 글만)
+    # 내가 참여한 모임 
     my_participations = Participation.objects.filter(
         user=user,
-        status='APPROVED',
-        post__complete=True  # 완성된 글만
+        post__complete=True 
     ).select_related('post').order_by('-create_time')
     
     # 통계

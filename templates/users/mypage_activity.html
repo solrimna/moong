@@ -5,154 +5,17 @@
 {% block title %}활동 이력 - 뭉이{% endblock %}
 
 {% block myHead %}
-<style>
-    /* ===========================================
-       활동 이력 페이지 고유 스타일
-       =========================================== */
-    
-    .container {
-        max-width: 900px;
-    }
-    
-    /* 통계 */
-    .stats-container {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-        padding: 30px;
-    }
-    
-    .stat-box {
-        background: #F8F9FA;
-        color: #333;
-        padding: 25px;
-        border-radius: 16px;
-        text-align: center;
-        border: 1px solid #E0E0E0;
-    }
-    
-    .stat-number {
-        font-size: 36px;
-        font-weight: 700;
-        color: #4285F4;
-        margin-bottom: 5px;
-    }
-    
-    .stat-label {
-        font-size: 14px;
-        color: #666;
-    }
-    
-    /* 섹션 */
-    .content-section {
-        padding: 0 30px 30px;
-    }
-    
-    /* 모임 카드 */
-    .post-list {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .post-card {
-        background: #F8F9FA;
-        border-radius: 16px;
-        padding: 20px;
-        transition: all 0.3s ease;
-        border-left: 4px solid #4285F4;
-    }
-    
-    .post-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(66, 133, 244, 0.2);
-        background: #FFF9E6;
-    }
-    
-    .post-card a {
-        text-decoration: none;
-        color: inherit;
-    }
-    
-    .post-card a:hover .post-title {
-        color: #4285F4;
-    }
-    
-    .post-title {
-        font-size: 18px;
-        font-weight: 600;
-        color: #1A237E;
-        margin-bottom: 10px;
-    }
-    
-    .post-info {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
-        font-size: 14px;
-        color: #666;
-        margin-bottom: 10px;
-    }
-    
-    .post-info-item {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-    
-    .status-badge {
-        display: inline-block;
-        padding: 6px 12px;
-        border-radius: 12px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-    
-    .status-open {
-        background: #E8F5E9;
-        color: #2E7D32;
-    }
-    
-    .status-closed {
-        background: #FFEBEE;
-        color: #C62828;
-    }
-    
-    .status-cancelled {
-        background: #E0E0E0;
-        color: #616161;
-    }
-    
-    /* 버튼 */
-    .button-section {
-        padding: 0 30px 30px;
-    }
-    
-    /* 반응형 */
-    @media (max-width: 768px) {
-        .stats-container {
-            grid-template-columns: 1fr;
-        }
-        
-        .post-info {
-            flex-direction: column;
-            gap: 8px;
-        }
-    }
-</style>
 {% endblock %}
 
 {% block myBlock %}
 {% include 'moong/navigation.html' %}
 
 <div class="mypage_container">
-    <!-- 헤더 -->
     <div class="mypage_header">
         <div class="mypage_header-title">활동 이력</div>
         <div class="mypage_header-subtitle">{{ user.nick_name }}님의 모임 활동 기록</div>
     </div>
 
-    <!-- 통계 -->
     <div class="stats-container">
         <div class="stat-box">
             <div class="stat-number">{{ total_created }}</div>
@@ -164,30 +27,20 @@
         </div>
     </div>
 
-    <!-- 내용 -->
     <div class="content-section">
-        <!-- 내가 만든 모임 -->
         <h2 class="section-title">🎯 내가 만든 모임</h2>
         {% if my_posts %}
             <div class="post-list">
                 {% for post in my_posts %}
                 <div class="post-card">
-                    <a href="{% url 'moong:post_detail' post.id %}" style="text-decoration: none; color: inherit;">
+                    <a href="{% url 'moong:post_detail' post.id %}">
                         <div class="post-title">{{ post.title }}</div>
                     </a>
                     <div class="post-info">
-                        <div class="post-info-item">
-                            📅 {{ post.moim_date|date:"Y년 m월 d일" }}
-                        </div>
-                        <div class="post-info-item">
-                            ⏰ {{ post.moim_time|time:"H:i" }}
-                        </div>
-                        <div class="post-info-item">
-                            📍 {{ post.location|default:"장소 미정" }}
-                        </div>
-                        <div class="post-info-item">
-                            👥 {{ post.get_approved_count }}/{{ post.max_people|default:"∞" }}명
-                        </div>
+                        <div class="post-info-item">📅 {{ post.moim_date|date:"Y년 m월 d일" }}</div>
+                        <div class="post-info-item">⏰ {{ post.moim_time|time:"H:i" }}</div>
+                        <div class="post-info-item">📍 {{ post.location|default:"장소 미정" }}</div>
+                        <div class="post-info-item">👥 {{ post.get_approved_count }}/{{ post.max_people|default:"∞" }}명</div>
                     </div>
                     {% if post.is_cancelled %}
                         <span class="status-badge status-cancelled">취소됨</span>
@@ -206,48 +59,38 @@
             </div>
         {% endif %}
 
-        <!-- 내가 참여한 모임 -->
-        <h2 class="section-title">🤝 내가 참여한 모임</h2>
+        <h2 class="section-title" style="margin-top: 40px;">🤝 내가 참여한 모임</h2>
         {% if my_participations %}
             <div class="post-list">
                 {% for participation in my_participations %}
                 <div class="post-card">
-                    <a href="{% url 'moong:post_detail' participation.post.id %}" style="text-decoration: none; color: inherit;">
+                    <a href="{% url 'moong:post_detail' participation.post.id %}">
                         <div class="post-title">{{ participation.post.title }}</div>
                     </a>
                     <div class="post-info">
-                        <div class="post-info-item">
-                            📅 {{ participation.post.moim_date|date:"Y년 m월 d일" }}
-                        </div>
-                        <div class="post-info-item">
-                            ⏰ {{ participation.post.moim_time|time:"H:i" }}
-                        </div>
-                        <div class="post-info-item">
-                            📍 {{ participation.post.location|default:"장소 미정" }}
-                        </div>
-                        <div class="post-info-item">
-                            👤 주최자: {{ participation.post.author.nick_name }}
-                        </div>
+                        <div class="post-info-item">📅 {{ participation.post.moim_date|date:"Y년 m월 d일" }}</div>
+                        <div class="post-info-item">📍 {{ participation.post.location|default:"장소 미정" }}</div>
+                        <div class="post-info-item">👤 주최자: {{ participation.post.author.nick_name }}</div>
                     </div>
-                    <div class="post-info">
-                        <div class="post-info-item">
-                            ✅ 승인일: {{ participation.approve_time|date:"Y-m-d H:i" }}
-                        </div>
-                    </div>
+                    
+                    {% if participation.approve_time %}
+                        <span class="status-badge status-open">✅ 참여 확정</span>
+                    {% else %}
+                        <span class="status-badge status-cancelled">⏳ 승인 대기 중</span>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </div>
         {% else %}
             <div class="empty-state">
-                <div class="empty-state-icon">🙋</div>
-                <div class="empty-state-text">아직 참여한 모임이 없어요</div>
+                <div class="empty-state-icon">🤝</div>
+                <div class="empty-state-text">아직 참여 신청한 모임이 없어요.</div>
             </div>
         {% endif %}
-    </div>
+        </div>
 
-    <!-- 버튼 -->
     <div class="button-section">
-        <a href="{% url 'users:mypage' %}" class="btn btn-primary">← 마이페이지로 돌아가기</a>
+        <a href="{% url 'users:mypage' %}" class="back-button">마이페이지로 돌아가기</a>
     </div>
 </div>
 {% endblock %}

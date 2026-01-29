@@ -1,13 +1,13 @@
-<div class="post-card" style="border: 1px solid #ddd; border-radius: 10px; margin-bottom: 20px; padding: 15px; background: #fff;">
-    <div class="post-header" style="display: flex; align-items: center; margin-bottom: 10px;">
-        <a href="{% url 'users:user_profile' post.author.id %}" style="text-decoration: none; color: inherit; cursor: pointer;">
+<div class="a-post-card">
+    <div class="a-post-header">
+        <a href="{% url 'users:user_profile' post.author.id %}" class="author-link">
             <strong>{{ post.author.nick_name }}</strong>
         </a>
-        <span style="color: #888; font-size: 0.8rem; margin-left: 10px;">{{ post.create_time|date:"Y-m-d" }}</span>
+        <span class="post-date">{{ post.create_time|date:"Y-m-d" }}</span>
     </div>
     <br>
-    <div class="post-content">
-        <h4 style="margin: 5px 0;">
+    <div class="a-post-content">
+        <h4>
             <a href="{% url 'moong:post_detail' post.id %}">
                 {{ post.title }}
             </a>    
@@ -15,39 +15,30 @@
         <p>{{ post.content }}</p>
     </div>
 
-    <div class="post-images">
+    <div class="a-post-images">
         {% if post.images.first %}
-            <a href="{% url 'moong:post_detail' post.id %}" style="display: block;">
-                <img src="{{ post.images.first.image.url }}" style="width: 100%; max-width: 500px; height: 500px; margin: 0 auto; object-fit: cover; display: block; cursor: pointer;">
+            <a href="{% url 'moong:post_detail' post.id %}" class="image-link">
+                <img src="{{ post.images.first.image.url }}" class="post-image">
             </a>
         {% endif %}
     </div>
     <br>
 
-    <div class="post-info" style="background: #f8f9fa; padding: 8px; border-radius: 5px; font-size: 0.9rem;">
+    <div class="a-post-info">
         장소: {{ post.location }} <br>
         참여 현황: <strong>{{ post.get_approved_count }}</strong> / {{ post.max_people }}명
         {% if post.is_full %}
-            <span style="color: red; font-weight: bold;">[인원 마감]</span>
+            <span class="full-badge">[인원 마감]</span>
         {% endif %}
     </div>
 
-    <div class="post-tags" style="margin-top: 10px;">
+    <div class="a-post-tags">
         {% for tag in post.hashtags.all %}
-            <a href="{% url 'moong:tag_feeds' tag.name %}" style="text-decoration: none; color: #007bff; font-size: 0.9rem;">#{{ tag.name }}</a>
+            <a href="{% url 'moong:tag_feeds' tag.name %}" class="tag-link">#{{ tag.name }}</a>
         {% endfor %}
     </div>
 
-    <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+    <hr class="a-post-divider">
 
-    <!-- <div class="post-comments" style="font-size: 1.3rem;">
-        <h6>댓글 {{ post.comments.count }}개</h6>
-        {% for comment in post.comments.all %}
-            <div style="margin-bottom: 5px;">
-                <strong>{{ comment.author.nick_name }}</strong> {{ comment.content }}
-            </div>
-        {% endfor %}
-        
-    </div> -->
     {% include "moong/comments.html" %}
 </div>

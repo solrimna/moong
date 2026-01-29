@@ -234,7 +234,7 @@ class Comment(models.Model):
         db_table = 'Comment'
     
     def __str__(self):
-        return f'{self.author.username}의 댓글 - {self.content[:20] if self.content else ""}'
+        return f'{self.author.nick_name}의 댓글 - {self.content[:20] if self.content else ""}'
     
     def save(self, *args, **kwargs):
         """저장 시 주최자 여부 자동 설정"""

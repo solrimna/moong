@@ -1,5 +1,5 @@
 from django import forms
-from .models import Post
+from .models import Post, Comment
 from locations.models import Location
 from django.utils import timezone
 
@@ -93,3 +93,12 @@ class PostForm(forms.ModelForm):
                 if moim_date == today and moim_time < current_time:
                     raise forms.ValidationError(f'모임 시간은 현재 시간({current_time.strftime("%H:%M")}) 이후여야 합니다.')        
         return cleaned_data
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ["content"]
+        widgets = {
+            "content":forms.TextInput(attrs = {"placeholder" : "댓글을 입력하세요."})
+        }

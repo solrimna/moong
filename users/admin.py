@@ -19,10 +19,8 @@ class UserAdmin(UserAdmin):
     # 상세 화면 필드 그룹핑
     fieldsets = (
         ( None, {"fields" : ("username", "password","email", "phone")}),
-        ( "활동 정보", {"fields" : ("nick_name", "location", "profile_image", "gender")}),
+        ( "활동 정보", {"fields" : ("nick_name", "location", "profile_image", "gender", "ddomoong")}),
         ( "권한", { "fields": ("is_active", "is_staff", "is_superuser")}),
         ( "중요한 일정", { "fields": ("last_login", "date_joined")}),
-        # ('추가 정보', {
-        #     'fields': ('nick_name', 'profile_image', 'location', 'ddomoong', 'gender', 'phone')
-        # }),
+        
     )

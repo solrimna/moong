@@ -55,7 +55,8 @@ class User(AbstractUser):
         max_length=20, 
         null=True, 
         blank=True, 
-        verbose_name='전화번호'
+        verbose_name='전화번호',
+        validators=[phone_regex]
     )
 
     gender = models.CharField(

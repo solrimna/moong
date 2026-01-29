@@ -1,0 +1,36 @@
+<div>
+    댓글 {{ post.comments.count }}개
+        <ul>
+            {% for comment in post.comments.all %}
+                <li>
+                    <!-- comment_list -->
+                    <strong>{{ comment.author.nick_name }}</strong> <small>님의 댓글</small> : <span>{{ comment.content }}</span>
+                    <small>{{ comment.create_time }}</small>
+                    <!-- comment_delete -->
+                    {% if comment_form %}
+                    {% if user == comment.author %}
+                        <form method="POST" 
+                              action="{% url 'moong:comment_delete' comment_id=comment.id %}">
+                            {% csrf_token %}
+                            <button type="submit">삭제</button>
+                        </form>
+                    {% endif %}
+                    {% endif %}
+                </li>
+            {% empty %}
+                <li>댓글이 없습니다.</li>
+            {% endfor %}
+        </ul>
+</div>
+
+      
+{% if comment_form %}
+<div>
+    <form method="POST" action="{% url 'moong:comment_add' post_id=post.id %}">
+        {% csrf_token %}
+        {{ comment_form.content }}
+        <button type="submit">댓글 등록</button>
+
+    </form>
+</div>
+{% endif %}

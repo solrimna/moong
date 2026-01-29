@@ -70,9 +70,11 @@ class SignupForm(UserCreationForm): # UsercreationForm은 ModelForm
     )
 
     gender = forms.ChoiceField(
-        choices=[("","성별 선택")] + list(
-            User._meta.get_field("gender").choices
-        ),
+        choices=[
+        ("", "성별 선택"),
+        ("M", "남성"),
+        ("F", "여성")
+        ],
         label="성별",      
         required=False,
         widget=forms.Select(
@@ -89,14 +91,13 @@ class SignupForm(UserCreationForm): # UsercreationForm은 ModelForm
             "nick_name",
             "location",
             "profile_image",
-            "email",
             "phone",
             "gender",
+            "email",
             )
     
     
-    email = forms.EmailField(required=True)    
-    
+        
     def clean_email(self):
         email = self.cleaned_data["email"]
 

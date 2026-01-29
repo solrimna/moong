@@ -26,3 +26,6 @@ reset_db.bat
 
 # 이미지 파일 제외
 media/profile_images/*/*/*/*.png
+media/profile_images/*/*/*/*.jpg
+media/post_images/*/*/*/*.png
+media/post_images/*/*/*/*.jpg

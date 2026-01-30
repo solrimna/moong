@@ -2,40 +2,6 @@
 {% load static %}
 
 {% block myHead %}
-    <style>
-        .imagePreview {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .imagePreview img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 5px;
-            border: 2px solid #ddd;
-        }
-        .existing-image {
-            display: inline-block;
-            margin: 10px;
-            position: relative;
-        }
-        .existing-image img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 5px;
-            border: 2px solid #ddd;
-        }
-        .delete-checkbox {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: white;
-            padding: 2px;
-        }
-    </style>
     {% if post and post.location %}
         <div id="saved_location"
             data-sido="{{ post.location.sido }}"

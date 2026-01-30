@@ -95,6 +95,20 @@
     font-style: italic;
 }
 
+/* imagePreview - js에 미리보기 이벤트로 이용되므로, 이름 변경시 반드시 공통 변경 필요  */
+.imagePreview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+.imagePreview img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 5px;
+    border: 2px solid #ddd;
+}
 /* ========================================
     공통 빈 상태 스타일
     ======================================== */
@@ -407,7 +421,7 @@
 }
 
 /* ========================================
-    활동 이력 (Activity) 전용 스타일
+    마이페이지 활동 이력 (Activity) 전용 스타일
     ======================================== */
 /* 바꿔도 됩니당 */
 
@@ -607,8 +621,25 @@
     cursor: pointer;
     transition: transform 0.3s ease;
 }
-
-
+.existing-image {
+    display: inline-block;
+    margin: 10px;
+    position: relative;
+}
+.existing-image img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 5px;
+    border: 2px solid #ddd;
+}
+.delete-checkbox {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: white;
+    padding: 2px;
+}
 
 /* ========================================
     글 작성 페이지

@@ -48,11 +48,18 @@
             </a> 
             </h4>
             <div class="post-profile-image-wrapper">
-                {% if post.author.profile_image %}
-                    <img src="{{ post.author.profile_image.url }}" alt="프로필" 
-                    class="post-profile-image" onclick="openImageModal(this.src);">
+                {% if user == post.author %}
+                    <a href="{% url 'users:mypage' %}">
+                        <img src="{{ post.author.profile_image.url }}" alt="프로필" class ='profile-image'>
+                        작성자: {{ post.author.nick_name }} 
+                    </a>
+                {% else %}
+                    <a href="{% url 'users:user_profile' post.author.id %}">
+                        <img src="{{ post.author.profile_image.url }}" alt="프로필" class ='profile-image'>
+                        작성자: {{ post.author.nick_name }}
+                    </a>
                 {% endif %}
-                작성자: {{ post.author.username }} | {{ post.create_time }}
+                | {{ post.create_time }}
             </div>
         </div>
         <div class="post-info">
@@ -166,6 +173,13 @@
                         </button>
                     </form>
                 {% else %}
+                    <form method="POST" action="{% url 'moong:post_closed_cancel' post.id %}" >
+                        {% csrf_token %}
+                        <button type="submit">
+                            모집 확정 취소
+                        </button>
+                    </form>
+
                     <form method="POST" action="{% url 'moong:moim_finished' post.id %}" >
                         {% csrf_token %}
                         <button type="submit">

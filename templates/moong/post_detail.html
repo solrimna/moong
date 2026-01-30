@@ -146,7 +146,16 @@
                         {% for participant in approved_participants %}
                             <li>
                                 {{ participant.user.nick_name|default:participant.user.username }}
-                    
+                                {% if user == post.author %}
+                                    <form action="{% url 'moong:participant_manage' participant.id %}" method="post">
+                                        {% csrf_token %}
+                                        {% if participant.status == 'APPROVED' %}
+                                            <button type="submit" name="action_complete" value="reject"> 승인취소 </button> 
+                                        {% else %}
+                                            <button type="submit" name="action_complete" value="approve"> 승인 </button>
+                                        {% endif %}                 
+                                    </form>
+                                {% endif %}   
                                 {% if participant.user == post.author %}
                                     (주최자)
                                 {% else %}
@@ -161,7 +170,6 @@
                                 {% endif %}
 
                                 {% comment %} 체크 박스 리스트를 만들어서 체크를 해야함  {% endcomment %}
-
                             </li>
                         {% empty %}
                             <li>참여자가 없습니다.</li>

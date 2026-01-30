@@ -581,19 +581,20 @@ def post_apply(request, post_id):
 @login_required
 def participant_manage(request, participation_id):
     participation = get_object_or_404(Participation, id=participation_id)
-    
+    #print(f"승인여부 :  {action_comple}")
     # 주최자만 권한 허용
     if request.user != participation.post.author:
         return redirect('moong:post_detail', post_id=participation.post.id)
 
     if request.method == 'POST':
-        action = request.POST.get('action')
-        if action == 'approve':
+        action_complete = request.POST.get('action_complete')
+        print(f"승인여부 :  {action_complete}")
+        if action_complete == 'approve':
             participation.status = 'APPROVED' # 수락 시 승인 상태로 변경
             participation.save()
-        elif action == 'reject':
+        elif action_complete == 'reject':
             # 거절 시 다시 신청할 수 있도록 아예 삭제하거나 상태를 REJECTED로 변경
-            participation.delete() 
+            participation.cancel() 
             
     return redirect('moong:post_detail', post_id=participation.post.id)    
 

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block myHead %}
     <style>
         .container { display: flex; margin-top: 20px; }
@@ -7,6 +7,7 @@
         .content { width: 75%; padding: 20px; }
         .search-bar { margin-bottom: 20px; }
     </style>
+    <script src="{% static 'js/swipe_slider.js' %}"></script>
 {% endblock %}
 
 {% block myBlock %}

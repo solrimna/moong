@@ -1,8 +1,13 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block myHead %}  
+{% block myHead %}
 <script src="{% static 'js/img_view.js' %}"></script>
+<script>
+    const DDOMOONG_URL_BASE = "{% url 'moong:give_ddomoong' participation_id=0 %}";
+    const CSRF_TOKEN = "{{ csrf_token }}";
+</script>
+<script src="{% static 'js/ddo_moong.js' %}"></script>
 {% endblock %}
 
 {% block myBlock %}
@@ -176,6 +181,9 @@
                         {% endfor %}
                     </ul>
                 </details>
+                {% if post.moim_finished %}
+                    {% include "moong/ddo_moong.html" with participants=ddomoong_participants %}
+                {% endif %}
             </div>
         </div>
         
@@ -195,9 +203,13 @@
         {% if messages %}
         <div class="messages">
             {% for message in messages %}
-            <div class="message {{ message.tags }}">
-                {{ message }}
-            </div>
+                {% if 'alert_popup' in message.tags %}
+                    <script>alert("{{ message }}");</script>
+                {% else %}
+                    <div class="message {{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endif %} 
             {% endfor %}
         </div>
         {% endif %}
@@ -205,21 +217,13 @@
             <a href="{% url 'moong:main' %}" class="btn btn-secondary">목록으로</a>
             {% if user == post.author %}
                 <a href="{% url 'moong:post_mod' post.id %}" class="btn btn-primary"> 모임글 수정</a>
-                {% if not post.is_closed %}
-                    <form method="POST" action="{% url 'moong:post_closed' post.id %}" >
-                        {% csrf_token %}
-                        <button type="submit">
-                            모집 확정
-                        </button>
-                    </form>
-                {% else %}
-                    <form method="POST" action="{% url 'moong:post_closed_cancel' post.id %}" >
-                        {% csrf_token %}
-                        <button type="submit">
-                            모집 확정 취소
-                        </button>
-                    </form>
-
+                <form method="POST" action="{% url 'moong:post_closed' post.id %}" >
+                    {% csrf_token %}
+                    <button type="submit">
+                        {% if post.is_closed %}모집 확정 취소{% else %}모집 확정{% endif %}
+                    </button>
+                </form>
+                {% if post.is_closed %}
                     <form method="POST" action="{% url 'moong:moim_finished' post.id %}" >
                         {% csrf_token %}
                         <button type="submit">

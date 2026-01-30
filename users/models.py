@@ -102,32 +102,37 @@ class User(AbstractUser):
             self.save(update_fields=['ddomoong'])
             
     def save(self, *args, **kwargs):
-        if self.profile_image:
-            img = Image.open(self.profile_image)
+        # 🔥 새로 업로드된 이미지만 처리 (기본 이미지나 이미 저장된 이미지는 건너뛰기)
+        if self.profile_image and hasattr(self.profile_image, 'file'):
+            try:
+                img = Image.open(self.profile_image)
 
-            if img.mode != "RGB":
-                img = img.convert("RGB")
+                if img.mode != "RGB":
+                    img = img.convert("RGB")
 
-            width, height = img.size
-            min_side = min(width, height)
+                width, height = img.size
+                min_side = min(width, height)
 
-            left = (width - min_side) // 2
-            top = (height - min_side) // 2
-            right = left + min_side
-            bottom = top + min_side
+                left = (width - min_side) // 2
+                top = (height - min_side) // 2
+                right = left + min_side
+                bottom = top + min_side
 
-            img = img.crop((left, top, right, bottom))
-            img = img.resize((300, 300), Image.LANCZOS)
+                img = img.crop((left, top, right, bottom))
+                img = img.resize((300, 300), Image.LANCZOS)
 
-            buffer = BytesIO()
-            img.save(buffer, format='JPEG', quality=95)
-            buffer.seek(0)
+                buffer = BytesIO()
+                img.save(buffer, format='JPEG', quality=95)
+                buffer.seek(0)
 
-            # 🔥 파일명 유지 (또는 새 이름 지정 가능)
-            self.profile_image = ContentFile(
-                buffer.read(),
-                name=self.profile_image.name
-            )
+                # 파일명 유지
+                self.profile_image = ContentFile(
+                    buffer.read(),
+                    name=self.profile_image.name
+                )
+            except Exception:
+                # 이미지 처리 실패 시 원본 유지
+                pass
 
     
         super().save(*args, **kwargs)

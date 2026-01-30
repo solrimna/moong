@@ -42,6 +42,11 @@
                 {% endif %}
                 {{ form.profile_image }}
                 <p class="helper-text">JPG, PNG 파일만 가능 (최대 5MB)</p>
+                
+                <!-- 🔥 기본 프로필로 변경 버튼 (메인 폼 안에 포함) -->
+                <button type="submit" name="reset_profile_image" class="btn-reset-image">
+                     기본 프로필로 변경
+                </button>
             </div>
             
             <div class="form-group">

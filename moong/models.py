@@ -1,5 +1,7 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
+from datetime import timedelta
 
 
 class Post(models.Model):
@@ -251,7 +253,30 @@ class Comment(models.Model):
     def is_reply(self):
         """대댓글 여부"""
         return self.parent is not None
+    
+    def display_time(self):
+        """
+        오늘 작성 → n시간 전 / n분 전
+        오늘이 아님 → YYYY.MM.DD
+        """
+        now = timezone.now()
+        created = self.create_time
 
+        # 날짜가 같은 경우
+        if now.date() == created.date():
+            diff = now - created
+
+            if diff < timedelta(minutes=1):
+                return "방금 전"
+            elif diff < timedelta(hours=1):
+                minutes = int(diff.total_seconds() // 60)
+                return f"{minutes}분 전"
+            else:
+                hours = int(diff.total_seconds() // 3600)
+                return f"{hours}시간 전"
+
+        # 날짜가 다른 경우
+        return created.strftime("%Y.%m.%d")
 
 class Hashtag(models.Model):
     """해시태그 모델"""

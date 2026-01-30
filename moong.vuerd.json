@@ -888,19 +888,19 @@
         "id": "_aTRXv9u0dhYf76CjQULA",
         "tableId": "nRcoxDzOxlejRYE-Zb-J8",
         "name": "is_closed",
-        "comment": "모집 마감여부 (0:마감X, 1:마감)",
+        "comment": "마감여부 (0:마감X, 1:마감)",
         "dataType": "BOOLEAN",
-        "default": "0",
+        "default": "",
         "options": 0,
         "ui": {
           "keys": 0,
           "widthName": 60,
-          "widthComment": 167,
+          "widthComment": 140,
           "widthDataType": 60,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1769578281246,
+          "updateAt": 1769387410710,
           "createAt": 1769387298349
         }
       },
@@ -910,7 +910,7 @@
         "name": "is_cancelled",
         "comment": "폭파여부 (0:활성화, 1:비활성화)",
         "dataType": "BOOLEAN",
-        "default": "0",
+        "default": "",
         "options": 0,
         "ui": {
           "keys": 0,
@@ -920,7 +920,7 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1769578366244,
+          "updateAt": 1769387458274,
           "createAt": 1769387352230
         }
       },
@@ -930,7 +930,7 @@
         "name": "complete",
         "comment": "임시저장여부(0:임시저장 1:저장)",
         "dataType": "BOOLEAN",
-        "default": "0",
+        "default": "",
         "options": 0,
         "ui": {
           "keys": 0,
@@ -940,7 +940,7 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1769578368589,
+          "updateAt": 1769475092650,
           "createAt": 1769387428249
         }
       },
@@ -1862,26 +1862,6 @@
         "meta": {
           "updateAt": 1769400347115,
           "createAt": 1769400317333
-        }
-      },
-      "RO1rcGUDcXrciF3rlIZ11": {
-        "id": "RO1rcGUDcXrciF3rlIZ11",
-        "tableId": "nRcoxDzOxlejRYE-Zb-J8",
-        "name": "moim_finished",
-        "comment": "모임 완료여부 (0:모임미완료, 1: 모임완료)",
-        "dataType": "BOOLEAN",
-        "default": "0",
-        "options": 0,
-        "ui": {
-          "keys": 0,
-          "widthName": 79,
-          "widthComment": 223,
-          "widthDataType": 60,
-          "widthDefault": 60
-        },
-        "meta": {
-          "updateAt": 1769578311443,
-          "createAt": 1769577960355
         }
       }
     },

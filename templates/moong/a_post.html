@@ -6,15 +6,6 @@
         <span class="post-date">{{ post.create_time|date:"Y-m-d" }}</span>
     </div>
     <br>
-    <div class="a-post-images">
-        {% if post.images.first %}
-            <a href="{% url 'moong:post_detail' post.id %}" class="image-link">
-                <img src="{{ post.images.first.image.url }}" class="post-image">
-            </a>
-        {% endif %}
-    </div>
-    <!-- 내용 바꾼건 없고 사진 밑에 글 나오게 순서만 바꿨어요. 혹시 원래대로 사진 위에 글 원하시면 다시 원상복구하셔도 됩니다. -->
-    <br>
     <div class="a-post-content">
         <h4>
             <a href="{% url 'moong:post_detail' post.id %}">
@@ -23,7 +14,16 @@
         </h4>
         <p>{{ post.content }}</p>
     </div>
+
+    <div class="a-post-images">
+        {% if post.images.first %}
+            <a href="{% url 'moong:post_detail' post.id %}" class="image-link">
+                <img src="{{ post.images.first.image.url }}" class="post-image">
+            </a>
+        {% endif %}
+    </div>
     <br>
+
     <div class="a-post-info">
         장소: {{ post.location }} <br>
         참여 현황: <strong>{{ post.get_approved_count }}</strong> / {{ post.max_people }}명
@@ -38,7 +38,8 @@
         {% endfor %}
     </div>
 
-    <hr class="a-post-divider">
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+    <!-- 댓글 리스트 -->
+    {% include "moong/comments.html" with is_a_post=True comments=post.comments.filter parent__isnull=True %}
 
-    {% include "moong/comments.html" %}
 </div>

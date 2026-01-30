@@ -1,22 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block myHead %}
-    <style>
-        .imagePreview {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .imagePreview img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 5px;
-            border: 2px solid #ddd;
-        }
-    </style>
+{% block myHead %}>
     {% if temp_post and temp_post.location %}
         <div id="saved_location"
             data-sido="{{ temp_post.location.sido }}"
@@ -89,7 +74,24 @@
             {% endif %}
             <br>
 
-            <label>이미지 (Ctrl+클릭으로 여러 개 선택)</label><br>
+            {% if temp_post and temp_post.images.exists %}
+                <fieldset>
+                    <legend>기존 이미지</legend>
+                    {% for image in temp_post.images.all %}
+                        <div class="existing-image">
+                            <img src="{{ image.image.url }}" alt="이미지 {{ image.order }}">
+                            <label class="delete-checkbox">
+                                <input type="checkbox" name="delete_images" value="{{ image.id }}">
+                                삭제
+                            </label>
+                        </div>
+                    {% endfor %}
+                </fieldset>
+                <br>
+                <label>새 이미지 추가 (Ctrl+클릭으로 여러 개 선택)</label><br>
+            {% else %}
+                <label>이미지 (Ctrl+클릭으로 여러 개 선택)</label><br>
+            {% endif %}
             <input type="file" name="images" id="images" multiple accept="image/*">
             <div id="imagePreview" class="imagePreview"></div>
             <br>
@@ -124,7 +126,7 @@
         <!-- 버튼 -->
         {% if temp_post_id %}
             <!-- 임시저장 후: 게시 버튼만 -->
-            <button type="submit" style="background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px;">게시하기</button>
+            <button type="submit">게시하기</button>
         {% else %}
             <!-- 처음: 둘 다 보임 -->
             <button type="submit">게시</button>

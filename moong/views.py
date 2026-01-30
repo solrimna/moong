@@ -186,7 +186,7 @@ def post_add(request):
                     complete=False
                 )
                 # is_updated ture면 -> 갱신 : 이미지 지웠다가 재저장 해줘야해서 clear true
-                save_or_clear_images(post, request, clear_all=is_updated)
+                save_or_clear_images(post, request, clear_all=False, clear_list='delete_images')
 
                 # AI 해시태그
                 tags = ai_tags(post.content, location_text)
@@ -195,11 +195,8 @@ def post_add(request):
                 print("post_add 임시 저장 호출됨!")
                 print(f"임시 저장한 location: {post.location}")
 
-                return render(request, 'moong/post_add.html', {
-                    'form': form,
-                    'tags': tags,
-                    'temp_post': post,
-                })
+                url = reverse('moong:post_add') + '?load_temp=yes'
+                return redirect(url)
             # 최종 저장!
             else :    
                 post, is_updated = get_or_create_post(
@@ -278,11 +275,10 @@ def post_add(request):
                 messages.success(request, '임시저장된 글을 불러왔습니다.')
 
                 print(f"임시저장 - 불러온 location: {temp_post.location}")
-
+                print(f"임시저장 - 불러온 images: {temp_post.images.all()}")
                 context = {
                     'form': form,
                     'temp_post': temp_post,
-                    'existing_images': existing_images,
                     'tags': existing_tags,
                 }
                 return render(request, 'moong/post_add.html', context)
@@ -468,7 +464,32 @@ def post_delete(request, post_id):
     else:
         # GET 요청은 거부
         return redirect('moong:post_detail', post_id=post_id)
-       
+
+@login_required
+def post_closed_cancel(request, post_id):
+    print("post_closed_cancel 모집 확정 취소 호출됨!")
+    post = get_object_or_404(Post, id=post_id)
+    
+    # 권한 체크
+    if post.author != request.user:
+        messages.error(request, '모집 확정 취소 권한이 없습니다.')
+        return redirect('moong:post_detail', post_id=post_id)
+    
+    # POST 요청만 허용
+    if request.method == 'POST':
+
+        print(f"게시글 모집 확정 취소 처리")
+        post.is_closed = False
+        post.save()
+        messages.warning(request, f'모집 확정이 취소되었습니다.')
+        print("게시글 모집 확정 취소 완료!")
+
+        # 모임이 확정되던 아니던 post_detail로 
+        return redirect('moong:post_detail', post_id=post_id)
+    else:
+        # GET 요청은 거부
+        return redirect('moong:post_detail', post_id=post_id)
+
 # ==================== 모집 확정 ====================
 @login_required
 def post_closed(request, post_id):
@@ -675,10 +696,12 @@ def save_or_clear_images(post, request, clear_all=False, clear_list=None):
             print(f"선택 삭제된 이미지: {len(delete_images)}개")
 
     if clear_all:
+        print(f"clear_all true 확인 로그")
         post.images.all().delete()
 
     images = request.FILES.getlist('images')
     if not images:
+        print(f"왜 임시저장 때 이미지가 없지?")
         return  
     
     # 이미지 다 지우는거 아닌거 고려 

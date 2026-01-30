@@ -19,13 +19,11 @@
     <div class="profile-section">
         <div class="profile-header">
             <div class="profile-image-wrapper">
-                {% if user.profile_image %}
-                    <img src="{{ user.profile_image.url }}" alt="프로필" class="profile-image" onclick="openImageModal(this.src)">
-                {% else %}
-                    <img src="https://via.placeholder.com/100?text=👤" alt="프로필" class="profile-image">
-                {% endif %}
+                <img src="{{ user.profile_image.url }}" alt="프로필" class="profile-image" onclick="openImageModal(this.src)">
+    
                 <a href="{% url 'users:mypage_edit' %}" class="edit-badge">✏️</a>
             </div>
+            
             <div class="profile-info-header">
                 <div class="nickname-row">
                     <div class="nickname">{{ user.nick_name }}님</div>

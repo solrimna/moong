@@ -67,6 +67,14 @@ def mypage_edit(request):
     user = request.user
     
     if request.method == 'POST':
+        # 🔥 기본 프로필로 변경 버튼을 눌렀을 때
+        if 'reset_profile_image' in request.POST:
+            user.profile_image = 'profile_images/custom_property.png'
+            # update_fields를 사용해서 save() 메서드의 이미지 처리 건너뛰기
+            User.objects.filter(pk=user.pk).update(profile_image='profile_images/custom_property.png')
+            messages.success(request, '프로필 이미지가 기본 이미지로 변경되었습니다.')
+            return redirect('users:mypage_edit')
+        
         form = ProfileEditForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             # 지역 정보는 따로 처리 (3단계 선택에서 전송됨)

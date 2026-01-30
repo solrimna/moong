@@ -10,7 +10,7 @@ document.getElementById('add-tag-btn').addEventListener('click', function() {
         
         // 새로운 태그를 HTML 구조로 생성
         const newTag = `
-            <label style="display: inline-block; margin: 5px; padding: 8px 12px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 20px;">
+            <label style="display: inline-block; margin: 5px; background: #d2dbff;">
                 <input type="checkbox" name="tags" value="${tagValue}" checked>
                 #${tagValue}
             </label>

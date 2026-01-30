@@ -15,10 +15,48 @@ load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
+# 찢긴 했는데 해시태그 분류에 좀 오류가 있어요! 수정해나가겠습니다.
+# ============ 메인 페이지 =============
+# 첫번째: location 모델에서 지역 키워드 추출하는 함수
+def get_location_keywords():
+    location_keywords = set()
+    loc_data = Location.objects.values_list('sido', 'sigungu', 'eupmyeondong')
+    
+    for loc in loc_data:
+        for name in filter(None, loc):
+          
+            location_keywords.add(name)
+            
+            # 서울특별시 → 서울
+            clean_name = name.replace('특별시', '').replace('광역시', '').replace('특별자치시', '').replace('특별자치도', '').replace('도', '')
+            
+            # 전라남도 → 전남
+            if '남도' in name or '북도' in name:
+                location_keywords.add(name[0] + name[2])
+            
+            location_keywords.add(clean_name)
+            
+        
+    
+    return location_keywords
 
-# 메인 페이지
+
+# 두번째: 해시태그 지역/키워드로 분류하는 함수
+def categorize_hashtags(active_tags, location_keywords):
+    location_tags = []
+    keyword_tags = []
+    
+    for tag in active_tags:
+        if tag.name in location_keywords:
+            location_tags.append(tag)
+        else:
+            keyword_tags.append(tag)
+    
+    return location_tags[:10], keyword_tags[:10]
+
+
+# url 연결된 찐 main 함수
 def main(request):
-    # 검색하면 필터링해서 메인페이지에서 바로
     search = request.GET.get('search', '')
     
     posts = Post.objects.filter(
@@ -27,65 +65,29 @@ def main(request):
         moim_finished=False
     ).prefetch_related('images', 'hashtags')
 
-    # 검색어가 있으면 추가 필터
     if search:
         posts = posts.filter(content__icontains=search)
 
-    # 정렬
     posts = posts.order_by('-create_time')
 
-    # 해시태그 리스트
     active_tags = Hashtag.objects.annotate(
         num_posts=Count('posts')
     ).filter(num_posts__gt=0).order_by('-num_posts')
     
-    # Location 모델에서 모든 지역 키워드 수집
-    location_keywords = set()
-    loc_data = Location.objects.values_list('sido', 'sigungu', 'eupmyeondong')
+    # 함수로 분리된거 불러오기~
+    location_keywords = get_location_keywords()
+    location_tags, keyword_tags = categorize_hashtags(active_tags, location_keywords)
     
-    for loc in loc_data:
-        for name in filter(None, loc):
-            # 1. 원본 추가
-            location_keywords.add(name)
-            
-            # 2. "서울특별시" → "서울"
-            clean_name = name.replace('특별시', '').replace('광역시', '').replace('특별자치시', '').replace('특별자치도', '').replace('도', '')
-            # "전라남도" -> "전남", "경상북도" -> "경북" 처럼 앞글자+세번째글자 조합
-            if '남도' in name or '북도' in name:
-                short_name = name[0] + name[2] # 예: '전' + '남'
-                location_keywords.add(short_name)
-            
-            location_keywords.add(clean_name)
-            
-            # 3. "강남구" → "강남"
-            if clean_name.endswith('구'):
-                location_keywords.add(clean_name[:-1])
-            elif clean_name.endswith('시'):
-                location_keywords.add(clean_name[:-1])
-            elif clean_name.endswith('군'):
-                location_keywords.add(clean_name[:-1])
-    
-    # 지역 태그와 키워드 태그 구분...
-    location_tags = []
-    keyword_tags = []
-    
-    for tag in active_tags:
-        # '부분 일치'를 빼고 '정확히 일치'하는지만. 운동 이런것도 '동'으로 인식함 ㅜㅜ
-       
-        if tag.name in location_keywords:
-            location_tags.append(tag)
-        else:
-            keyword_tags.append(tag)
-
     comment_form = CommentForm()        
-    
+
     return render(request, 'moong/main.html', {
         'posts': posts,
-        'location_tags': location_tags[:10],  # 상위 10개만
-        'keyword_tags': keyword_tags[:10],    # 상위 10개만
+        'location_tags': location_tags,
+        'keyword_tags': keyword_tags,
         'search': search,
         # 'comment_form': comment_form,  # 메인 페이지 댓글 작성폼 노출 여부
     })
+
 
 
 
@@ -107,9 +109,8 @@ def tag_feeds(request, tag_name):
 # ai 해시태그 쓰려면 pip install openai, pip install python-dotenv 해야합니다!
 # .env 파일 manage.py 파일과 같은 곳에 놓고, .env 안에 open ai key 넣으셔야 합니다.
 # .gitignore에도 .env 넣어주세욥~
-# AI 해시태그 생성 함수
+# ================ AI 해시태그 생성 함수 ======================
 def ai_tags(content, location):
-    """내용과 장소를 바탕으로 해시태그 5개 생성"""
     
     if not content and not location:
         return []
@@ -126,9 +127,10 @@ def ai_tags(content, location):
 - 지역 해시태그는 장소 정보에서 추출하고, 키워드 해시태그는 내용에서 추출
 - 키워드 해시태그 예: 맛집, 취미, 친목, 운동 등
 - 장소 해시태그 규칙(입력 데이터는 항상 A B C 3단계 형식):
-    1. A (광역시/도): 약칭으로 (예: 서울, 세종, 경기, 전북 등)
-    2. B (시/군/구): 마지막 글자 제외 (예: 순천, 강남, 의왕 등)
+    1. A (광역시/도): 약칭으로 (예: 서울, 세종, 경기, 전북, 충남 등)
+    2. B (시/군/구): 전체 단어 그대로 (예: 수원시 등)
     3. C (읍/면/동): 전체 단어 그대로 (예: 정자동 등)
+    **특별 규칙: B와 C가 중복되는 경우(예: '세종특별자치시 소담동 소담동'), A와 C만 사용하여 장소 해시태그 2개 생성, 나머지 4개는 키워드 해시태그로 채우기**
 
 답변:"""
 
@@ -148,6 +150,7 @@ def ai_tags(content, location):
     except Exception as e:
         print(f"AI 해시태그 생성 오류: {e}")
         return []
+
 
 # ==================== 게시글 작성 ====================
 @login_required

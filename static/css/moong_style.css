@@ -610,6 +610,38 @@
 
 
 
+/* ========================================
+    글 작성 페이지
+    ======================================== */
+
+/* ========================================
+    글 작성 페이지 -> 해시태그 추가
+    ======================================== */
+/* 구분하기 쉽게만 하고 디자인적인건 다 없앴어요 ^^ */
+
+.tags-add-div {
+    background: #f3f3f3;
+    padding: 15px;
+}
+
+.tag-checkbox {
+    display: inline-block;
+    margin: 5px;
+    background: #ffffff;
+}
+
+.self-tags-area {
+    border-top: 1px solid #ddd;
+    padding-top: 10px;
+}
+
+.self-tags-input {
+    border: 1px solid #ccc;
+    width: 200px;
+}
+
+
+
 
 /* ========================================
     댓글창

@@ -3,25 +3,19 @@
         <ul>
             {% for comment in comments|default:post.comments.all %}
                 {% if not comment.parent %}
-                <li style="margin-bottom: 12px;">
+                <li>
 
                     <!-- comment_list -->
-               
+
                         <img src="{{ comment.author.profile_image.url }}"
                             alt="profile"
-                            class="comment-profile"
-                            style=
-                                "width: 24px;
-                                height: 24px;
-                                border-radius: 50%;
-                                border: 2px solid #d8aac3;
-                                object-fit: cover;">
+                            class="comment-profile">
 
-              
+
                         <strong>{{ comment.author.nick_name }}</strong>
-                        <small>님의 댓글</small> : 
+                        <small>님의 댓글</small> :
                         <span>
-                            {% if is_a_post %}  
+                            {% if is_a_post %}
                                 {{ comment.content|truncatechars:20 }}
                             {% else %}
                                 {{ comment.content }}
@@ -37,39 +31,32 @@
                                     data-comment-id="{{ comment.id }}">
                                 Re ↳
                             </button>
-                                
-                        {% endif %}                   
+
+                        {% endif %}
                     </small>
-                   
-               
+
 
                     <!-- comment_delete -->
                     {% if comment_form and user == comment.author %}
-                        <form method="POST" 
+                        <form method="POST"
                               action="{% url 'moong:comment_delete' comment_id=comment.id %}"
                               style="display:inline;">
                             {% csrf_token %}
                             <button type="submit">Del</button>
                         </form>
                     {% endif %}
-                    
+
                     <!-- replies list -->
                     {% for reply in comment.replies.all %}
 
-                        <div style="margin-left:20px; margin-top:6px;">
-                            <strong>↳ 
+                        <div class="reply-area">
+                            <strong>↳
                             <img src="{{ reply.author.profile_image.url }}"
                             alt="profile"
-                            class="comment-profile"
-                            style=
-                                "width: 24px;
-                                height: 24px;
-                                border-radius: 50%;
-                                border: 2px solid #d8aac3;
-                                object-fit: cover;">
-                                
+                            class="comment-profile">
+
                                 {{ reply.author.nick_name }}</strong>
-                            <small>님의 댓글</small> : 
+                            <small>님의 댓글</small> :
                             <span>
                                 {% if is_a_post %}
                                     {{ reply.content|truncatechars:20 }}
@@ -81,7 +68,7 @@
 
                             <!-- reply_delete -->
                             {% if comment_form and user == reply.author %}
-                                <form method="POST" 
+                                <form method="POST"
                                     action="{% url 'moong:comment_delete' comment_id=reply.id %}"
                                     style="display:inline;">
                                     {% csrf_token %}
@@ -92,10 +79,10 @@
                         </div>
                     {% endfor %}
 
-                   
+
 
                     <!-- replies add -->
-                
+
                     {% if comment_form and not is_a_post %}
                     <div class="reply-form"
                         id="reply-form-{{ comment.id }}"
@@ -105,11 +92,11 @@
                             {% csrf_token %}
                             {{ comment_form.content }}
                             <input type="hidden" name="parent_id" value="{{ comment.id }}">
-                            <button type="submit">대댓글 등록</button>                
+                            <button type="submit">대댓글 등록</button>
                         </form>
-                    </div>  
-                    {% endif %}                                 
-                    
+                    </div>
+                    {% endif %}
+
                 </li>
                 {% endif %}
             {% empty %}
@@ -118,7 +105,7 @@
         </ul>
 </div>
 
-<!-- comment add -->      
+<!-- comment add -->
 
 {% if comment_form %}
 <div style="margin-top:16px;">
@@ -130,7 +117,7 @@
 </div>
 {% endif %}
 
-<!-- 🔽 JS: 대댓글 폼 토글 -->
+<!-- JS: 대댓글 폼 토글 -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".reply-toggle").forEach(function (btn) {

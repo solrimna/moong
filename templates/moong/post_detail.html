@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block myHead %}  
+{% block myHead %}
 <script src="{% static 'js/img_view.js' %}"></script>
 {% endblock %}
 
@@ -10,29 +10,31 @@
     <div class="post-container">
         <!-- 배너 -->
         {% if post.is_closed %}
-        <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 20px; margin-bottom: 20px; border-radius: 10px; text-align: center;">
-            <h2 style="margin: 0; font-size: 24px;">🔒 모집이 확정되었습니다</h2>
-            <p style="margin: 10px 0 0 0;">
+        <div class="banner banner-closed">
+            <h2>🔒 모집이 확정되었습니다</h2>
+            <p>
                 확정 인원: <strong>{{ post.get_approved_count }}명</strong>
                 {% if post.max_people %}
                 / {{ post.max_people }}명
                 {% endif %}
             </p>
-            <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">
+            <p class="banner-sub">
                 📅 {{ post.moim_date }} {{ post.moim_time }}에 진행 예정입니다
             </p>
         </div>
         {% elif post.moim_finished %}
-            <span style="color: #28a745;">✅ 완료된 모임</span>
+            <div class="banner banner-open">
+                <span class="banner-finished">✅ 완료된 모임</span>
+            </div>
         {% elif post.is_cancelled %}
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; margin-bottom: 20px; border-radius: 10px; text-align: center;">
-            <h2 style="margin: 0; font-size: 24px;">💥 이 모임은 폭파되었습니다</h2>
-            <p style="margin: 10px 0 0 0;">주최자에 의해 취소된 모임입니다.</p>
+        <div class="banner banner-cancelled">
+            <h2>💥 이 모임은 폭파되었습니다</h2>
+            <p>주최자에 의해 취소된 모임입니다.</p>
         </div>
         {% else %}
-        <div style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; padding: 20px; margin-bottom: 20px; border-radius: 10px; text-align: center;">
-            <h2 style="margin: 0; font-size: 24px;">🟢 모집 중입니다</h2>
-            <p style="margin: 10px 0 0 0;">
+        <div class="banner banner-open">
+            <h2>🟢 모집 중입니다</h2>
+            <p>
                 현재 인원: <strong>{{ post.get_approved_count }}명</strong>
                 {% if post.max_people %}
                 / {{ post.max_people }}명
@@ -42,20 +44,20 @@
         {% endif %}
 
         <div class="post-header">
-            <h4 style="margin: 5px 0;">
+            <h4>
             <a href="{% url 'moong:post_detail' post.id %}">
                 {{ post.title }}
-            </a> 
+            </a>
             </h4>
             <div class="post-profile-image-wrapper">
                 {% if user == post.author %}
                     <a href="{% url 'users:mypage' %}">
-                        <img src="{{ post.author.profile_image.url }}" alt="프로필" class ='profile-image'>
-                        작성자: {{ post.author.nick_name }} 
+                        <img src="{{ post.author.profile_image.url }}" alt="프로필" class='profile-image'>
+                        작성자: {{ post.author.nick_name }}
                     </a>
                 {% else %}
                     <a href="{% url 'users:user_profile' post.author.id %}">
-                        <img src="{{ post.author.profile_image.url }}" alt="프로필" class ='profile-image'>
+                        <img src="{{ post.author.profile_image.url }}" alt="프로필" class='profile-image'>
                         작성자: {{ post.author.nick_name }}
                     </a>
                 {% endif %}
@@ -64,7 +66,7 @@
         </div>
         <div class="post-info">
             <div>
-                <strong>📅 모임 날짜:</strong> 
+                <strong>📅 모임 날짜:</strong>
                 {{ post.moim_date }} {{ post.moim_time }}
             </div>
             <div>
@@ -77,7 +79,7 @@
             </div>
             {% if post.max_people %}
                 <div>
-                    <strong>👥 최대 인원:</strong> 
+                    <strong>👥 최대 인원:</strong>
                     {{ post.max_people }}명
                 </div>
             {% endif %}
@@ -86,18 +88,18 @@
             </div>
             <div class="post-images">
                 {% for image in post.images.all %}
-                    <img src="{{ image.image.url }}" alt="{{ post.title }}" style="max-width: 100%; margin: 10px 0;">
+                    <img src="{{ image.image.url }}" alt="{{ post.title }}">
                 {% endfor %}
             </div>
 
 
             <div>
                 {% if request.user.is_authenticated %}
-    
+
                     {% if request.user == post.author %}
                         <p>당신은 이 모임의 주최자입니다. 하단의 명단에서 신청자를 관리하세요.</p>
 
-                    {% else %}          
+                    {% else %}
                         {% if not user_participation %}
                             <form action="{% url 'moong:post_apply' post.id %}" method="post">
                                 {% csrf_token %}
@@ -114,7 +116,7 @@
                                 {% csrf_token %}
                                 <button type="submit">참여 취소</button>
                             </form>
-        
+
                         {% elif user_participation.status == 'REJECTED' %}
                             <form action="{% url 'moong:post_apply' post.id %}" method="post">
                                 {% csrf_token %}
@@ -126,13 +128,13 @@
                 {% else %}
                     <p><a href="{% url 'users:login' %}">로그인</a> 후 신청할 수 있습니다.</p>
                 {% endif %}
-                
+
             </div>
 
             <div class="info-box">
                 <span>참여 현황: <strong>{{ post.get_approved_count }}</strong> / {{ post.max_people }}명</span>
                 {% if post.is_full %}
-                    <span style="color: red; font-weight: bold;">[마감]</span>
+                    <span class="status-badge status-closed">[마감]</span>
                 {% endif %}
             </div>
 
@@ -141,27 +143,27 @@
                     <summary>
                         참여자 목록 보기 (현재 {{ approved_participants.count }}명)
                     </summary>
-        
+
                     <ul>
                         {% for participant in approved_participants %}
                             <li>
                                 {{ participant.user.nick_name|default:participant.user.username }}
                                 {% if user == post.author %}
-                                    <form action="{% url 'moong:participant_manage' participant.id %}" method="post">
+                                    <form action="{% url 'moong:participant_manage' participant.id %}" method="post" style="display:inline;">
                                         {% csrf_token %}
                                         {% if participant.status == 'APPROVED' %}
-                                            <button type="submit" name="action_complete" value="reject"> 승인취소 </button> 
+                                            <button type="submit" name="action_complete" value="reject"> 승인취소 </button>
                                         {% else %}
                                             <button type="submit" name="action_complete" value="approve"> 승인 </button>
-                                        {% endif %}                 
+                                        {% endif %}
                                     </form>
-                                {% endif %}   
+                                {% endif %}
                                 {% if participant.user == post.author %}
                                     (주최자)
                                 {% else %}
                                     {% comment %} 주최자가 아닐 때 {% endcomment %}
                                 {% endif %}
-                                
+
                                 {% if participant.status == 'APPROVED' %}
                                     <small>- {{ participant.create_time|date:"Y-m-d H:i" }} 참여 완료</small>
                                 {% endif %}
@@ -178,15 +180,14 @@
                 </details>
             </div>
         </div>
-        
-        <div class="post-tags" style="margin-top: 10px;">
+
+        <div class="post-tags">
             {% for tag in post.hashtags.all %}
-                <a href="{% url 'moong:tag_feeds' tag.name %}" style="text-decoration: none; color: #007bff; font-size: 0.9rem;">#{{ tag.name }}</a>
+                <a href="{% url 'moong:tag_feeds' tag.name %}">#{{ tag.name }}</a>
             {% endfor %}
         </div>
 
-        <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
-
+        <hr>
 
         <!--댓글-->
         {% include "moong/comments.html" with is_a_post=False %}
@@ -206,32 +207,32 @@
             {% if user == post.author %}
                 <a href="{% url 'moong:post_mod' post.id %}" class="btn btn-primary"> 모임글 수정</a>
                 {% if not post.is_closed %}
-                    <form method="POST" action="{% url 'moong:post_closed' post.id %}" >
+                    <form method="POST" action="{% url 'moong:post_closed' post.id %}" style="display:inline;">
                         {% csrf_token %}
                         <button type="submit">
                             모집 확정
                         </button>
                     </form>
                 {% else %}
-                    <form method="POST" action="{% url 'moong:post_closed_cancel' post.id %}" >
+                    <form method="POST" action="{% url 'moong:post_closed_cancel' post.id %}" style="display:inline;">
                         {% csrf_token %}
                         <button type="submit">
                             모집 확정 취소
                         </button>
                     </form>
 
-                    <form method="POST" action="{% url 'moong:moim_finished' post.id %}" >
+                    <form method="POST" action="{% url 'moong:moim_finished' post.id %}" style="display:inline;">
                         {% csrf_token %}
                         <button type="submit">
                             모임 완료
                         </button>
                     </form>
                 {% endif %}
-                <form method="POST" action="{% url 'moong:post_delete' post.id %}" >
+                <form method="POST" action="{% url 'moong:post_delete' post.id %}" style="display:inline;">
                     {% csrf_token %}
                     {% comment %} 참여자 확정 처리 개발 이후 추가 수정 필요  {% endcomment %}
                     <button type="submit" onclick="return confirm('모집글을 삭제하시겠습니까?\r\n확정 참여자가 없는 경우에만 삭제가 가능합니다');">
-                        모임 삭제 
+                        모임 삭제
                     </button>
                 </form>
             {% endif %}
@@ -241,5 +242,5 @@
 <div class="image-modal" id="imageModal" onclick="closeImageModal()">
     <span class="close-modal">&times;</span>
     <img class="modal-content" id="modalImage">
-</div>    
+</div>
 {% endblock %}

@@ -17,6 +17,7 @@
 {% block myBlock %}
     {% include 'moong/navigation.html' %}
 
+    <div class="post-form-container">
     <h1>게시글 수정</h1>
 
     <!-- 메시지 표시 -->
@@ -126,4 +127,5 @@
         <button type="submit">수정 완료</button>
         <a href="{% url 'moong:post_detail' post.id %}">취소</a>
     </form>
+    </div>
 {% endblock %}

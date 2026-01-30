@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
-{% block myBlock %}
 {% load static %}
 
 {% block myHead %}
   <script src="{% static 'js/location_select.js' %}"></script>
 {% endblock %}
 
+{% block myBlock %}
 {% include 'moong/navigation.html' %}
 
 <div id="signup">
@@ -14,130 +14,112 @@
 
     {% csrf_token %}
 
+    <div class="form-group">
       <h3>E-MAIL 주소</h3>
       {{ form.email }}
+      {% if form.email.errors %}
+          <ul class="field-error">
+              {% for error in form.email.errors %}
+                  <li>{{ error }}</li>
+              {% endfor %}
+          </ul>
+      {% endif %}
+    </div>
 
-        {% if form.email.errors %}
-            <ul class="field-error">
-                {% for error in form.email.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div> 
-    
-    
-    <!-- <div>
-      <h3>사용자 ID</h3>
-      {{ form.username }}
-
-        {% if form.username.errors %}
-            <ul class="field-error">
-                {% for error in form.username.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div> -->
-
-
-    <div>
+    <div class="form-group">
       <h3>패스워드 입력</h3>
       {{ form.password1 }}
-
-        {% if form.password1.errors %}
-            <ul class="field-error">
-                {% for error in form.password1.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}      
+      {% if form.password1.errors %}
+          <ul class="field-error">
+              {% for error in form.password1.errors %}
+                  <li>{{ error }}</li>
+              {% endfor %}
+          </ul>
+      {% endif %}
     </div>
 
-    <div>
+    <div class="form-group">
       <h3>패스워드 확인</h3>
       {{ form.password2 }}
-
-        {% if form.password2.errors %}
-            <ul class="field-error">
-                {% for error in form.password2.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}      
+      {% if form.password2.errors %}
+          <ul class="field-error">
+              {% for error in form.password2.errors %}
+                  <li>{{ error }}</li>
+              {% endfor %}
+          </ul>
+      {% endif %}
     </div>
 
-    
-    <div>
+    <div class="form-group">
       <h3>닉네임 설정</h3>
       {{ form.nick_name }}
-
-        {% if form.nick_name.errors %}
-            <ul class="field-error">
-                {% for error in form.nick_name.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}      
+      {% if form.nick_name.errors %}
+          <ul class="field-error">
+              {% for error in form.nick_name.errors %}
+                  <li>{{ error }}</li>
+              {% endfor %}
+          </ul>
+      {% endif %}
     </div>
-    
 
-    <div>    
+    <div class="form-group">
       <h3>휴대전화번호</h3>
       {{ form.phone }}
+      {% if form.phone.errors %}
+          <ul class="field-error">
+              {% for error in form.phone.errors %}
+                  <li>{{ error }}</li>
+              {% endfor %}
+          </ul>
+      {% endif %}
+    </div>
 
-        {% if form.phone.errors %}
-            <ul class="field-error">
-                {% for error in form.phone.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>   
-
-   
-    
-    <div>
+    <div class="form-group">
       <h3>프로필 이미지</h3>
       {{ form.profile_image }}
     </div>
 
-    <div>
+    <div class="form-group">
       <h3>성별</h3>
       {{ form.gender }}
-
-        {% if form.gender.errors %}
-            <ul class="field-error">
-                {% for error in form.gender.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>    
-    
+      {% if form.gender.errors %}
+          <ul class="field-error">
+              {% for error in form.gender.errors %}
+                  <li>{{ error }}</li>
+              {% endfor %}
+          </ul>
+      {% endif %}
+    </div>
 
     <!-- 활동 지역 선택 (AJAX) -->
-    <div>
+    <div class="form-group">
       <h3>활동 지역 선택</h3>
 
-      <label for="sido">시/도</label>
-      <select id="sido">
-        <option value="">시/도 선택</option>
-      </select>
+      <div class="location-selects">
+        <div>
+          <label for="sido">시/도</label>
+          <select id="sido">
+            <option value="">시/도 선택</option>
+          </select>
+        </div>
 
-      <label for="sigungu">시/군/구</label>
-      <select id="sigungu">
-        <option value="">시/군/구 선택</option>
-      </select>
+        <div>
+          <label for="sigungu">시/군/구</label>
+          <select id="sigungu">
+            <option value="">시/군/구 선택</option>
+          </select>
+        </div>
 
-      <label for="eupmyeondong">읍/면/동</label>
-      <!-- ⭐ Django Form의 location 필드와 연결 -->
-      <select id="eupmyeondong" name="location" required>
-        <option value="">읍/면/동 선택</option>
-      </select>
+        <div>
+          <label for="eupmyeondong">읍/면/동</label>
+          <!-- Django Form의 location 필드와 연결 -->
+          <select id="eupmyeondong" name="location" required>
+            <option value="">읍/면/동 선택</option>
+          </select>
+        </div>
+      </div>
     </div>
-    <br>
-    <br>
+
     <button type="submit">뭉! 가입</button>
   </form>
 </div>

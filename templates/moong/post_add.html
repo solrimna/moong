@@ -12,11 +12,12 @@
     {% endif %}
     <script src="{% static 'js/img_view.js' %}"></script>
     <script src="{% static 'js/location_select.js' %}"></script>
-    
+
 {% endblock %}
 
 {% block myBlock %}
     {% include 'moong/navigation.html' %}
+    <div class="post-form-container">
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
 
@@ -114,15 +115,6 @@
         </div>
         {% endif %}
 
-        <!-- 폼 전체 에러 -->
-        <!-- 에러 중복 표기로 주석 처리
-        {% if form.non_field_errors %}
-        <div class="form-errors">
-            {{ form.non_field_errors }}
-        </div>
-        {% endif %}
-        --> 
-
         <!-- 버튼 -->
         {% if temp_post_id %}
             <!-- 임시저장 후: 게시 버튼만 -->
@@ -133,6 +125,7 @@
             <button type="submit" name="save_temp">임시저장</button>
         {% endif %}
     </form>
+    </div>
     <script src="{% static 'js/hashtags_add.js' %}"></script>
     <!-- 셀프 해시태그 추가기능이 자바스크립트가 버튼보다 밑에 있어야 작동돼서 제것만 옮겼어요... -->
 {% endblock %}

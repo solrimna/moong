@@ -1,23 +1,15 @@
 {% extends 'base.html' %}
 
-{% block myHead %}
-    <style>
-        .container { display: flex; margin-top: 20px; }
-        .sidebar { width: 25%; padding: 20px; border-right: 1px solid #eee; }
-        .content { width: 75%; padding: 20px; }
-        .search-bar { margin-bottom: 20px; }
-    </style>
-{% endblock %}
-
 {% block myBlock %}
     {% include 'moong/navigation.html' %}
-     <!-- 왼쪽: 검색창, 해시태그 목록 -->
-    <br>
-    <div class="search-bar" style="margin-left: 30px;">
-        <form action="{% url 'moong:main' %}" method="get">
-            <input type="text" name="search" placeholder="글 내용 검색..." value="{{ search }}">
-            <button type="submit">검색</button>
-        </form>
+
+    <div class="search-section">
+        <div class="search-bar">
+            <form action="{% url 'moong:main' %}" method="get">
+                <input type="text" name="search" placeholder="글 내용 검색..." value="{{ search }}">
+                <button type="submit">검색</button>
+            </form>
+        </div>
     </div>
 
     <div class="container">
@@ -27,21 +19,21 @@
                 {% for tag in location_tags %}
                     <li>
                         <a href="{% url 'moong:tag_feeds' tag.name %}">#{{ tag.name }}</a>
-                        <small style="color: #999;">({{ tag.num_posts }})</small>
+                        <small>({{ tag.num_posts }})</small>
                     </li>
                 {% empty %}
                     <li>활성화된 지역 태그가 없어요.</li>
                 {% endfor %}
             </ul>
 
-            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+            <hr class="sidebar-divider">
 
             <h3>키워드 해시태그</h3>
             <ul>
                 {% for tag in keyword_tags %}
                     <li>
                         <a href="{% url 'moong:tag_feeds' tag.name %}">#{{ tag.name }}</a>
-                        <small style="color: #999;">({{ tag.num_posts }})</small>
+                        <small>({{ tag.num_posts }})</small>
                     </li>
                 {% empty %}
                     <li>인기 키워드 태그가 없어요.</li>
@@ -55,6 +47,6 @@
                 {% include 'moong/feeds.html' %}
             </div>
         </div>
-        
+
     </div>
 {% endblock %}

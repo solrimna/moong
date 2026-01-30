@@ -1,7 +1,7 @@
 <div class="tags-add-div">
-    <h4 style="margin-top: 0;">AI 추천 해시태그</h4>
-    <p style="color: #666;">원하는 태그를 체크하거나 직접 추가하세요</p>
-    
+    <h4>AI 추천 해시태그</h4>
+    <p>원하는 태그를 체크하거나 직접 추가하세요</p>
+
     <div id="tag-container">
         {% if tags %}
             {% for tag in tags %}
@@ -14,9 +14,9 @@
     </div>
 
     <div class="self-tags-area">
-        <input type="text" id="direct-tag-input" placeholder="직접 태그 입력 (예: 맛집)" 
+        <input type="text" id="direct-tag-input" placeholder="직접 태그 입력 (예: 맛집)"
                class="self-tags-input">
-        <button type="button" id="add-tag-btn" style="cursor: pointer;">
+        <button type="button" id="add-tag-btn">
             태그 추가
         </button>
     </div>

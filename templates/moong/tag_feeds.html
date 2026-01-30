@@ -1,15 +1,5 @@
 {% extends 'base.html' %}
 
-{% block myHead %}
-    <style>
-        .container { display: flex; margin-top: 20px; }
-        .sidebar { width: 25%; padding: 20px; border-right: 1px solid #eee; }
-        .content { width: 75%; padding: 20px; }
-        .tag-info h2 { color: #007bff; font-size: 2rem; margin-bottom: 10px; }
-        .tag-count { color: #666; font-size: 1rem; }
-    </style>
-{% endblock %}
-
 {% block myBlock %}
     {% include 'moong/navigation.html' %}
 
@@ -23,13 +13,14 @@
         </div>
 
         <div class="content">
-            <div class="feed-list" style="max-width: 600px; margin: 0 auto;">
+            <div class="feed-list feeds-container">
                 {% for post in posts %}
                     {% include 'moong/a_post.html' %}
                 {% empty %}
-                    <p style="text-align: center; color: #999; margin-top: 50px;">
-                        이 태그가 달린 게시물이 아직 없습니다.
-                    </p>
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🏷️</div>
+                        <div class="empty-state-text">이 태그가 달린 게시물이 아직 없습니다.</div>
+                    </div>
                 {% endfor %}
             </div>
         </div>

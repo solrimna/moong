@@ -38,6 +38,7 @@ class User(AbstractUser):
         verbose_name='자기소개'
     )
 
+    # 주소
     location = models.ForeignKey('locations.Location',
                                 on_delete=models.SET_NULL,
                                 null=True,
@@ -90,6 +91,7 @@ class User(AbstractUser):
     def __str__(self):
         return self.nick_name 
     
+    # 또뭉
     def increase_ddomoong(self):
         """또뭉 증가"""
         self.ddomoong += 1
@@ -100,7 +102,8 @@ class User(AbstractUser):
         if self.ddomoong > 0:
             self.ddomoong -= 1
             self.save(update_fields=['ddomoong'])
-            
+
+    # 이미지 바꾸고 저장할때         
     def save(self, *args, **kwargs):
         # 🔥 새로 업로드된 이미지만 처리 (기본 이미지나 이미 저장된 이미지는 건너뛰기)
         if self.profile_image and hasattr(self.profile_image, 'file'):

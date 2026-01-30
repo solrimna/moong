@@ -10,6 +10,7 @@
      data-location-id="{{ user.location.id }}">
 </div>
 <script src="{% static 'js/location_select.js' %}"></script>
+<script src="{% static 'js/img_view.js' %}"></script>
 {% endblock %}
 
 {% block myBlock %}
@@ -36,16 +37,19 @@
             <div class="form-group">
                 <label class="form-label">📸 프로필 사진</label>
                 {% if user.profile_image %}
-                    <img src="{{ user.profile_image.url }}" alt="현재 프로필" class="current-image">
+                    <img src="{{ user.profile_image.url }}" alt="현재 프로필" class="current-image" id="profilePreview">
                 {% else %}
-                    <div class="image-placeholder">👤</div>
+                    <div class="image-placeholder" id="profilePreview">👤</div>
                 {% endif %}
-                {{ form.profile_image }}
+                
+                <!-- 직접 input 태그 생성 (Django form 위젯 대신) -->
+                <input type="file" name="profile_image" accept="image/jpeg,image/png" class="file-input" id="profileImageInput">
+                
                 <p class="helper-text">JPG, PNG 파일만 가능 (최대 5MB)</p>
                 
                 <!-- 🔥 기본 프로필로 변경 버튼 (메인 폼 안에 포함) -->
                 <button type="submit" name="reset_profile_image" class="btn-reset-image">
-                     기본 프로필로 변경
+                    🔄 기본 프로필로 변경
                 </button>
             </div>
             

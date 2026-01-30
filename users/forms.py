@@ -120,6 +120,12 @@ class ProfileEditForm(forms.ModelForm):
         model = User
         fields = ['profile_image', 'bio', 'gender_visible']
         widgets = {
+            'profile_image': forms.FileInput(
+                attrs={
+                    'class': 'file-input',
+                    'accept': 'image/jpeg,image/png'
+                }
+            ),
             'bio': forms.Textarea(
                 attrs={
                     'class': 'form-textarea',
@@ -136,21 +142,3 @@ class ProfileEditForm(forms.ModelForm):
             'bio': '자기소개',
             'gender_visible': '성별 공개',
         }
-    
-    profile_image = forms.ImageField(
-        required=False,
-        widget=forms.FileInput(
-            attrs={
-                'class': 'file-input',
-                'accept': 'image/jpeg,image/png'
-            }
-        ),
-        validators=[
-            FileExtensionValidator(
-                allowed_extensions=['jpg', 'jpeg', 'png']
-            )
-        ],
-        error_messages={
-            'invalid': '이미지 파일만 업로드할 수 있습니다.',
-        },
-    )

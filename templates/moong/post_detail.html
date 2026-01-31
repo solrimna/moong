@@ -48,11 +48,18 @@
             </a> 
             </h4>
             <div class="post-profile-image-wrapper">
-                {% if post.author.profile_image %}
-                    <img src="{{ post.author.profile_image.url }}" alt="프로필" 
-                    class="post-profile-image" onclick="openImageModal(this.src);">
+                {% if user == post.author %}
+                    <a href="{% url 'users:mypage' %}">
+                        <img src="{{ post.author.profile_image.url }}" alt="프로필" class ='profile-image'>
+                        작성자: {{ post.author.nick_name }} 
+                    </a>
+                {% else %}
+                    <a href="{% url 'users:user_profile' post.author.id %}">
+                        <img src="{{ post.author.profile_image.url }}" alt="프로필" class ='profile-image'>
+                        작성자: {{ post.author.nick_name }}
+                    </a>
                 {% endif %}
-                작성자: {{ post.author.username }} | {{ post.create_time }}
+                | {{ post.create_time }}
             </div>
         </div>
         <div class="post-info">
@@ -82,22 +89,44 @@
                     <img src="{{ image.image.url }}" alt="{{ post.title }}" style="max-width: 100%; margin: 10px 0;">
                 {% endfor %}
             </div>
+
+
             <div>
                 {% if request.user.is_authenticated %}
-                    {% if is_applied %}
-                        <form action="{% url 'moong:post_cancel' post.id %}" method="post">
-                            {% csrf_token %}
-                            <button type="submit" clsss="btn btn-danger">참여 취소하기</button>
-                        </form>
-                    {% else %}
-                        <form action="{% url 'moong:post_apply' post.id %}" method="post">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-primary" {% if post.is_full %}disabled{% endif %}>
-                                {% if post.is_full %}정원 초과{% else %}참여 신청하기{% endif %}
-                            </button>
-                        </form>
+    
+                    {% if request.user == post.author %}
+                        <p>당신은 이 모임의 주최자입니다. 하단의 명단에서 신청자를 관리하세요.</p>
+
+                    {% else %}          
+                        {% if not user_participation %}
+                            <form action="{% url 'moong:post_apply' post.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit">참여 신청</button>
+                            </form>
+
+                        {% elif user_participation.status == 'PENDING' %}
+                            <form action="{% url 'moong:post_cancel' post.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit">{% if post.is_full %}정원 초과{% else %}참여 신청 중{% endif %}</button>
+                            </form>
+                        {% elif user_participation.status == 'APPROVED' %}
+                            <form action="{% url 'moong:post_cancel' post.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit">참여 취소</button>
+                            </form>
+        
+                        {% elif user_participation.status == 'REJECTED' %}
+                            <form action="{% url 'moong:post_apply' post.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit">{% if post.is_full %}정원 초과{% else %}참여 신청 (재신청){% endif %}</button>
+                            </form>
+                        {% endif %}
                     {% endif %}
+
+                {% else %}
+                    <p><a href="{% url 'users:login' %}">로그인</a> 후 신청할 수 있습니다.</p>
                 {% endif %}
+                
             </div>
 
             <div class="info-box">
@@ -117,12 +146,30 @@
                         {% for participant in approved_participants %}
                             <li>
                                 {{ participant.user.nick_name|default:participant.user.username }}
-                    
+                                {% if user == post.author %}
+                                    <form action="{% url 'moong:participant_manage' participant.id %}" method="post">
+                                        {% csrf_token %}
+                                        {% if participant.status == 'APPROVED' %}
+                                            <button type="submit" name="action_complete" value="reject"> 승인취소 </button> 
+                                        {% else %}
+                                            <button type="submit" name="action_complete" value="approve"> 승인 </button>
+                                        {% endif %}                 
+                                    </form>
+                                {% endif %}   
                                 {% if participant.user == post.author %}
                                     (주최자)
+                                {% else %}
+                                    {% comment %} 주최자가 아닐 때 {% endcomment %}
                                 {% endif %}
-                    
-                                <small>- {{ participant.create_time|date:"Y-m-d H:i" }} 신청</small>
+                                
+                                {% if participant.status == 'APPROVED' %}
+                                    <small>- {{ participant.create_time|date:"Y-m-d H:i" }} 참여 완료</small>
+                                {% endif %}
+                                {% if participant.status == 'PENDING' %}
+                                    <small>- {{ participant.create_time|date:"Y-m-d H:i" }} 참여 신청 중</small>
+                                {% endif %}
+
+                                {% comment %} 체크 박스 리스트를 만들어서 체크를 해야함  {% endcomment %}
                             </li>
                         {% empty %}
                             <li>참여자가 없습니다.</li>
@@ -166,6 +213,13 @@
                         </button>
                     </form>
                 {% else %}
+                    <form method="POST" action="{% url 'moong:post_closed_cancel' post.id %}" >
+                        {% csrf_token %}
+                        <button type="submit">
+                            모집 확정 취소
+                        </button>
+                    </form>
+
                     <form method="POST" action="{% url 'moong:moim_finished' post.id %}" >
                         {% csrf_token %}
                         <button type="submit">

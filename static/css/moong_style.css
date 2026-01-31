@@ -95,6 +95,20 @@
     font-style: italic;
 }
 
+/* imagePreview - js에 미리보기 이벤트로 이용되므로, 이름 변경시 반드시 공통 변경 필요  */
+.imagePreview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+.imagePreview img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 5px;
+    border: 2px solid #ddd;
+}
 /* ========================================
     공통 빈 상태 스타일
     ======================================== */
@@ -390,6 +404,29 @@
     border: 2px dashed #4285F4;
 }
 
+/* 🔥 기본 프로필로 변경 버튼 */
+.btn-reset-image {
+    padding: 8px 16px;
+    background: #4285F4;
+    color: #E3F2FD;
+    border: 2px solid #4285F4;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;  /* 파일 선택 필드와 간격 */
+}
+
+.btn-reset-image:hover {
+    background: #4285F4;
+    border-color: #4285F4;
+    transform: translateY(-1px);
+}
+
 .helper-text { font-size: 12px; color: #757575; margin-top: 5px; }
 .helper-text.locked { color: #EF5350; font-weight: 500; }
 
@@ -407,7 +444,7 @@
 }
 
 /* ========================================
-    활동 이력 (Activity) 전용 스타일
+    마이페이지 활동 이력 (Activity) 전용 스타일
     ======================================== */
 /* 바꿔도 됩니당 */
 
@@ -607,8 +644,25 @@
     cursor: pointer;
     transition: transform 0.3s ease;
 }
-
-
+.existing-image {
+    display: inline-block;
+    margin: 10px;
+    position: relative;
+}
+.existing-image img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 5px;
+    border: 2px solid #ddd;
+}
+.delete-checkbox {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: white;
+    padding: 2px;
+}
 
 /* ========================================
     글 작성 페이지
@@ -648,4 +702,4 @@
    ======================================== */
 
 /*
-댓글 대댓글 미니 프로필 이미지 일단 inline style로 처리   
+댓글 대댓글 미니 프로필 이미지 일단 inline style로 처리  

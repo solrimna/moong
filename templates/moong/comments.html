@@ -52,7 +52,7 @@
                             <button type="submit">Del</button>
                         </form>
                     {% endif %}
-
+                    
                     <!-- replies list -->
                     {% for reply in comment.replies.all %}
 
@@ -78,8 +78,21 @@
                                 {% endif %}
                             </span>
                             <small>{{ reply.display_time }}</small>
+
+                            <!-- reply_delete -->
+                            {% if comment_form and user == reply.author %}
+                                <form method="POST" 
+                                    action="{% url 'moong:comment_delete' comment_id=reply.id %}"
+                                    style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit">Del</button>
+                                </form>
+                            {% endif %}
+
                         </div>
                     {% endfor %}
+
+                   
 
                     <!-- replies add -->
                 

@@ -9,7 +9,7 @@ from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseRedire
 import openai
 import os
 from dotenv import load_dotenv
-
+from django.utils import timezone
 # OpenAI 설정
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -216,7 +216,7 @@ def post_add(request):
                     complete=False
                 )
                 # is_updated ture면 -> 갱신 : 이미지 지웠다가 재저장 해줘야해서 clear true
-                save_or_clear_images(post, request, clear_all=is_updated)
+                save_or_clear_images(post, request, clear_all=False, clear_list='delete_images')
 
                 # AI 해시태그
                 tags = ai_tags(post.content, location_text)
@@ -225,11 +225,8 @@ def post_add(request):
                 print("post_add 임시 저장 호출됨!")
                 print(f"임시 저장한 location: {post.location}")
 
-                return render(request, 'moong/post_add.html', {
-                    'form': form,
-                    'tags': tags,
-                    'temp_post': post,
-                })
+                url = reverse('moong:post_add') + '?load_temp=yes'
+                return redirect(url)
             # 최종 저장!
             else :    
                 post, is_updated = get_or_create_post(
@@ -308,11 +305,10 @@ def post_add(request):
                 messages.success(request, '임시저장된 글을 불러왔습니다.')
 
                 print(f"임시저장 - 불러온 location: {temp_post.location}")
-
+                print(f"임시저장 - 불러온 images: {temp_post.images.all()}")
                 context = {
                     'form': form,
                     'temp_post': temp_post,
-                    'existing_images': existing_images,
                     'tags': existing_tags,
                 }
                 return render(request, 'moong/post_add.html', context)
@@ -365,10 +361,17 @@ def post_detail(request, post_id):
         Post.objects.select_related('author', 'location'),
         id=post_id
     )
-    approved_participants = post.participations.filter(status='APPROVED').select_related('user')
+    approved_participants = post.participations.select_related('user')
     is_applied = False #is_applied 초기화
     if request.user.is_authenticated:
         is_applied = post.participations.filter(user=request.user).exists()
+    
+    user_participation = None
+    if request.user.is_authenticated:
+        user_participation = Participation.objects.filter(
+            post=post,
+            user=request.user
+        ).first()
 
     comments = (
         post.comments
@@ -382,12 +385,16 @@ def post_detail(request, post_id):
 
     comment_form = CommentForm()
 
-    return render(request, 'moong/post_detail.html', {'post': post,
-                                                      'comments':comments,
-                                                      'comment_form':comment_form,
-                                                      'is_applied': is_applied,
-                                                      'approved_participants': approved_participants,
-                                                      })
+    context = {
+        'post': post,
+        'comments':comments,
+        'comment_form':comment_form,
+        'is_applied': is_applied,
+        'approved_participants': approved_participants,
+        'user_participation': user_participation,
+    }
+    
+    return render(request, 'moong/post_detail.html', context)
 
 # ==================== 게시글 수정 ====================
 def post_mod(request, post_id):
@@ -498,7 +505,32 @@ def post_delete(request, post_id):
     else:
         # GET 요청은 거부
         return redirect('moong:post_detail', post_id=post_id)
-       
+
+@login_required
+def post_closed_cancel(request, post_id):
+    print("post_closed_cancel 모집 확정 취소 호출됨!")
+    post = get_object_or_404(Post, id=post_id)
+    
+    # 권한 체크
+    if post.author != request.user:
+        messages.error(request, '모집 확정 취소 권한이 없습니다.')
+        return redirect('moong:post_detail', post_id=post_id)
+    
+    # POST 요청만 허용
+    if request.method == 'POST':
+
+        print(f"게시글 모집 확정 취소 처리")
+        post.is_closed = False
+        post.save()
+        messages.warning(request, f'모집 확정이 취소되었습니다.')
+        print("게시글 모집 확정 취소 완료!")
+
+        # 모임이 확정되던 아니던 post_detail로 
+        return redirect('moong:post_detail', post_id=post_id)
+    else:
+        # GET 요청은 거부
+        return redirect('moong:post_detail', post_id=post_id)
+
 # ==================== 모집 확정 ====================
 @login_required
 def post_closed(request, post_id):
@@ -563,13 +595,43 @@ def moim_finished(request, post_id):
 @login_required
 def post_apply(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    # 이미 신청했는지 확인 후 없으면 생성
-    participation, created =Participation.objects.get_or_create(post=post, user=request.user, defaults={'status': 'APPROVED'})
+    # 이미 신청했는지 확인 후 없으면 생성    
+    
+    participation, created =Participation.objects.get_or_create(
+        post=post, 
+        user=request.user, 
+        defaults={'status': 'PENDING',
+                  'approve_time' : timezone.now()
+                  }, 
+        )
+    print(f"참여 확인 :  {participation}, created : {created}")
     messages.success(request, '참여 신청이 완료되었습니다.')
-    return redirect('moong:post_detail', post_id=post.id) # 다시 상세페이지로!
+    return redirect('moong:post_detail', post_id = post.id) # 다시 상세페이지로!
+
+@login_required
+def participant_manage(request, participation_id):
+    participation = get_object_or_404(Participation, id=participation_id)
+    #print(f"승인여부 :  {action_comple}")
+    # 주최자만 권한 허용
+    if request.user != participation.post.author:
+        return redirect('moong:post_detail', post_id=participation.post.id)
+
+    if request.method == 'POST':
+        action_complete = request.POST.get('action_complete')
+        print(f"승인여부 :  {action_complete}")
+        if action_complete == 'approve':
+            participation.status = 'APPROVED' # 수락 시 승인 상태로 변경
+            participation.save()
+        elif action_complete == 'reject':
+            # 거절 시 다시 신청할 수 있도록 아예 삭제하거나 상태를 REJECTED로 변경
+            participation.cancel() 
+            
+    return redirect('moong:post_detail', post_id=participation.post.id)    
+
 
 @login_required
 def post_cancel(request, post_id):
+    print("참여 취소 호출")
     post = get_object_or_404(Post, id=post_id)
     # 해당 신청 내역 찾아서 삭제
     participation = Participation.objects.filter(post=post, user=request.user)
@@ -705,10 +767,12 @@ def save_or_clear_images(post, request, clear_all=False, clear_list=None):
             print(f"선택 삭제된 이미지: {len(delete_images)}개")
 
     if clear_all:
+        print(f"clear_all true 확인 로그")
         post.images.all().delete()
 
     images = request.FILES.getlist('images')
     if not images:
+        print(f"왜 임시저장 때 이미지가 없지?")
         return  
     
     # 이미지 다 지우는거 아닌거 고려 

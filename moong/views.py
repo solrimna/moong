@@ -218,8 +218,17 @@ def post_add(request):
                 # is_updated ture면 -> 갱신 : 이미지 지웠다가 재저장 해줘야해서 clear true
                 save_or_clear_images(post, request, clear_all=False, clear_list='delete_images')
 
-                # AI 해시태그
+                # 1. AI 해시태그
                 tags = ai_tags(post.content, location_text)
+
+                # 2. 생성된 태그를 DB에 저장하고 post와 연결
+                post.hashtags.clear()
+                if tags:
+                    for tag_name in tags:
+                        tag_name = tag_name.strip().replace("#", "")
+                        if tag_name:
+                            tag, created = Hashtag.objects.get_or_create(name=tag_name)
+                            post.hashtags.add(tag)
 
                 messages.success(request, '임시저장 완료!')
                 print("post_add 임시 저장 호출됨!")
@@ -300,7 +309,7 @@ def post_add(request):
             if temp_post:
                 form = PostForm(instance=temp_post)
                 existing_images = temp_post.images.all().order_by('order')
-                existing_tags = [f"#{tag.name}" for tag in temp_post.hashtags.all()]
+                existing_tags = [tag.name for tag in temp_post.hashtags.all()] # 이름만 리스트로 넘겨주기
                 
                 messages.success(request, '임시저장된 글을 불러왔습니다.')
 
@@ -310,6 +319,7 @@ def post_add(request):
                     'form': form,
                     'temp_post': temp_post,
                     'tags': existing_tags,
+                    'temp_post_id': temp_post.id, # 버튼 분기를 위해 ID 추가
                 }
                 return render(request, 'moong/post_add.html', context)
             else:

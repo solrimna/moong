@@ -290,9 +290,6 @@ def post_detail(request, post_id):
         id=post_id
     )
     approved_participants = post.participations.select_related('user')
-    is_applied = False #is_applied 초기화
-    if request.user.is_authenticated:
-        is_applied = post.participations.filter(user=request.user).exists()
     
     user_participation = None
     if request.user.is_authenticated:
@@ -307,15 +304,29 @@ def post_detail(request, post_id):
 
     comment_form = CommentForm()
 
+    approval_list = []
+    index_participant_list = []
+    index_indicator = False
+    index_participant = 0
+    print(user_participation)
+    for user in list(approved_participants):
+        for index, item in enumerate(list(approved_participants)):
+            if item == user and ((index + 1) > post.max_people):
+                index_participant = (index + 1) - post.max_people
+                index_indicator = True
+        index_participant_list.append(index_participant)
+        approval_list.append(index_indicator)
+    
     context = {
         'post': post,
         'comments':comments,
         'comment_form':comment_form,
-        'is_applied': is_applied,
-        'approved_participants': approved_participants,
+        'approved_participants_and_approval': zip(approved_participants,approval_list, index_participant_list),
         'user_participation': user_participation,
-    }
+        'index_participant': index_participant,
+            }
     
+        
     return render(request, 'moong/post_detail.html', context)
 
 # ==================== 게시글 수정 ====================

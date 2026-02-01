@@ -125,12 +125,13 @@
                 <span>참여 현황: <strong>{{ post.get_approved_count }}</strong> / {{ post.max_people }}명</span>
                 {% if post.is_full %}
                     <span style="color: red; font-weight: bold;">[마감]</span>
+                    <span>대기자 수: <strong>{{ post.get_wait_count }}</strong></span>
                 {% endif %}
             </div>
 
             <div>
                 <ul>
-                    {% for participant in approved_participants %}
+                    {% for participant,approval,index in approved_participants_and_approval %}
                         <li>
                             {{ participant.user.nick_name|default:participant.user.username }}
                             {% if user == post.author %}
@@ -150,7 +151,11 @@
                             {% endif %}
                             
                             {% if participant.status == 'APPROVED' %}
-                                <small>- {{ participant.create_time|date:"Y-m-d H:i" }} 참여 완료</small>
+                                {% if not approval %}
+                                    <small>- {{ participant.create_time|date:"Y-m-d H:i" }} 참여 완료</small>
+                                {% else %}
+                                    <small>- {{ participant.create_time|date:"Y-m-d H:i" }} 대기자 {{ index }}</small>
+                                {% endif %}
                             {% endif %}
                             {% if participant.status == 'PENDING' %}
                                 <small>- {{ participant.create_time|date:"Y-m-d H:i" }} 참여 신청 중</small>

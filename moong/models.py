@@ -80,7 +80,9 @@ class Post(models.Model):
     def get_approved_count(self):
         """승인된 참여자 수"""
         return self.participations.filter(status='APPROVED').count()
-    
+    def get_wait_count(self):
+        """승인된 대기자 수"""
+        return self.participations.filter(status='APPROVED').count() - self.max_people
     def get_pending_count(self):
         """승인 대기 중인 신청자 수"""
         return self.participations.filter(status='PENDING').count()

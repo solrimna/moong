@@ -145,8 +145,8 @@ html, body {
 
 /* 발바닥 아이콘 - 60px 고화질 */
 .nav-paw {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     object-fit: contain;
     vertical-align: middle;
     image-rendering: -webkit-optimize-contrast;
@@ -954,8 +954,8 @@ html, body {
 
 .a-post-images .post-image {
     width: 100%;
-    max-width: 500px;
-    height: 500px;
+    max-width: 350px;
+    height: 350px;
     margin: 0 auto;
     object-fit: cover;
     display: block;
@@ -1278,6 +1278,58 @@ html, body {
 }
 
 /* ========================================
+   게시글 작성/수정 폼 (사진 추가 버튼, 태그 추가 버튼)
+   ======================================== */
+
+/* 파일 선택 버튼 */
+#images {
+    display: none; /* 기본 버튼 숨기기 */
+}
+
+/* 커스텀 버튼 만들기 */
+label[for="images"] {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: var(--moong-primary);
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+label[for="images"]:hover {
+    background-color: var(--moong-secondary);
+}
+
+/* 태그 추가 버튼 */
+.add-tag-button {
+    padding: 10px 20px;
+    background-color: var(--moong-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 14px;
+    margin-top: 12px;
+}
+
+.add-tag-button:hover {
+    background-color: var(--moong-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+.add-tag-button:active {
+    transform: translateY(0);
+}
+
+
+
+
+/* ========================================
     게시글 상세 페이지
     ======================================== */
 .post-container {
@@ -1530,6 +1582,7 @@ html, body {
     padding: 0 24px 24px;
 }
 
+
 /* ========================================
     피드 카드 (a_post) 개선
     ======================================== */
@@ -1564,15 +1617,28 @@ html, body {
 }
 
 .a-post-card .a-post-content h4 a {
-    color: var(--moong-text);
+    color: var(--moong-primary);
     text-decoration: none;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
-    transition: color 0.3s;
+    transition: color 0.3s, transform 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.a-post-card .a-post-content h4 a::after {
+    content: '→';
+    font-size: 18px;
+    transition: transform 0.2s;
 }
 
 .a-post-card .a-post-content h4 a:hover {
-    color: var(--moong-primary);
+    color: var(--moong-primary-dark);
+}
+
+.a-post-card .a-post-content h4 a:hover::after {
+    transform: translateX(4px);
 }
 
 .a-post-card .a-post-content p {
@@ -1659,7 +1725,7 @@ html, body {
     justify-content: center;
     align-items: center;
     min-height: calc(100vh - 100px);
-    padding: 20px 20px **300px** 20px;
+    padding: 20px 20px 300px 20px;
 }
 
 #login form {
@@ -1910,11 +1976,12 @@ html, body {
 }
 
 /* 댓글 리스트 */
-.comment-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
+#comment-list,
+.comments ul {
+  list-style: none;
+  padding-left: 0;
+  margin-left: 0;
+} 
 
 /* 댓글 아이템 */
 .comment-item {
@@ -2209,20 +2276,24 @@ html, body {
 .post-tags a {
     display: inline-flex;
     align-items: center;
-    padding: 6px 14px;
-    background: transparent;
-    color: #333 !important;
-    border: none;
-    border-radius: 0;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, var(--moong-bg-light) 0%, var(--moong-secondary) 100%);
+    color: var(--moong-primary-dark) !important;
+    border: 2px solid var(--moong-primary-light);
+    border-radius: 20px;
     font-size: 14px !important;
     font-weight: 600;
     text-decoration: none !important;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(59, 125, 216, 0.15);
 }
 
 .post-tags a:hover {
-    color: var(--moong-primary) !important;
-    text-decoration: underline !important;
+    background: linear-gradient(135deg, var(--moong-primary) 0%, var(--moong-primary-dark) 100%);
+    color: white !important;
+    border-color: var(--moong-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 125, 216, 0.3);
 }
 
 /* ========================================

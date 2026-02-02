@@ -1,9 +1,31 @@
 <div class="a-post-card">
+    {% if post.is_closed and not post.moim_finished %}
+        <div class="status-banner confirmed">
+            <h2>모집이 확정되었습니다</h2>
+            <p>확정 인원: <strong>{{ post.get_approved_count }}명</strong>{% if post.max_people %} / {{ post.max_people }}명{% endif %}</p>
+            <p style="font-size: 14px; opacity: 0.9; margin-top: 8px;">{{ post.moim_date }} {{ post.moim_time }}에 진행 예정</p>
+        </div>
+    {% elif post.moim_finished %}
+        <div class="status-banner finished">
+            <h2>완료된 모임</h2>
+            <p>이 모임은 성공적으로 완료되었습니다</p>
+        </div>
+    {% elif post.is_cancelled %}
+        <div class="status-banner cancelled">
+            <h2>이 모임은 취소되었습니다</h2>
+            <p>주최자에 의해 취소된 모임입니다</p>
+        </div>
+    {% else %}
+        <div class="status-banner recruiting">
+            <h2>모집 중입니다</h2>
+            <p>현재 인원: <strong>{{ post.get_approved_count }}명</strong>{% if post.max_people %} / {{ post.max_people }}명{% endif %}</p>
+        </div>
+    {% endif %}
     <div class="a-post-header">
         <a href="{% url 'users:user_profile' post.author.id %}" class="author-link">
             {{ post.author.nick_name }}
         </a>
-        <span class="post-date">{{ post.create_time|date:"Y-m-d" }}</span>
+        <span class="post-date">{{ post.display_time }}</span>
     </div>
 
     <div class="a-post-content">
@@ -12,7 +34,7 @@
         </h4>
         <p>{{ post.content|truncatechars:100 }}</p>
     </div>
-
+    <br>
     {% if post.images.first %}
     <div class="a-post-images">
         {% if post.images.first %}
@@ -38,10 +60,6 @@
     <div class="a-post-info">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
             <span>{{ post.location }}</span>
-            <span>
-                참여: <strong>{{ post.get_approved_count }}</strong>/{{ post.max_people }}명
-                {% if post.is_full %}<span class="full-badge">마감</span>{% endif %}
-            </span>
         </div>
     </div>
 

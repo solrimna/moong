@@ -103,11 +103,11 @@
                         </div>
                     {% endfor %}
                 </div>
-                <label>새 이미지 추가</label>
+                <label for="images">새 이미지 추가</label>
             {% else %}
-                <label>이미지 (여러 개 선택 가능)</label>
+                <label for="images">이미지 (여러 개 선택 가능)</label>
             {% endif %}
-            <input type="file" name="images" id="images" multiple accept="image/*">
+            <input type="file" name="images" id="images" multiple accept="image/*" style="display: none;">
             <div id="imagePreview" class="imagePreview"></div>
 
             <!-- AI 추천 해시태그 영역 -->

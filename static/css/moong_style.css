@@ -1,4 +1,312 @@
 /* ========================================
+    뭉이 테마 - 메인 스타일
+    ======================================== */
+
+/* CSS 변수 정의 */
+:root {
+    --moong-primary: #3B7DD8;
+    --moong-primary-dark: #2E63B0;
+    --moong-primary-light: #7EB5E3;
+    --moong-secondary: #A8D4F5;
+    --moong-bg-light: #E8F4FC;
+    --moong-accent: #4A6FA5;
+    --moong-cream: #F5E6C8;
+    --moong-white: #FFFFFF;
+    --moong-text: #2C3E50;
+    --moong-text-light: #5D6D7E;
+}
+
+/* 전체 배경 - 번개 패턴 */
+.moong-body {
+    background: linear-gradient(135deg, #3B7DD8 0%, #5A9BE8 50%, #7EB5E3 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    position: relative;
+}
+
+/* 번개 패턴 오버레이 - custom_property 스타일 (부드럽고 자연스럽게) */
+.moong-body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpath d='M50 15 L60 40 L52 40 L65 70 L42 45 L52 45 L40 15 Z' fill='%23ffffff' fill-opacity='0.18'/%3E%3C/svg%3E"),
+                        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpath d='M80 50 L88 70 L82 70 L92 95 L75 73 L82 73 L72 50 Z' fill='%23A8D4F5' fill-opacity='0.15'/%3E%3C/svg%3E");
+    background-size: 150px 150px, 180px 180px;
+    background-position: 0 0, 60px 40px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* 두번째 번개 레이어 (살짝 다른 위치에 겹쳐서 풍성하게) */
+.moong-body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M45 20 L52 38 L47 38 L56 58 L40 42 L47 42 L38 20 Z' fill='%23ffffff' fill-opacity='0.12'/%3E%3C/svg%3E"),
+                        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cpath d='M70 30 L80 55 L72 55 L85 85 L62 60 L72 60 L58 30 Z' fill='%237EB5E3' fill-opacity='0.1'/%3E%3C/svg%3E");
+    background-size: 200px 200px, 220px 220px;
+    background-position: 80px 30px, 20px 80px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* 컨텐츠가 배경 위에 오도록 */
+.moong-body > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* ========================================
+    네비게이션 - 배경과 통합 (투명)
+    ======================================== */
+#navigation {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 30px 20px 20px 65px !important; /* 상(30) 우(20) 하(20) 좌(65) */
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    min-height: 120px !important;
+    flex-wrap: nowrap !important;
+    position: relative !important;
+    z-index: 100 !important;
+}
+
+/* 뭉이 로고 - 100px 고화질 */
+#navigation > a img,
+#navigation .nav-logo img {
+    height: 100px;
+    width: auto;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+}
+
+#navigation > a img:hover,
+#navigation .nav-logo img:hover {
+    transform: scale(1.08);
+}
+
+#navigation > div {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    flex-wrap: nowrap !important;
+    white-space: nowrap !important;
+}
+
+/* 네비게이션 링크 스타일 */
+#navigation a {
+    color: white;
+    text-decoration: none;
+    font-weight: 700;
+    padding: 10px 18px;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+#navigation > div a:hover {
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* 네비게이션 구분선 제거 */
+#navigation > div {
+    font-size: 0;
+}
+
+#navigation > div a {
+    font-size: 16px;
+    padding: 12px 20px;
+}
+
+/* 발바닥 아이콘 - 60px 고화질 */
+.nav-paw {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    vertical-align: middle;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* ========================================
+    메인 컨텐츠 래퍼
+    ======================================== */
+.main-content-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+
+/* 카드 스타일 컨테이너 */
+.moong-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(59, 125, 216, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    overflow: hidden;
+}
+
+/* ========================================
+    사이드바 스타일 (해시태그)
+    ======================================== */
+.sidebar {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-radius: 20px !important;
+    padding: 24px !important;
+    border-right: none !important;
+    box-shadow: 0 4px 20px rgba(59, 125, 216, 0.1);
+    margin-right: 20px;
+}
+
+.sidebar h3 {
+    color: var(--moong-primary);
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sidebar h3::before {
+    content: '';
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    background-image: url('/static/images/moong2.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar ul li {
+    margin-bottom: 8px;
+}
+
+.sidebar ul li a {
+    display: inline-block;
+    padding: 8px 14px;
+    background: var(--moong-bg-light);
+    border-radius: 20px;
+    color: var(--moong-accent);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.sidebar ul li a:hover {
+    background: var(--moong-primary);
+    color: white;
+    transform: translateX(5px);
+    border-color: var(--moong-primary-dark);
+}
+
+.sidebar ul li small {
+    color: var(--moong-text-light);
+    font-size: 12px;
+}
+
+.sidebar hr {
+    border: none !important;
+    height: 2px !important;
+    background: linear-gradient(90deg, transparent, var(--moong-secondary), transparent) !important;
+    margin: 20px 0 !important;
+}
+
+/* ========================================
+    컨텐츠 영역
+    ======================================== */
+.content {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-radius: 20px !important;
+    padding: 24px !important;
+    box-shadow: 0 4px 20px rgba(59, 125, 216, 0.1);
+}
+
+/* ========================================
+    메인 컨테이너
+    ======================================== */
+.container {
+    display: flex;
+    margin-top: 20px;
+    gap: 20px;
+    padding: 0 20px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ========================================
+    검색바 스타일
+    ======================================== */
+.search-bar {
+    margin: 20px auto !important;
+    max-width: 600px;
+    padding: 0 20px;
+}
+
+.search-bar form {
+    display: flex;
+    gap: 10px;
+}
+
+.search-bar input[type="text"] {
+    flex: 1;
+    padding: 14px 20px;
+    border: 2px solid var(--moong-secondary);
+    border-radius: 25px;
+    font-size: 15px;
+    background: rgba(255, 255, 255, 0.95);
+    transition: all 0.3s ease;
+}
+
+.search-bar input[type="text"]:focus {
+    outline: none;
+    border-color: var(--moong-primary);
+    box-shadow: 0 0 0 4px rgba(59, 125, 216, 0.2);
+}
+
+.search-bar button {
+    padding: 14px 28px;
+    background: linear-gradient(135deg, var(--moong-primary) 0%, var(--moong-primary-dark) 100%);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.search-bar button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 125, 216, 0.4);
+}
+
+/* ========================================
     공통 버튼 스타일
     ======================================== */
 .btn {
@@ -17,26 +325,40 @@
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #4285F4 0%, #1E88E5 100%);
+    background: linear-gradient(135deg, var(--moong-primary) 0%, var(--moong-primary-dark) 100%);
     color: white;
-    box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+    box-shadow: 0 4px 12px rgba(59, 125, 216, 0.3);
+    border-radius: 20px;
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(66, 133, 244, 0.4);
+    box-shadow: 0 6px 20px rgba(59, 125, 216, 0.4);
     color: white;
 }
 
 .btn-secondary {
     background: white;
-    color: #4285F4;
-    border: 2px solid #4285F4;
+    color: var(--moong-primary);
+    border: 2px solid var(--moong-primary);
+    border-radius: 20px;
 }
 
 .btn-secondary:hover {
-    background: #E3F2FD;
-    color: #4285F4;
+    background: var(--moong-bg-light);
+    color: var(--moong-primary);
+}
+
+.btn-danger {
+    background: white;
+    color: #E53935;
+    border: 2px solid #E53935;
+    border-radius: 20px;
+}
+
+.btn-danger:hover {
+    background: #FFEBEE;
+    color: #C62828;
 }
 
 .btn-back {
@@ -115,7 +437,7 @@
 .empty-state {
     text-align: center;
     padding: 60px 20px;
-    color: #999;
+    color: var(--moong-text-light);
 }
 
 .empty-state-icon {
@@ -125,6 +447,25 @@
 
 .empty-state-text {
     font-size: 16px;
+    color: var(--moong-accent);
+}
+
+/* 뭉이 캐릭터 빈 상태 */
+.empty-state-moong {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.empty-state-moong img {
+    width: 120px;
+    height: auto;
+    margin-bottom: 20px;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
 }
 
 /* ========================================
@@ -207,27 +548,8 @@
 }
 
 /* ========================================
-    네비게이션 스타일
+    네비게이션 스타일 (상단 뭉이 테마로 이동됨)
     ======================================== */
-#navigation {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    padding: 1rem 2rem !important;
-    border-bottom: 1px solid #E0E0E0 !important;
-    background: white !important;
-    min-height: 60px !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
-    flex-wrap: nowrap !important;
-}
-
-#navigation > div {
-    display: flex !important;
-    align-items: center !important;
-    gap: 0.5rem !important;
-    flex-wrap: nowrap !important;
-    white-space: nowrap !important;
-}
 
 /* ========================================
     마이페이지
@@ -255,8 +577,8 @@
     height: 100px;
     border-radius: 16px;
     object-fit: cover;
-    border: 3px solid #4285F4;
-    box-shadow: 0 4px 12px rgba(66, 133, 244, 0.2);
+    border: 3px solid var(--moong-primary);
+    box-shadow: 0 4px 12px rgba(59, 125, 216, 0.2);
     cursor: pointer;
     transition: transform 0.3s ease;
 }
@@ -430,6 +752,13 @@
 .helper-text { font-size: 12px; color: #757575; margin-top: 5px; }
 .helper-text.locked { color: #EF5350; font-weight: 500; }
 
+.error-text {
+    display: block;
+    color: #E53935;
+    font-size: 13px;
+    margin-top: 4px;
+}
+
 .checkbox-group {
     display: flex;
     align-items: center;
@@ -452,20 +781,21 @@
 .stats-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr); /* 가로로 2등분 */
-    gap: 20px;
-    padding: 30px;
+    gap: 12px;
+    padding: 16px;
 }
 
 /* 2. 통계 박스 안의 숫자와 글자 중앙 정렬 */
 .stat-box {
     background: #F8F9FA;
-    padding: 25px;
-    border-radius: 16px;
+    padding: 14px;
+    border-radius: 12px;
     text-align: center;
-    border: 1px solid #E0E0E0;
+    border: 2px solid var(--moong-primary);
     display: flex;
     flex-direction: column;
     align-items: center;
+    font-size: 14px;
 }
 
 /* 1. 카드 내부의 각 정보 줄 (아이콘 + 텍스트) */
@@ -480,17 +810,31 @@
 
 /* 2. 카드 내부 전체 여백 조정 */
 .post-card {
-    background: white;             /* 하얀색 배경 */
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 20px;
-    border: 1px solid #E0E0E0;     /* 아주 연한 전체 테두리 (선택) */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* 은은한 그림자 */
+    background: white;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 10px;
+    border: 2px solid var(--moong-primary);
+    box-shadow: 0 2px 8px rgba(59, 125, 216, 0.1);
     transition: transform 0.2s ease;
 }
 
 .post-card:hover {
-    transform: translateY(-3px);   /* 마우스 올리면 살짝 들리는 효과 */
+    transform: translateY(-2px);
+}
+
+/* 활동이력 카드 제목 */
+.post-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+/* 활동이력 카드 정보 */
+.post-card .post-info-item {
+    font-size: 13px;
+    margin-bottom: 4px;
+    gap: 6px;
 }
 
 /* 3. 카드 안의 제목 스타일 */
@@ -515,11 +859,11 @@
 .mypage_container {
     max-width: 600px;
     margin: 40px auto;
-    background: white;
+    background: rgba(255, 255, 255, 0.98);
     border-radius: 24px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 32px rgba(59, 125, 216, 0.15);
     overflow: hidden;
-    border: 1px solid #E0E0E0;
+    border: 2px solid var(--moong-secondary);
 }
 
 .mypage_header {
@@ -554,11 +898,19 @@
 
 
 .a-post-card {
-    border: 1px solid #ddd;
-    border-radius: 10px;
+    border: 3px solid var(--moong-primary);
+    border-radius: 20px;
     margin-bottom: 20px;
-    padding: 15px;
-    background: #fff;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.98);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(59, 125, 216, 0.15);
+}
+
+.a-post-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(59, 125, 216, 0.15);
+    border-color: var(--moong-primary-light);
 }
 
 /* 헤더 */
@@ -672,8 +1024,19 @@
 
 .a-post-tags .tag-link {
     text-decoration: none;
-    color: #007bff;
+    color: var(--moong-primary);
     font-size: 0.9rem;
+    background: var(--moong-bg-light);
+    padding: 4px 12px;
+    border-radius: 15px;
+    display: inline-block;
+    margin: 2px;
+    transition: all 0.3s ease;
+}
+
+.a-post-tags .tag-link:hover {
+    background: var(--moong-primary);
+    color: white;
 }
 
 /* 구분선 */
@@ -742,12 +1105,688 @@
 }
 
 .self-tags-input {
-    border: 1px solid #ccc;
+    border: 2px solid var(--moong-secondary);
+    border-radius: 8px;
+    padding: 8px 12px;
     width: 200px;
+    transition: border-color 0.3s;
 }
 
+.self-tags-input:focus {
+    outline: none;
+    border-color: var(--moong-primary);
+}
 
+/* ========================================
+    글 작성 페이지 컨테이너
+    ======================================== */
+.post-form-container {
+    max-width: 700px;
+    margin: 30px auto;
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(59, 125, 216, 0.15);
+    border: 2px solid var(--moong-secondary);
+    overflow: hidden;
+}
 
+.post-form-header {
+    background: linear-gradient(135deg, var(--moong-primary) 0%, var(--moong-primary-light) 100%);
+    padding: 24px 30px;
+    text-align: center;
+}
+
+.post-form-header h2 {
+    color: white;
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.post-form-body {
+    padding: 30px;
+}
+
+.post-form-body label {
+    display: block;
+    font-weight: 600;
+    color: var(--moong-accent);
+    margin-bottom: 8px;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.post-form-body label:first-child {
+    margin-top: 0;
+}
+
+.post-form-body input[type="text"],
+.post-form-body input[type="date"],
+.post-form-body input[type="time"],
+.post-form-body input[type="number"],
+.post-form-body textarea,
+.post-form-body select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--moong-secondary);
+    border-radius: 12px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    background: white;
+    box-sizing: border-box;
+}
+
+.post-form-body input:focus,
+.post-form-body textarea:focus,
+.post-form-body select:focus {
+    outline: none;
+    border-color: var(--moong-primary);
+    box-shadow: 0 0 0 4px rgba(59, 125, 216, 0.15);
+}
+
+.post-form-body textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.post-form-body .location-selects {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.post-form-body .location-selects select {
+    flex: 1;
+    min-width: 120px;
+}
+
+.post-form-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid var(--moong-bg-light);
+}
+
+.post-form-buttons button {
+    flex: 1;
+    padding: 14px 24px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.post-form-buttons button[type="submit"]:not([name]) {
+    background: linear-gradient(135deg, var(--moong-primary) 0%, var(--moong-primary-dark) 100%);
+    color: white;
+}
+
+.post-form-buttons button[name="save_temp"] {
+    background: white;
+    color: var(--moong-primary);
+    border: 2px solid var(--moong-primary);
+}
+
+.post-form-buttons button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(59, 125, 216, 0.3);
+}
+
+/* ========================================
+    게시글 상세 페이지
+    ======================================== */
+.post-container {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.post-detail-card {
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(59, 125, 216, 0.15);
+    border: 2px solid var(--moong-secondary);
+    overflow: hidden;
+}
+
+/* 상태 배너 */
+.status-banner {
+    padding: 20px 24px;
+    text-align: center;
+    border-radius: 16px;
+    margin-bottom: 24px;
+}
+
+.status-banner h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.status-banner p {
+    margin: 8px 0 0 0;
+    font-size: 15px;
+}
+
+.status-banner.recruiting {
+    background: linear-gradient(135deg, var(--moong-bg-light) 0%, var(--moong-secondary) 100%);
+    color: var(--moong-primary-dark);
+    border: 2px solid var(--moong-primary-light);
+}
+
+.status-banner.confirmed {
+    background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+    color: #2E7D32;
+    border: 2px solid #81C784;
+}
+
+.status-banner.cancelled {
+    background: linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%);
+    color: #C62828;
+    border: 2px solid #EF9A9A;
+}
+
+.status-banner.finished {
+    background: linear-gradient(135deg, #F3E5F5 0%, #E1BEE7 100%);
+    color: #7B1FA2;
+    border: 2px solid #CE93D8;
+}
+
+/* 게시글 헤더 */
+.post-detail-header {
+    padding: 24px;
+    border-bottom: 2px solid var(--moong-bg-light);
+}
+
+.post-detail-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--moong-text);
+    margin: 0 0 16px 0;
+}
+
+.post-detail-author {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.post-detail-author img {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 2px solid var(--moong-primary-light);
+}
+
+.post-detail-author-info {
+    flex: 1;
+}
+
+.post-detail-author-name {
+    font-weight: 600;
+    color: var(--moong-accent);
+    text-decoration: none;
+}
+
+.post-detail-author-name:hover {
+    color: var(--moong-primary);
+}
+
+.post-detail-date {
+    font-size: 13px;
+    color: var(--moong-text-light);
+}
+
+/* 게시글 정보 박스 */
+.post-detail-info {
+    padding: 24px;
+    background: var(--moong-bg-light);
+}
+
+.post-info-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    font-size: 15px;
+    color: var(--moong-text);
+}
+
+.post-info-item:not(:last-child) {
+    border-bottom: 1px solid var(--moong-secondary);
+}
+
+.post-info-item strong {
+    color: var(--moong-primary);
+}
+
+/* 게시글 본문 */
+.post-detail-content {
+    padding: 24px;
+}
+
+.post-detail-content p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--moong-text);
+}
+
+.post-detail-images {
+    margin-top: 20px;
+}
+
+.post-detail-images img {
+    max-width: 100%;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 참여 현황 박스 */
+.participation-box {
+    background: white;
+    border: 2px solid var(--moong-secondary);
+    border-radius: 16px;
+    padding: 20px;
+    margin: 24px;
+}
+
+.participation-box .info-box {
+    background: var(--moong-bg-light);
+    padding: 16px;
+    border-radius: 12px;
+    text-align: center;
+    margin-bottom: 16px;
+    font-size: 16px;
+}
+
+.participation-box .info-box strong {
+    color: var(--moong-primary);
+    font-size: 20px;
+}
+
+.participation-box details {
+    margin-top: 12px;
+}
+
+.participation-box summary {
+    cursor: pointer;
+    padding: 12px;
+    background: var(--moong-bg-light);
+    border-radius: 8px;
+    font-weight: 600;
+    color: var(--moong-accent);
+}
+
+.participation-box ul {
+    list-style: none;
+    padding: 12px 0 0 0;
+    margin: 0;
+}
+
+.participation-box ul li {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--moong-bg-light);
+}
+
+/* 게시글 하단 버튼 그룹 */
+.post-detail-buttons {
+    padding: 24px;
+    border-top: 2px solid var(--moong-bg-light);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.post-detail-buttons .btn,
+.post-detail-buttons button {
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 2px solid transparent;
+}
+
+.post-detail-buttons .btn-primary,
+.post-detail-buttons button[type="submit"] {
+    background: linear-gradient(135deg, var(--moong-primary) 0%, var(--moong-primary-dark) 100%);
+    color: white;
+    border: none;
+}
+
+.post-detail-buttons .btn-secondary {
+    background: white;
+    color: var(--moong-primary);
+    border: 2px solid var(--moong-primary);
+}
+
+.post-detail-buttons .btn-danger,
+.post-detail-buttons button.btn-danger {
+    background: white;
+    color: #E53935;
+    border: 2px solid #E53935;
+}
+
+.post-detail-buttons .btn:hover,
+.post-detail-buttons button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 125, 216, 0.2);
+}
+
+/* 태그 영역 */
+.post-detail-tags {
+    padding: 0 24px 24px;
+}
+
+/* ========================================
+    피드 카드 (a_post) 개선
+    ======================================== */
+.a-post-card .a-post-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--moong-bg-light);
+    margin-bottom: 12px;
+}
+
+.a-post-card .author-link {
+    color: var(--moong-accent);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.a-post-card .author-link:hover {
+    color: var(--moong-primary);
+}
+
+.a-post-card .post-date {
+    color: var(--moong-text-light);
+    font-size: 13px;
+    margin-left: auto;
+}
+
+.a-post-card .a-post-content h4 {
+    margin: 0 0 10px 0;
+}
+
+.a-post-card .a-post-content h4 a {
+    color: var(--moong-text);
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 700;
+    transition: color 0.3s;
+}
+
+.a-post-card .a-post-content h4 a:hover {
+    color: var(--moong-primary);
+}
+
+.a-post-card .a-post-content p {
+    color: var(--moong-text-light);
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.a-post-card .a-post-info {
+    background: var(--moong-bg-light);
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    color: var(--moong-text);
+    margin-top: 15px;
+}
+
+.a-post-card .a-post-info strong {
+    color: var(--moong-primary);
+}
+
+.a-post-card .full-badge {
+    background: #FFEBEE;
+    color: #E53935;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+.a-post-card hr {
+    border: none !important;
+    height: 1px !important;
+    background: var(--moong-bg-light) !important;
+    margin: 16px 0 !important;
+}
+
+/* ========================================
+    해시태그 추가 영역 개선
+    ======================================== */
+.tags-add-div {
+    background: var(--moong-bg-light);
+    padding: 20px;
+    border-radius: 16px;
+    margin-top: 20px;
+}
+
+.tag-checkbox {
+    display: inline-block;
+    margin: 4px;
+    background: white;
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 2px solid var(--moong-secondary);
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.tag-checkbox:hover {
+    border-color: var(--moong-primary);
+    background: white;
+}
+
+.tag-checkbox input[type="checkbox"]:checked + label,
+.tag-checkbox:has(input:checked) {
+    background: var(--moong-primary);
+    color: white;
+    border-color: var(--moong-primary);
+}
+
+.self-tags-area {
+    border-top: 2px solid var(--moong-secondary);
+    padding-top: 16px;
+    margin-top: 16px;
+}
+
+/* ========================================
+    로그인 페이지
+    ======================================== */
+#login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 100px);
+    padding: 40px 20px;
+}
+
+#login form {
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(59, 125, 216, 0.2);
+    border: 2px solid var(--moong-secondary);
+    padding: 50px 40px;
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+}
+
+#login h1 {
+    color: var(--moong-primary);
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 30px;
+}
+
+#login form p {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+#login form label {
+    display: block;
+    font-weight: 600;
+    color: var(--moong-accent);
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+#login form input[type="text"],
+#login form input[type="email"],
+#login form input[type="password"] {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid var(--moong-secondary);
+    border-radius: 12px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+#login form input:focus {
+    outline: none;
+    border-color: var(--moong-primary);
+    box-shadow: 0 0 0 4px rgba(59, 125, 216, 0.15);
+}
+
+#login .btn-login {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--moong-primary) 0%, var(--moong-primary-dark) 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+}
+
+#login .btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 125, 216, 0.4);
+}
+
+/* ========================================
+    회원가입 페이지
+    ======================================== */
+#signup {
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+#signup form {
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(59, 125, 216, 0.2);
+    border: 2px solid var(--moong-secondary);
+    padding: 50px 40px;
+    width: 100%;
+    max-width: 500px;
+}
+
+#signup h1 {
+    color: var(--moong-primary);
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+#signup h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--moong-accent);
+    margin: 20px 0 8px 0;
+}
+
+#signup form > div {
+    margin-bottom: 5px;
+}
+
+#signup input[type="text"],
+#signup input[type="email"],
+#signup input[type="password"],
+#signup input[type="tel"],
+#signup select {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid var(--moong-secondary);
+    border-radius: 12px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+#signup input:focus,
+#signup select:focus {
+    outline: none;
+    border-color: var(--moong-primary);
+    box-shadow: 0 0 0 4px rgba(59, 125, 216, 0.15);
+}
+
+#signup .location-selects {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+#signup .location-selects select {
+    flex: 1;
+    min-width: 100px;
+}
+
+#signup button[type="submit"] {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--moong-primary) 0%, var(--moong-primary-dark) 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 30px;
+    transition: all 0.3s ease;
+}
+
+#signup button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 125, 216, 0.4);
+}
+
+#signup .field-error {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0 0;
+}
+
+#signup .field-error li {
+    color: #E53935;
+    font-size: 13px;
+}
 
 /* ========================================
     댓글창

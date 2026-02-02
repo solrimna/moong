@@ -3,14 +3,6 @@
 
 {% block title %}활동 이력 - 뭉이{% endblock %}
 
-{% block myHead %}
-<script>
-    const DDOMOONG_URL_BASE = "{% url 'moong:give_ddomoong' participation_id=0 %}";
-    const CSRF_TOKEN = "{{ csrf_token }}";
-</script>
-<script src="{% static 'js/ddo_moong.js' %}"></script>
-{% endblock %}
-
 {% block myBlock %}
 {% include 'moong/navigation.html' %}
 
@@ -21,80 +13,18 @@
     </div>
 
     <div class="stats-container">
-        <div class="stat-box">
-            <div class="stat-number">{{ total_created }}</div>
-            <div class="stat-label">개최한 모임</div>
-        </div>
-        <div class="stat-box">
-            <div class="stat-number">{{ total_participated }}</div>
-            <div class="stat-label">참여한 모임</div>
-        </div>
-    </div>
-
-    <div class="content-section">
-        <h2 class="section-title">🎯 내가 만든 모임</h2>
-        <div class="post-list">
-            {% if my_posts %}
-                {% for post in my_posts %}
-                <div class="post-card">
-                    <a href="{% url 'moong:post_detail' post.id %}">
-                        <div class="post-title">{{ post.title }}</div>
-                    </a>
-                    <div class="post-info">
-                        <div class="post-info-item">📅 {{ post.moim_date|date:"Y년 m월 d일" }}</div>
-                        <div class="post-info-item">⏰ {{ post.moim_time|time:"H:i" }}</div>
-                        <div class="post-info-item">📍 {{ post.location|default:"장소 미정" }}</div>
-                        <div class="post-info-item">👥 {{ post.get_approved_count }}/{{ post.max_people|default:"∞" }}명</div>
-                    </div>
-                    {% if post.is_cancelled %}
-                        <span class="status-badge status-cancelled">취소됨</span>
-                    {% elif post.is_closed %}
-                        <span class="status-badge status-closed">마감</span>
-                    {% else %}
-                        <span class="status-badge status-open">모집중</span>
-                    {% endif %}
-                    {% if post.moim_finished %}
-                        {% include "moong/ddo_moong.html" with participants=post.other_participants %}
-                    {% endif %}
-                </div>
-                {% endfor %}
-            {% else %}
-                <div class="empty-state">
-                    <div class="empty-state-icon">📝</div>
-                    <div class="empty-state-text">아직 개최한 모임이 없어요</div>
-                </div>
-            {% endif %}
-        </div>
-
-        <h2 class="section-title second-title">🤝 내가 참여한 모임</h2>
-        <div class="post-list">
-            {% if my_participations %}
-                {% for participation in my_participations %}
-                <div class="post-card">
-                    <a href="{% url 'moong:post_detail' participation.post.id %}">
-                        <div class="post-title">{{ participation.post.title }}</div>
-                    </a>
-                    <div class="post-info">
-                        <div class="post-info-item">📅 {{ participation.post.moim_date|date:"Y년 m월 d일" }}</div>
-                        <div class="post-info-item">📍 {{ participation.post.location|default:"장소 미정" }}</div>
-                        <div class="post-info-item">👤 주최자: {{ participation.post.author.nick_name }}</div>
-                    </div>
-                    {% if participation.approve_time %}
-                        <span class="status-badge status-open">✅ 참여 확정</span>
-                    {% else %}
-                        <span class="status-badge status-cancelled">⏳ 승인 대기 중</span>
-                    {% endif %}
-                    <br><br>
-                    {% include "moong/ddo_moong.html" with participants=participation.other_participants %}
-                </div>
-                {% endfor %}
-            {% else %}
-                <div class="empty-state">
-                    <div class="empty-state-icon">🤝</div>
-                    <div class="empty-state-text">아직 참여 신청한 모임이 없어요.</div>
-                </div>
-            {% endif %}
-        </div>
+        <a href="{% url 'users:mypage_created_list' %}" class="stat-box-link">
+            <div class="stat-box">
+                <div class="stat-number">{{ total_created }}</div>
+                <div class="stat-label">개최한 모임</div>
+            </div>
+        </a>
+        <a href="{% url 'users:mypage_participated_list' %}" class="stat-box-link">
+            <div class="stat-box">
+                <div class="stat-number">{{ total_participated }}</div>
+                <div class="stat-label">참여한 모임</div>
+            </div>
+        </a>
     </div>
 
     <div class="button-section">

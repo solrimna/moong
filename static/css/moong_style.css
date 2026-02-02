@@ -975,14 +975,46 @@
     height: calc(100% - 30px);
     cursor: pointer;
     z-index: 2;
+    display: flex;
+    align-items: center;
+}
+
+.tap-prev::after,
+.tap-next::after {
+    content: '';
+    display: block;
+    width: 14px;
+    height: 14px;
+    border-top: 3px solid rgba(255, 255, 255, 0.9);
+    border-right: 3px solid rgba(255, 255, 255, 0.9);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
+}
+
+.tap-slider:hover .tap-prev::after,
+.tap-slider:hover .tap-next::after {
+    opacity: 1;
 }
 
 .tap-prev {
     left: 0;
+    justify-content: flex-start;
+    padding-left: 12px;
+}
+
+.tap-prev::after {
+    transform: rotate(225deg);
 }
 
 .tap-next {
     right: 0;
+    justify-content: flex-end;
+    padding-right: 12px;
+}
+
+.tap-next::after {
+    transform: rotate(45deg);
 }
 
 .tap-dots {
@@ -1793,4 +1825,41 @@
    ======================================== */
 
 /*
-댓글 대댓글 미니 프로필 이미지 일단 inline style로 처리  
+댓글 대댓글 미니 프로필 이미지 일단 inline style로 처리 
+
+/* 페이지네이션 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 30px 0;
+}
+
+.page-link {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #333;
+    transition: all 0.2s;
+}
+
+.page-link:hover {
+    background-color: #f0f0f0;
+}
+
+.page-link.active {
+    background-color: #4285F4;
+    color: white;
+    border-color: #4285F4;
+}
+
+.stat-box-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.stat-box-link:hover .stat-box {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}

@@ -58,7 +58,7 @@
                         {% else %}
                             <a href="{% url 'users:user_profile' post.author.id %}" class="post-detail-author-name">{{ post.author.nick_name }}</a>
                         {% endif %}
-                        <div class="post-detail-date">{{ post.create_time }}</div>
+                        <div class="post-detail-date">{{ post.display_time }}</div>
                     </div>
                 </div>
             </div>

@@ -954,8 +954,8 @@ html, body {
 
 .a-post-images .post-image {
     width: 100%;
-    max-width: 500px;
-    height: 500px;
+    max-width: 350px;
+    height: 350px;
     margin: 0 auto;
     object-fit: cover;
     display: block;

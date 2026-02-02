@@ -15,9 +15,23 @@
 
     {% if post.images.first %}
     <div class="a-post-images">
-        <a href="{% url 'moong:post_detail' post.id %}" class="image-link">
-            <img src="{{ post.images.first.image.url }}" class="post-image">
-        </a>
+        {% if post.images.first %}
+            <div class="tap-slider">
+                {% for image in post.images.all %}
+                    <img src="{{ image.image.url }}"
+                         class="post-image tap-slide {% if forloop.first %}active{% endif %}">
+                {% endfor %}
+                {% if post.images.count > 1 %}
+                    <div class="tap-prev"></div>
+                    <div class="tap-next"></div>
+                    <div class="tap-dots">
+                        {% for image in post.images.all %}
+                            <span class="tap-dot {% if forloop.first %}active{% endif %}"></span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
     </div>
     {% endif %}
 

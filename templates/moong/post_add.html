@@ -24,11 +24,6 @@
 
         <form method="POST" enctype="multipart/form-data" class="post-form-body">
             {% csrf_token %}
-
-            {% if temp_post %}
-                <input type="hidden" name="temp_post_id" value="{{ temp_post.id }}">
-            {% endif %}
-
             <label>제목</label>
             {{ form.title }}
             {% if form.title.errors %}
@@ -110,16 +105,17 @@
             </div>
             {% endif %}
 
-            <!-- 버튼 -->
-            <div class="post-form-buttons">
-                {% if temp_post_id %}
-                    <button type="submit">게시하기</button>
-                {% else %}
-                    <button type="submit">게시</button>
-                    <button type="submit" name="save_temp">임시저장</button>
-                {% endif %}
-            </div>
-        </form>
-    </div>
+        <!-- 버튼 -->
+        <div class="post-form-buttons">
+            {% if temp_post_id %}
+                <!-- 임시저장 후: 게시 버튼만 -->
+                <button type="submit">게시하기</button>
+            {% else %}
+                <!-- 처음: 둘 다 보임 -->
+                <button type="submit">게시</button>
+                <button type="submit" name="save_temp">임시저장</button>
+            {% endif %}
+        </div>
+    </form>
     <script src="{% static 'js/hashtags_add.js' %}"></script>
 {% endblock %}

@@ -952,6 +952,58 @@
     cursor: pointer;
 }
 
+/* 터치 이미지 슬라이더 */
+.tap-slider {
+    position: relative;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.tap-slider .tap-slide {
+    display: none;
+}
+
+.tap-slider .tap-slide.active {
+    display: block;
+}
+
+.tap-prev,
+.tap-next {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: calc(100% - 30px);
+    cursor: pointer;
+    z-index: 2;
+}
+
+.tap-prev {
+    left: 0;
+}
+
+.tap-next {
+    right: 0;
+}
+
+.tap-dots {
+    text-align: center;
+    padding: 8px 0;
+}
+
+.tap-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin: 0 3px;
+    background: #ccc;
+    border-radius: 50%;
+    transition: background 0.3s;
+}
+
+.tap-dot.active {
+    background: #333;
+}
+
 /* 정보 */
 .a-post-info {
     background: #f8f9fa;

@@ -1,0 +1,31 @@
+<div class="participants-list">
+
+{% if participants %}
+    또뭉 줄 사람들 - 모임이 완료된 경우에만 줄 수 있어요!
+{% endif %}
+
+{% for p in participants %}
+    <div class="participant-item">
+        <span>{{ p.user.nick_name }}</span>
+        <span class="ddo-count" id="ddo-count-{{ p.id }}">
+            또뭉 {{ p.user.ddomoong }}개
+        </span>
+
+        {% if user.is_authenticated %}
+            <button
+                type="button"
+                class="btn-ddo"
+                id="ddo-btn-{{ p.id }}"
+                onclick="toggleDdomoong({{ p.id }})"
+            >
+                {% if p.is_ddo_by_me %}
+                    <span id="ddo-text-{{ p.id }}">❤️ 또뭉 취소</span>
+                {% else %}
+                    <span id="ddo-text-{{ p.id }}">🤍 또뭉 주기</span>
+                {% endif %}
+            </button>
+        {% endif %}
+    </div>
+{% endfor %}
+
+</div>

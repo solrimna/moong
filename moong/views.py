@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404, reverse
 from django.db.models import Count
-from .models import Post, Hashtag, Image, Participation, Comment
+from .models import Post, Hashtag, Image, Participation, Comment, Ddomoong
 from locations.models import Location
 from django.contrib.auth.decorators import login_required
 from .forms import PostForm, CommentForm
@@ -9,13 +9,12 @@ from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseRedire
 import openai
 import os
 from dotenv import load_dotenv
-
+from django.utils import timezone
 # OpenAI 설정
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
-# 찢긴 했는데 해시태그 분류에 좀 오류가 있어요! 수정해나가겠습니다.
 # ============ 메인 페이지 =============
 # 첫번째: location 모델에서 지역 키워드 추출하는 함수
 def get_location_keywords():
@@ -35,9 +34,7 @@ def get_location_keywords():
                 location_keywords.add(name[0] + name[2])
             
             location_keywords.add(clean_name)
-            
-        
-    
+
     return location_keywords
 
 
@@ -89,8 +86,6 @@ def main(request):
     })
 
 
-
-
 # 해시태그별 게시물 보기
 def tag_feeds(request, tag_name):
     posts = Post.objects.filter(
@@ -105,51 +100,86 @@ def tag_feeds(request, tag_name):
 
 
 
-
 # ai 해시태그 쓰려면 pip install openai, pip install python-dotenv 해야합니다!
 # .env 파일 manage.py 파일과 같은 곳에 놓고, .env 안에 open ai key 넣으셔야 합니다.
 # .gitignore에도 .env 넣어주세욥~
-# ================ AI 해시태그 생성 함수 ======================
-def ai_tags(content, location):
+# ================ 해시태그 생성 함수 ======================
+# 지역 해시태그를 파싱으로 바꿔서 지역 해시태그, 키워드 해시태그 함수 나눴습니다!
+def extract_location_tags(location):
+    if not location or not isinstance(location, str):
+        return []
+
+    loc_tags = []
+    if location and isinstance(location, str):
+        # 오류 날때 ' | ' 이런 이상한 해시태그가 생겨서 없앴어요
+        clean_location = location.replace('|', ' ').strip()
+        parts = [p.strip() for p in clean_location.split() if p.strip()]
+        
+        if len(parts) > 0:
+            # 광역시/도 (이 부분이 문제가 많아서 아예 다 써놨어요)
+            a = parts[0]
+            short_names = {
+                "강원특별자치도": "강원", "경기도": "경기",
+                "경상남도": "경남", "경상북도": "경북", "광주광역시": "광주",
+                "대구광역시": "대구", "대전광역시": "대전", "부산광역시": "부산",
+                "서울특별시": "서울", "세종특별자치시": "세종", "울산광역시": "울산",
+                "인천광역시": "인천", "전라남도": "전남",
+                "전북특별자치도": "전북", "제주특별자치도": "제주",
+                "충청남도": "충남", "충청북도": "충북"
+            }
+            a_short = short_names.get(a, a[:2])
+            loc_tags.append(a_short)
+
+            # 나머지 주소
+            details = []
+            for p in parts[1:]:
+                p_clean = p.strip()
+                # ' | ' 문자나 이름 겹치지 않는 것만 추가
+                if p_clean and p_clean not in ['|', 'None', 'null'] and p_clean not in details:
+                    details.append(p_clean)
     
+            loc_tags.extend(details[:2])
+    return loc_tags
+
+# ai로 키워드 해시태그만 추출하기
+def ai_tags(content, location):
     if not content and not location:
         return []
-    
+
+    loc_tags = extract_location_tags(location)
+
+    needed_count = 6 - len(loc_tags)
     prompt = f"""
-다음 정보로 SNS 해시태그 6개를 만들어줘.
-장소: {location}
 내용: {content}
+위 내용을 바탕으로 SNS 키워드 해시태그를 {needed_count}개 만들어줘.
 
 조건:
 - # 기호 없이 단어나 명사만 출력
 - 쉼표(,)로 구분하고 한글로만 작성
-- 장소 해시태그 3개, 내용 해시태그 3개 만들기
-- 지역 해시태그는 장소 정보에서 추출하고, 키워드 해시태그는 내용에서 추출
-- 키워드 해시태그 예: 맛집, 취미, 친목, 운동 등
-- 장소 해시태그 규칙(입력 데이터는 항상 A B C 3단계 형식):
-    1. A (광역시/도): 약칭으로 (예: 서울, 세종, 경기, 전북, 충남 등)
-    2. B (시/군/구): 전체 단어 그대로 (예: 수원시 등)
-    3. C (읍/면/동): 전체 단어 그대로 (예: 정자동 등)
-    **특별 규칙: B와 C가 중복되는 경우(예: '세종특별자치시 소담동 소담동'), A와 C만 사용하여 장소 해시태그 2개 생성, 나머지 4개는 키워드 해시태그로 채우기**
+- 글 내용 기반으로 키워드 해시태그 생성
+- 예: 맛집, 취미, 카페, 운동 등
 
 답변:"""
-
     try:
         response = openai.chat.completions.create(
             model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.7,
-        )
-        
+            messages=[
+                {"role": "system", "content": "해시태그 생성기"},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.3,
+        ) # 키워드 해시태그가 너무 엉뚱하게 나오면 temperature를 0에 가깝게 줄이고,
+          # 좀 더 창의적으로 나오길 원하시면 0.5 정도로 늘리면 돼요.
         
         result = response.choices[0].message.content.strip()
-        tags = [tag.strip().replace('#', '') for tag in result.split(',') if tag.strip()]
+        keyword_tags = [k.strip().replace('#', '') for k in result.split(',') if k.strip()]
         
-        return tags[:6]  # 최대 6개만
+        # 합치기~
+        total_tags = [t for t in (loc_tags + keyword_tags) if t and t != '|']
+        return total_tags[:6]
         
-    except Exception as e:
-        print(f"AI 해시태그 생성 오류: {e}")
-        return []
+    except Exception:
+        return [t for t in loc_tags if t != '|']
 
 
 # ==================== 게시글 작성 ====================
@@ -188,8 +218,17 @@ def post_add(request):
                 # is_updated ture면 -> 갱신 : 이미지 지웠다가 재저장 해줘야해서 clear true
                 save_or_clear_images(post, request, clear_all=False, clear_list='delete_images')
 
-                # AI 해시태그
+                # 1. AI 해시태그
                 tags = ai_tags(post.content, location_text)
+
+                # 2. 생성된 태그를 DB에 저장하고 post와 연결
+                post.hashtags.clear()
+                if tags:
+                    for tag_name in tags:
+                        tag_name = tag_name.strip().replace("#", "")
+                        if tag_name:
+                            tag, created = Hashtag.objects.get_or_create(name=tag_name)
+                            post.hashtags.add(tag)
 
                 messages.success(request, '임시저장 완료!')
                 print("post_add 임시 저장 호출됨!")
@@ -270,7 +309,7 @@ def post_add(request):
             if temp_post:
                 form = PostForm(instance=temp_post)
                 existing_images = temp_post.images.all().order_by('order')
-                existing_tags = [f"#{tag.name}" for tag in temp_post.hashtags.all()]
+                existing_tags = [tag.name for tag in temp_post.hashtags.all()] # 이름만 리스트로 넘겨주기
                 
                 messages.success(request, '임시저장된 글을 불러왔습니다.')
 
@@ -331,10 +370,14 @@ def post_detail(request, post_id):
         Post.objects.select_related('author', 'location'),
         id=post_id
     )
-    approved_participants = post.participations.filter(status='APPROVED').select_related('user')
-    is_applied = False #is_applied 초기화
+    approved_participants = post.participations.select_related('user')
+    
+    user_participation = None
     if request.user.is_authenticated:
-        is_applied = post.participations.filter(user=request.user).exists()
+        user_participation = Participation.objects.filter(
+            post=post,
+            user=request.user
+        ).first()
 
     comments = (
         post.comments
@@ -347,13 +390,45 @@ def post_detail(request, post_id):
     hashtags = post.hashtags.all()
 
     comment_form = CommentForm()
+    # 참여자 리스트 (승인 & 승인 리스트 & 대기 list)
+    approval_list = []
+    index_participant_list = []
+    index_indicator = False
+    index_participant = 0
+    print(user_participation)
+    for user in list(approved_participants):
+        for index, item in enumerate(list(approved_participants)):
+            if item == user and ((index + 1) > post.max_people):
+                index_participant = (index + 1) - post.max_people
+                index_indicator = True
+        index_participant_list.append(index_participant)
+        approval_list.append(index_indicator)
+    
+    # 또뭉 참여자 리스트 (모임 완료 + COMPLETED + 본인 제외)
+    ddomoong_participants = []
+    if post.moim_finished and request.user.is_authenticated:
+        ddomoong_participants = list(
+            post.participations.filter(
+                status='COMPLETED'
+            ).select_related('user').exclude(
+                user=request.user
+            )
+        )
+        for p in ddomoong_participants:
+            p.is_ddo_by_me = p.ddomoongs.filter(from_user=request.user).exists()
 
-    return render(request, 'moong/post_detail.html', {'post': post,
-                                                      'comments':comments,
-                                                      'comment_form':comment_form,
-                                                      'is_applied': is_applied,
-                                                      'approved_participants': approved_participants,
-                                                      })
+    context = {
+        'post': post,
+        'comments':comments,
+        'comment_form':comment_form,
+        'approved_participants_and_approval': zip(approved_participants,approval_list, index_participant_list),
+        'user_participation': user_participation,
+        'index_participant': index_participant,
+                'ddomoong_participants': ddomoong_participants,
+    }
+    
+    
+    return render(request, 'moong/post_detail.html', context)
 
 # ==================== 게시글 수정 ====================
 def post_mod(request, post_id):
@@ -465,63 +540,36 @@ def post_delete(request, post_id):
         # GET 요청은 거부
         return redirect('moong:post_detail', post_id=post_id)
 
+# ==================== 모집 확정 / 확정 취소 ====================
 @login_required
-def post_closed_cancel(request, post_id):
-    print("post_closed_cancel 모집 확정 취소 호출됨!")
+def post_closed_toggle(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    
+
     # 권한 체크
     if post.author != request.user:
-        messages.error(request, '모집 확정 취소 권한이 없습니다.')
+        messages.error(request, '권한이 없습니다.', extra_tags='alert_popup')
         return redirect('moong:post_detail', post_id=post_id)
-    
+
     # POST 요청만 허용
     if request.method == 'POST':
-
-        print(f"게시글 모집 확정 취소 처리")
-        post.is_closed = False
-        post.save()
-        messages.warning(request, f'모집 확정이 취소되었습니다.')
-        print("게시글 모집 확정 취소 완료!")
-
-        # 모임이 확정되던 아니던 post_detail로 
-        return redirect('moong:post_detail', post_id=post_id)
-    else:
-        # GET 요청은 거부
-        return redirect('moong:post_detail', post_id=post_id)
-
-# ==================== 모집 확정 ====================
-@login_required
-def post_closed(request, post_id):
-    print("post_closed 모집 확정 호출됨!")
-    post = get_object_or_404(Post, id=post_id)
-    
-    # 권한 체크
-    if post.author != request.user:
-        messages.error(request, '모집 확정 권한이 없습니다.')
-        return redirect('moong:post_detail', post_id=post_id)
-    
-    # POST 요청만 허용
-    if request.method == 'POST':
-        approved_count = post.get_approved_count()
-
-        # # case1. 승인된 참여자가 없는 case
-        if approved_count == 0:
-            print(f"게시글 모집 확정 불가 - 확정 참여자 없음")
-            messages.warning(request, f'모임 참여자가 없어 모집 확정이 불가능합니다.')
-        # case2. 승인된 참여자가 있는 case
-        else:
-            print(f"게시글 모집 확정 처리 - (확정 참여자: {approved_count}명)으로 진행")
-            post.is_closed = True
+        if post.is_closed:
+            # 확정 취소
+            post.is_closed = False
             post.save()
-            messages.warning(request, f'확정 참여자({approved_count}명) 상태로 모임이 확정되었습니다.')
-            print("게시글 모집 확정 완료!")
+            messages.warning(request, '모집 확정이 취소되었습니다.', extra_tags='alert_popup')
+            print("게시글 모집 확정 취소 완료!")
+        else:
+            # 확정
+            approved_count = post.get_approved_count()
+            if approved_count == 0:
+                messages.warning(request, '모임 참여자가 없어 모집 확정이 불가능합니다.', extra_tags='alert_popup')
+            else:
+                post.is_closed = True
+                post.save()
+                messages.warning(request, f'확정 참여자({approved_count}명) 상태로 모임이 확정되었습니다.', extra_tags='alert_popup')
+                print("게시글 모집 확정 완료!")
 
-        # 모임이 확정되던 아니던 post_detail로 
-        return redirect('moong:post_detail', post_id=post_id)
-    else:
-        # GET 요청은 거부
-        return redirect('moong:post_detail', post_id=post_id)
+    return redirect('moong:post_detail', post_id=post_id)
 
 # ==================== 모임 완료(확정 뒤에) ====================
 @login_required
@@ -541,9 +589,12 @@ def moim_finished(request, post_id):
     
     # POST 요청만 허용
     if request.method == 'POST':
-        post.moim_finished = True  # 모임 완료 필드 (추가 필요)
+        post.moim_finished = True
         post.save()
-        
+
+        # 참여자들 상태도 바꿔줘야함  APPROVED > COMPLETED
+        post.participations.filter(status='APPROVED').update(status='COMPLETED')
+
         messages.success(request, '모임이 완료 처리되었습니다.')
         print("모임 완료 처리 완료!")
         return redirect('moong:main')
@@ -554,13 +605,43 @@ def moim_finished(request, post_id):
 @login_required
 def post_apply(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    # 이미 신청했는지 확인 후 없으면 생성
-    participation, created =Participation.objects.get_or_create(post=post, user=request.user, defaults={'status': 'APPROVED'})
+    # 이미 신청했는지 확인 후 없으면 생성    
+    
+    participation, created =Participation.objects.get_or_create(
+        post=post, 
+        user=request.user, 
+        defaults={'status': 'PENDING',
+                  'approve_time' : timezone.now()
+                  }, 
+        )
+    print(f"참여 확인 :  {participation}, created : {created}")
     messages.success(request, '참여 신청이 완료되었습니다.')
-    return redirect('moong:post_detail', post_id=post.id) # 다시 상세페이지로!
+    return redirect('moong:post_detail', post_id = post.id) # 다시 상세페이지로!
+
+@login_required
+def participant_manage(request, participation_id):
+    participation = get_object_or_404(Participation, id=participation_id)
+    #print(f"승인여부 :  {action_comple}")
+    # 주최자만 권한 허용
+    if request.user != participation.post.author:
+        return redirect('moong:post_detail', post_id=participation.post.id)
+
+    if request.method == 'POST':
+        action_complete = request.POST.get('action_complete')
+        print(f"승인여부 :  {action_complete}")
+        if action_complete == 'approve':
+            participation.status = 'APPROVED' # 수락 시 승인 상태로 변경
+            participation.save()
+        elif action_complete == 'reject':
+            # 거절 시 다시 신청할 수 있도록 아예 삭제하거나 상태를 REJECTED로 변경
+            participation.cancel() 
+            
+    return redirect('moong:post_detail', post_id=participation.post.id)    
+
 
 @login_required
 def post_cancel(request, post_id):
+    print("참여 취소 호출")
     post = get_object_or_404(Post, id=post_id)
     # 해당 신청 내역 찾아서 삭제
     participation = Participation.objects.filter(post=post, user=request.user)
@@ -629,11 +710,50 @@ def comment_delete(request, comment_id):
 #     return redirect("moong:post_detail", post_id=post_id)    
 
 
-
-
-
-
-
+# ==================== 또뭉 주기 ====================   
+@login_required
+def give_ddomoong(request, participation_id):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST만 가능'}, status=400)
+    participation = get_object_or_404(Participation, id=participation_id)
+    
+    # 자기 자신에게는 못 줌
+    if participation.user == request.user:
+        return JsonResponse({
+            'success': False,
+            'message': '자기 자신에게는 또뭉을 줄 수 없어요!'
+        })
+    
+    # 별도 table에 저장
+    ddomoong = Ddomoong.objects.filter(
+        participation=participation,
+        from_user=request.user
+    )
+    
+    if ddomoong.exists():
+        ddomoong.delete()
+        participation.user.decrease_ddomoong()
+        is_ddo = False
+        message = '또뭉을 취소했어요!'
+    else:
+        Ddomoong.objects.create(
+            participation=participation,
+            from_user=request.user
+        )
+        participation.user.increase_ddomoong()
+        is_ddo = True
+        message = '또뭉을 줬어요! 👍'
+    
+    # 현재 또뭉 개수 
+    participation.user.refresh_from_db(fields=['ddomoong'])
+    ddo_count = participation.user.ddomoong
+    print(f'또뭉 카운트 : {ddo_count}')
+    return JsonResponse({
+        'success': True,
+        'is_ddo': is_ddo,
+        'ddo_count': ddo_count,
+        'message': message
+    })
 
 # ===============================================================================================================================================================================
 # ==================== 공통 사용용 def ============================================================================================================================================

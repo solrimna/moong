@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 
+{% load static %}
 {% block myHead %}
     <style>
         .container { display: flex; margin-top: 20px; }
@@ -8,6 +9,7 @@
         .tag-info h2 { color: #007bff; font-size: 2rem; margin-bottom: 10px; }
         .tag-count { color: #666; font-size: 1rem; }
     </style>
+    <script src="{% static 'js/swipe_slider.js' %}"></script>
 {% endblock %}
 
 {% block myBlock %}

@@ -3,6 +3,14 @@
 
 {% block title %}활동 이력 - 뭉이{% endblock %}
 
+{% block myHead %}
+<script>
+    const DDOMOONG_URL_BASE = "{% url 'moong:give_ddomoong' participation_id=0 %}";
+    const CSRF_TOKEN = "{{ csrf_token }}";
+</script>
+<script src="{% static 'js/ddo_moong.js' %}"></script>
+{% endblock %}
+
 {% block myBlock %}
 {% include 'moong/navigation.html' %}
 
@@ -45,6 +53,9 @@
                     {% else %}
                         <span class="status-badge status-open">모집중</span>
                     {% endif %}
+                    {% if post.moim_finished %}
+                        {% include "moong/ddo_moong.html" with participants=post.other_participants %}
+                    {% endif %}
                 </div>
                 {% endfor %}
             {% else %}
@@ -73,6 +84,8 @@
                     {% else %}
                         <span class="status-badge status-cancelled">⏳ 승인 대기 중</span>
                     {% endif %}
+                    <br><br>
+                    {% include "moong/ddo_moong.html" with participants=participation.other_participants %}
                 </div>
                 {% endfor %}
             {% else %}

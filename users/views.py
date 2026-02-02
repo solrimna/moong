@@ -123,7 +123,39 @@ def mypage_activity(request):
     # 통계
     total_created = my_posts.count()
     total_participated = my_participations.count()
-    
+
+    # 나 외의 참여자 리스트 정리 (ddo_count 포함, 모임 완료된 것만)
+    for participation in my_participations:
+        if participation.post.moim_finished:
+            other_participants = list(
+                participation.post.participations.filter(
+                    status='COMPLETED'
+                ).select_related('user').exclude(
+                    user=request.user
+                )
+            )
+            for p in other_participants:
+                p.is_ddo_by_me = p.ddomoongs.filter(from_user=request.user).exists()
+            participation.other_participants = other_participants
+        else:
+            participation.other_participants = []
+
+    # 내가 만든 모임에도 또뭉 참여자 세팅 (모임 완료된 것만)
+    for post in my_posts:
+        if post.moim_finished:
+            other_participants = list(
+                post.participations.filter(
+                    status='COMPLETED'
+                ).select_related('user').exclude(
+                    user=request.user
+                )
+            )
+            for p in other_participants:
+                p.is_ddo_by_me = p.ddomoongs.filter(from_user=request.user).exists()
+            post.other_participants = other_participants
+        else:
+            post.other_participants = []
+
     context = {
         'user': user,
         'my_posts': my_posts,

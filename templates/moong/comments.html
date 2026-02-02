@@ -1,6 +1,6 @@
 <div>
     댓글 {{ post.comments.count }}개
-        <ul>
+        <ul id="comment-list" class="comments">
             {% for comment in comments|default:post.comments.all %}
                 {% if not comment.parent %}
                 <li style="margin-bottom: 12px;">

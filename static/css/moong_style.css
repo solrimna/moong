@@ -1801,4 +1801,10 @@
    ======================================== */
 
 /*
-댓글 대댓글 미니 프로필 이미지 일단 inline style로 처리  
+댓글 대댓글 미니 프로필 이미지 일단 inline style로 처리 */
+#comment-list,
+.comments ul {
+  list-style: none;
+  padding-left: 0;
+  margin-left: 0;
+} 

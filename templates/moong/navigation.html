@@ -14,11 +14,22 @@
                     글 작성
                 </a>
                 <a href="{% url 'users:mypage' %}">
-                    <img src="{% static 'images/moong2.png' %}" class="nav-paw" alt="">
+                    <img src="{{ user.profile_image.url }}" 
+                            style=
+                                "width: 45px;
+                                height: 45px;
+                                border-radius: 50%;
+                                border: 2px solid #90d1c6;
+                                object-fit: cover;">
                     {{ user.nick_name }}님
                 </a>
                 <a href="{% url 'users:logout' %}">
-                    <img src="{% static 'images/moong2.png' %}" class="nav-paw" alt="">
+                    <img src="{% static 'images/logout.png' %}"                            style=
+                                "width: 60px;
+                                height: 80px;
+                                border-radius: 50%;
+                                border: 0px solid #ffffff;
+                                object-fit: cover;">
                     로그아웃
                 </a>
             {% else %}

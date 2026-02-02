@@ -2210,20 +2210,24 @@ html, body {
 .post-tags a {
     display: inline-flex;
     align-items: center;
-    padding: 6px 14px;
-    background: transparent;
-    color: #333 !important;
-    border: none;
-    border-radius: 0;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, var(--moong-bg-light) 0%, var(--moong-secondary) 100%);
+    color: var(--moong-primary-dark) !important;
+    border: 2px solid var(--moong-primary-light);
+    border-radius: 20px;
     font-size: 14px !important;
     font-weight: 600;
     text-decoration: none !important;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(59, 125, 216, 0.15);
 }
 
 .post-tags a:hover {
-    color: var(--moong-primary) !important;
-    text-decoration: underline !important;
+    background: linear-gradient(135deg, var(--moong-primary) 0%, var(--moong-primary-dark) 100%);
+    color: white !important;
+    border-color: var(--moong-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 125, 216, 0.3);
 }
 
 /* ========================================

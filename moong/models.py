@@ -1,6 +1,8 @@
 from django.db import models
 from django.conf import settings
-
+from django.utils import timezone
+from datetime import timedelta
+from django.db.models import Q
 
 class Post(models.Model):
     """게시글 모델"""
@@ -81,8 +83,8 @@ class Post(models.Model):
         """승인된 참여자 수"""
         return self.participations.filter(status='APPROVED').count()
     def get_wait_count(self):
-        """승인된 대기자 수"""
-        return self.participations.filter(status='APPROVED').count() - self.max_people
+        """ 대기자 수"""
+        return self.participations.filter(Q(status='PENDING') | Q(status='CANCELLED')).count() 
     def get_pending_count(self):
         """승인 대기 중인 신청자 수"""
         return self.participations.filter(status='PENDING').count()
@@ -253,7 +255,30 @@ class Comment(models.Model):
     def is_reply(self):
         """대댓글 여부"""
         return self.parent is not None
+    
+    def display_time(self):
+        """
+        오늘 작성 → n시간 전 / n분 전
+        오늘이 아님 → YYYY.MM.DD
+        """
+        now = timezone.now()
+        created = self.create_time
 
+        # 날짜가 같은 경우
+        if now.date() == created.date():
+            diff = now - created
+
+            if diff < timedelta(minutes=1):
+                return "방금 전"
+            elif diff < timedelta(hours=1):
+                minutes = int(diff.total_seconds() // 60)
+                return f"{minutes}분 전"
+            else:
+                hours = int(diff.total_seconds() // 3600)
+                return f"{hours}시간 전"
+
+        # 날짜가 다른 경우
+        return created.strftime("%Y.%m.%d")
 
 class Hashtag(models.Model):
     """해시태그 모델"""
@@ -338,3 +363,30 @@ class Image(models.Model):
     
     def __str__(self):
         return f'{self.post.title} - 이미지 {self.order}'    
+    
+class Ddomoong(models.Model):
+    """참가자에게 또뭉 주기"""
+    participation = models.ForeignKey(
+        'Participation',
+        on_delete=models.CASCADE,
+        related_name='ddomoongs',
+        db_column='participation_id'
+    )
+    from_user = models.ForeignKey(
+        'users.User',  # users 앱의 User 모델
+        on_delete=models.CASCADE,
+        related_name='given_ddomoongs',
+        db_column='from_user_id'
+    )
+    created_at = models.DateTimeField(auto_now_add=True, db_column='create_time')
+    
+    class Meta:
+        db_table = 'Ddomoong'  # 다른 테이블명 스타일에 맞춤
+        unique_together = ('participation', 'from_user')
+        indexes = [
+            models.Index(fields=['participation']),
+            models.Index(fields=['from_user']),
+        ]
+    
+    def __str__(self):
+        return f"{self.from_user.nick_name} -> {self.participation.user.nick_name}"

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block myBlock %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-body text-center">
+            <h3>임시저장된 글이 있습니다</h3>
+            <p>
+                {{ temp_post.create_time|date:"Y년 m월 d일 H:i" }}에 저장됨
+            </p>
+            
+            {% if temp_post.content %}
+            <div class="alert alert-light mb-4">
+                <p class="mb-0">{{ temp_post.content|truncatewords:20 }}</p>
+            </div>
+            {% endif %}
+            
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{% url 'moong:post_add' %}?load_temp=yes" class="btn btn-primary">
+                    임시저장 글 이어쓰기
+                </a>
+                <a href="{% url 'moong:post_add' %}?load_temp=no" class="btn btn-secondary">
+                    새로 작성하기
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

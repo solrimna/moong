@@ -1,53 +1,56 @@
-<div class="post-card" style="border: 1px solid #ddd; border-radius: 10px; margin-bottom: 20px; padding: 15px; background: #fff;">
-    <div class="post-header" style="display: flex; align-items: center; margin-bottom: 10px;">
-        <a href="{% url 'users:user_profile' post.author.id %}" style="text-decoration: none; color: inherit; cursor: pointer;">
-            <strong>{{ post.author.nick_name }}</strong>
+<div class="a-post-card">
+    <div class="a-post-header">
+        <a href="{% url 'users:user_profile' post.author.id %}" class="author-link">
+            {{ post.author.nick_name }}
         </a>
-        <span style="color: #888; font-size: 0.8rem; margin-left: 10px;">{{ post.create_time|date:"Y-m-d" }}</span>
+        <span class="post-date">{{ post.create_time|date:"Y-m-d" }}</span>
     </div>
-    <br>
-    <div class="post-content">
-        <h4 style="margin: 5px 0;">
-            <a href="{% url 'moong:post_detail' post.id %}">
-                {{ post.title }}
-            </a>    
+
+    <div class="a-post-content">
+        <h4>
+            <a href="{% url 'moong:post_detail' post.id %}">{{ post.title }}</a>
         </h4>
-        <p>{{ post.content }}</p>
+        <p>{{ post.content|truncatechars:100 }}</p>
     </div>
 
-    <div class="post-images">
+    {% if post.images.first %}
+    <div class="a-post-images">
         {% if post.images.first %}
-            <a href="{% url 'moong:post_detail' post.id %}" style="display: block;">
-                <img src="{{ post.images.first.image.url }}" style="width: 100%; max-width: 500px; height: 500px; margin: 0 auto; object-fit: cover; display: block; cursor: pointer;">
-            </a>
-        {% endif %}
-    </div>
-    <br>
-
-    <div class="post-info" style="background: #f8f9fa; padding: 8px; border-radius: 5px; font-size: 0.9rem;">
-        장소: {{ post.location }} <br>
-        참여 현황: <strong>{{ post.get_approved_count }}</strong> / {{ post.max_people }}명
-        {% if post.is_full %}
-            <span style="color: red; font-weight: bold;">[인원 마감]</span>
-        {% endif %}
-    </div>
-
-    <div class="post-tags" style="margin-top: 10px;">
-        {% for tag in post.hashtags.all %}
-            <a href="{% url 'moong:tag_feeds' tag.name %}" style="text-decoration: none; color: #007bff; font-size: 0.9rem;">#{{ tag.name }}</a>
-        {% endfor %}
-    </div>
-
-    <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
-
-    <!-- <div class="post-comments" style="font-size: 1.3rem;">
-        <h6>댓글 {{ post.comments.count }}개</h6>
-        {% for comment in post.comments.all %}
-            <div style="margin-bottom: 5px;">
-                <strong>{{ comment.author.nick_name }}</strong> {{ comment.content }}
+            <div class="tap-slider">
+                {% for image in post.images.all %}
+                    <img src="{{ image.image.url }}"
+                         class="post-image tap-slide {% if forloop.first %}active{% endif %}">
+                {% endfor %}
+                {% if post.images.count > 1 %}
+                    <div class="tap-prev"></div>
+                    <div class="tap-next"></div>
+                    <div class="tap-dots">
+                        {% for image in post.images.all %}
+                            <span class="tap-dot {% if forloop.first %}active{% endif %}"></span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
             </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="a-post-info">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <span>{{ post.location }}</span>
+            <span>
+                참여: <strong>{{ post.get_approved_count }}</strong>/{{ post.max_people }}명
+                {% if post.is_full %}<span class="full-badge">마감</span>{% endif %}
+            </span>
+        </div>
+    </div>
+
+    <div class="a-post-tags">
+        {% for tag in post.hashtags.all %}
+            <a href="{% url 'moong:tag_feeds' tag.name %}" class="tag-link">#{{ tag.name }}</a>
         {% endfor %}
-        
-    </div> -->
-    {% include "moong/comments.html" %}
+    </div>
+
+    <hr>
+    {% include "moong/comments.html" with is_a_post=True comments=post.comments.filter parent__isnull=True %}
 </div>

@@ -4,7 +4,7 @@ from .models import User
 
 
 @admin.register(User)
-class UserAdmin(UserAdmin):
+class CustomUserAdmin(UserAdmin):
     """커스텀 User 모델을 위한 Admin"""
 
     # 리스트 화면에서 보여줄 필드
@@ -23,4 +23,9 @@ class UserAdmin(UserAdmin):
         ( "권한", { "fields": ("is_active", "is_staff", "is_superuser")}),
         ( "중요한 일정", { "fields": ("last_login", "date_joined")}),
         
+    )
+    # Admin 에서 User 추가 시 사용할 필드
+    add_fieldsets = (
+        ( "필수 정보", { "fields": ("username", "password1", "password2", "email")}),
+        ( "활동 정보", { "fields": ("nick_name", "location", "profile_image", "gender")}),        
     )

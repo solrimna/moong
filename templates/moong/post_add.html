@@ -2,125 +2,120 @@
 {% load static %}
 
 {% block myHead %}
-    <style>
-        .imagePreview {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .imagePreview img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 5px;
-            border: 2px solid #ddd;
-        }
-    </style>
+    {% if temp_post and temp_post.location %}
+        <div id="saved_location"
+            data-sido="{{ temp_post.location.sido }}"
+            data-sigungu="{{ temp_post.location.sigungu }}"
+            data-eupmyeondong="{{ temp_post.location.eupmyeondong }}"
+            data-location-id="{{ temp_post.location.id }}">
+        </div>
+    {% endif %}
     <script src="{% static 'js/img_view.js' %}"></script>
     <script src="{% static 'js/location_select.js' %}"></script>
 {% endblock %}
 
 {% block myBlock %}
     {% include 'moong/navigation.html' %}
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
 
-        {% if temp_post_id %}
-        <input type="hidden" name="temp_post_id" value="{{ temp_post_id }}">
-        {% endif %}
+    <div class="post-form-container">
+        <div class="post-form-header">
+            <h2>새 모임 만들기</h2>
+        </div>
 
-        <p>
-            <label>제목</label><br>
+        <form method="POST" enctype="multipart/form-data" class="post-form-body">
+            {% csrf_token %}
+            <label>제목</label>
             {{ form.title }}
             {% if form.title.errors %}
-                <span style="color: red;">{{ form.title.errors }}</span>
+                <span class="error-text">{{ form.title.errors }}</span>
             {% endif %}
-            <br>
-            <label>내용</label><br>
+
+            <label>내용</label>
             {{ form.content }}
             {% if form.content.errors %}
-                <span style="color: red;">{{ form.content.errors }}</span>
+                <span class="error-text">{{ form.content.errors }}</span>
             {% endif %}
-            <br>
-            <label>모임 날짜</label><br>
+
+            <label>모임 날짜</label>
             {{ form.moim_date }}
             {% if form.moim_date.errors %}
-                <span style="color: red;">{{ form.moim_date.errors }}</span>
+                <span class="error-text">{{ form.moim_date.errors }}</span>
             {% endif %}
-            <br>
 
-            <label>시간</label><br>
+            <label>시간</label>
             {{ form.moim_time }}
             {% if form.moim_time.errors %}
-                <span style="color: red;">{{ form.moim_time.errors }}</span>
+                <span class="error-text">{{ form.moim_time.errors }}</span>
             {% endif %}
-            <br>
-            <label>최대 인원</label><br>
+
+            <label>최대 인원</label>
             {{ form.max_people }}
-            <br>
-            <!-- 장소 (3단계 선택) -->
-            <label>장소</label><br>
-            <label for="sido">시/도</label>
-            <select id="sido">
-                <option value="">시/도 선택</option>
-            </select>
 
-            <label for="sigungu">시/군/구</label>
-            <select id="sigungu">
-                <option value="">시/군/구 선택</option>
-            </select>
-
-            <label for="eupmyeondong">읍/면/동</label>
-            <!-- ⭐ Django Form의 location 필드와 연결 -->
-            <select id="eupmyeondong" name="location">
-                <option value="">읍/면/동 선택</option>
-            </select>
+            <label>장소</label>
+            <div class="location-selects">
+                <select id="sido">
+                    <option value="">시/도 선택</option>
+                </select>
+                <select id="sigungu">
+                    <option value="">시/군/구 선택</option>
+                </select>
+                <select id="eupmyeondong" name="location">
+                    <option value="">읍/면/동 선택</option>
+                </select>
+            </div>
             {% if form.location.errors %}
-                <span style="color: red;">{{ form.location.errors }}</span>
+                <span class="error-text">{{ form.location.errors }}</span>
             {% endif %}
-            <br>
 
-            <label>이미지 (Ctrl+클릭으로 여러 개 선택)</label><br>
+            {% if temp_post and temp_post.images.exists %}
+                <label>기존 이미지</label>
+                <div class="existing-images-wrap">
+                    {% for image in temp_post.images.all %}
+                        <div class="existing-image">
+                            <img src="{{ image.image.url }}" alt="이미지 {{ image.order }}">
+                            <label class="delete-checkbox">
+                                <input type="checkbox" name="delete_images" value="{{ image.id }}">
+                                삭제
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+                <label>새 이미지 추가</label>
+            {% else %}
+                <label>이미지 (여러 개 선택 가능)</label>
+            {% endif %}
             <input type="file" name="images" id="images" multiple accept="image/*">
             <div id="imagePreview" class="imagePreview"></div>
-            <br>
-        </p>
-        <!-- AI 추천 해시태그 영역 (임시저장 후에만 보임) -->
-        {% if tags %}
-        <div id="tags-section">
-            {% include 'moong/tags_add.html' %}
-        </div>
-        {% endif %}
 
-        <!-- 메시지 표시 -->
-        {% if messages %}
-        <div class="messages">
-            {% for message in messages %}
-            <div class="message {{ message.tags }}">
-                {{ message }}
+            <!-- AI 추천 해시태그 영역 -->
+            {% if tags %}
+            <div id="tags-section">
+                {% include 'moong/tags_add.html' %}
             </div>
-            {% endfor %}
-        </div>
-        {% endif %}
+            {% endif %}
 
-        <!-- 폼 전체 에러 -->
-        <!-- 에러 중복 표기로 주석 처리
-        {% if form.non_field_errors %}
-        <div class="form-errors">
-            {{ form.non_field_errors }}
-        </div>
-        {% endif %}
-        --> 
+            <!-- 메시지 표시 -->
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="message {{ message.tags }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
 
         <!-- 버튼 -->
-        {% if temp_post_id %}
-            <!-- 임시저장 후: 게시 버튼만 -->
-            <button type="submit" style="background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px;">게시하기</button>
-        {% else %}
-            <!-- 처음: 둘 다 보임 -->
-            <button type="submit">게시</button>
-            <button type="submit" name="save_temp">임시저장</button>
-        {% endif %}
+        <div class="post-form-buttons">
+            {% if temp_post_id %}
+                <!-- 임시저장 후: 게시 버튼만 -->
+                <button type="submit">게시하기</button>
+            {% else %}
+                <!-- 처음: 둘 다 보임 -->
+                <button type="submit">게시</button>
+                <button type="submit" name="save_temp">임시저장</button>
+            {% endif %}
+        </div>
     </form>
+    <script src="{% static 'js/hashtags_add.js' %}"></script>
 {% endblock %}

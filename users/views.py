@@ -67,6 +67,14 @@ def mypage_edit(request):
     user = request.user
     
     if request.method == 'POST':
+        # 🔥 기본 프로필로 변경 버튼을 눌렀을 때
+        if 'reset_profile_image' in request.POST:
+            user.profile_image = 'profile_images/custom_property.png'
+            # update_fields를 사용해서 save() 메서드의 이미지 처리 건너뛰기
+            User.objects.filter(pk=user.pk).update(profile_image='profile_images/custom_property.png')
+            messages.success(request, '프로필 이미지가 기본 이미지로 변경되었습니다.')
+            return redirect('users:mypage_edit')
+        
         form = ProfileEditForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             # 지역 정보는 따로 처리 (3단계 선택에서 전송됨)
@@ -106,17 +114,48 @@ def mypage_activity(request):
         complete=True  # 완성된 글만 (임시저장 제외)
     ).order_by('-create_time')
     
-    # 내가 참여한 모임 (승인된 참여만, 완성된 글만)
+    # 내가 참여한 모임 
     my_participations = Participation.objects.filter(
         user=user,
-        status='APPROVED',
-        post__complete=True  # 완성된 글만
+        post__complete=True 
     ).select_related('post').order_by('-create_time')
     
     # 통계
     total_created = my_posts.count()
     total_participated = my_participations.count()
-    
+
+    # 나 외의 참여자 리스트 정리 (ddo_count 포함, 모임 완료된 것만)
+    for participation in my_participations:
+        if participation.post.moim_finished:
+            other_participants = list(
+                participation.post.participations.filter(
+                    status='COMPLETED'
+                ).select_related('user').exclude(
+                    user=request.user
+                )
+            )
+            for p in other_participants:
+                p.is_ddo_by_me = p.ddomoongs.filter(from_user=request.user).exists()
+            participation.other_participants = other_participants
+        else:
+            participation.other_participants = []
+
+    # 내가 만든 모임에도 또뭉 참여자 세팅 (모임 완료된 것만)
+    for post in my_posts:
+        if post.moim_finished:
+            other_participants = list(
+                post.participations.filter(
+                    status='COMPLETED'
+                ).select_related('user').exclude(
+                    user=request.user
+                )
+            )
+            for p in other_participants:
+                p.is_ddo_by_me = p.ddomoongs.filter(from_user=request.user).exists()
+            post.other_participants = other_participants
+        else:
+            post.other_participants = []
+
     context = {
         'user': user,
         'my_posts': my_posts,

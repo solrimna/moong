@@ -7,10 +7,14 @@
 
     <div id="login">
         <form method="POST">
-            <h1>Moong! Login</h1>
+            <img src="{% static 'images/moong4.png' %}" alt="뭉이" style="width: 100px; margin-bottom: 20px;">
+            <h1>로그인</h1>
             {% csrf_token %}
             {{ form.as_p }}
             <button type="submit" class="btn btn-login">로그인</button>
+            <p style="margin-top: 20px; color: var(--moong-text-light); font-size: 14px;">
+                아직 회원이 아니신가요? <a href="{% url 'users:signup' %}" style="color: var(--moong-primary); font-weight: 600;">회원가입</a>
+            </p>
         </form>
     </div>
 {% endblock %}    

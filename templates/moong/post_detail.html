@@ -148,8 +148,8 @@
             <div>
                 <ul>
                     {% for participant,approval,index in approved_participants_and_approval %}
-                        <li>
-                            {{ participant.user.nick_name|default:participant.user.username }}
+                        <li>                               
+                            <a href="{% url 'users:user_profile' participant.user.id %}"> {{ participant.user.nick_name|default:participant.user.username }} </a>
                             {% if user == post.author %}
                                 <form action="{% url 'moong:participant_manage' participant.id %}" method="post">
                                     {% csrf_token %}
@@ -162,8 +162,6 @@
                             {% endif %}   
                             {% if participant.user == post.author %}
                                 (주최자)
-                            {% else %}
-                                {% comment %} 주최자가 아닐 때 {% endcomment %}
                             {% endif %}
                             
                             {% if participant.status == 'APPROVED' %}
@@ -177,7 +175,6 @@
                                 <small>- {{ participant.create_time|date:"Y-m-d H:i" }} 참여 신청 중</small>
                             {% endif %}
 
-                                {% comment %} 체크 박스 리스트를 만들어서 체크를 해야함  {% endcomment %}
                             </li>
                         {% empty %}
                             <li style="color: var(--moong-text-light);">참여자가 없습니다.</li>

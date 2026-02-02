@@ -182,31 +182,40 @@ def ai_tags(content, location):
         return [t for t in loc_tags if t != '|']
 
 
-# ==================== 게시글 작성 ====================
+# ==================== 게시글 작성 + 수정 ===================
 @login_required
-def post_add(request):
+def post_form(request, post_id=None):
+
+    is_edit = post_id is not None
+    post = None
+    
+    # 수정 모드: 권한 체크
+    if is_edit:
+        post = get_object_or_404(Post, id=post_id)
+        if post.author != request.user:
+            messages.error(request, '수정 권한이 없습니다.')
+            return redirect('moong:post_detail', post_id=post_id)
+        
     print("post_add 뷰 호출됨!")
     if request.method == 'POST':
         print("post_add POST 호출됨!")
-        form = PostForm(data=request.POST, files=request.FILES)
+        if is_edit:
+            form = PostForm(data=request.POST, files=request.FILES, instance=post)
+        else:
+            form = PostForm(data=request.POST, files=request.FILES)
     
         if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user 
-
             location = form.cleaned_data.get("location")
             location = get_fixed_location(location)
 
             location_text = ""
             if location:
                 location_text = f"{location.sido} | {location.sigungu} | {location.eupmyeondong}"
-            
-            post.location = location
-            
+                        
             temp_post_id = request.POST.get('temp_post_id')
 
             # 임시 저장!
-            if 'save_temp' in request.POST :
+            if not is_edit and 'save_temp' in request.POST :
                 # post 신규생성 or 있던거 가져오기
                 post, is_updated = get_or_create_post(
                     temp_post_id, 
@@ -238,14 +247,21 @@ def post_add(request):
                 return redirect(url)
             # 최종 저장!
             else :    
-                post, is_updated = get_or_create_post(
-                    temp_post_id, 
-                    request.user, 
-                    form, 
-                    location, 
-                    complete=True
-                )             
-                save_or_clear_images(post, request, clear_all=True)
+                if is_edit:
+                    post = form.save(commit=False)
+                    post.location = location
+                    post.complete = True
+                    post.save()
+                    save_or_clear_images(post, request, clear_list='delete_images')
+                else :
+                    post, is_updated = get_or_create_post(
+                        temp_post_id, 
+                        request.user, 
+                        form, 
+                        location, 
+                        complete=True
+                    )             
+                    save_or_clear_images(post, request, clear_all=True)
 
                 # 해시태그 저장
                 selected_tags = request.POST.getlist('tags')
@@ -265,12 +281,16 @@ def post_add(request):
                             tag, created = Hashtag.objects.get_or_create(name=tag_name.strip())
                             post.hashtags.add(tag)
                 
-                messages.success(request, '게시 완료!')
-                Participation.objects.get_or_create(
-                    post=post,
-                    user=request.user,
-                    defaults={'status': 'APPROVED'}
-                )
+                
+                if not is_edit:
+                    Participation.objects.get_or_create(
+                        post=post,
+                        user=request.user,
+                        defaults={'status': 'APPROVED'}
+                    )
+                    messages.success(request, '게시 완료!')
+                else:
+                    messages.success(request, '게시글이 수정되었습니다!')
                 return redirect('moong:post_detail', post_id=post.id)
                 
         else:
@@ -290,15 +310,32 @@ def post_add(request):
 
             context = {
                 'form': form,
+                'is_edit': is_edit,
+                'post': post,
             }
+            if is_edit and post:
+                context['existing_images'] = post.images.all()
             return render(request, 'moong/post_add.html', context)
     else: # GET 
+        # 수정하기랑 합침 
+        if is_edit:
+            form = PostForm(instance=post)
+            existing_images = post.images.all()
+            existing_tags = [tag.name for tag in post.hashtags.all()]
+            context = {
+                'form': form,
+                'is_edit': True,
+                'post': post,
+                'existing_images': existing_images,
+                'tags': existing_tags,
+            }
+            return render(request, 'moong/post_add.html', context)
+        
         #load_temp  = YES -> 임시 저장글 가져오기
         #           = NO  -> 새글 작성
         #           = NONE -> 임시 저장 글이 있는지 확인 -> post_add_confirm reqeust 
         #                   -> 결정에 따라서 실제 게시글 작성 동작
         load_temp = request.GET.get('load_temp')
-
         if load_temp == 'yes':
             # 임시저장 글 불러오기
             temp_post = Post.objects.filter(
@@ -319,6 +356,7 @@ def post_add(request):
                     'form': form,
                     'temp_post': temp_post,
                     'tags': existing_tags,
+                    'existing_images': existing_images,
                 }
                 return render(request, 'moong/post_add.html', context)
             else:
@@ -429,79 +467,6 @@ def post_detail(request, post_id):
     
     
     return render(request, 'moong/post_detail.html', context)
-
-# ==================== 게시글 수정 ====================
-def post_mod(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
-
-    print("post_mod 뷰 호출됨!")
-    # 권한 체크: 작성자만 수정 가능
-    if post.author != request.user:
-        messages.error(request, '수정 권한이 없습니다.')
-        return redirect('moong:post_detail', post_id=post_id)
-    
-    if request.method == 'POST':
-        print("post_mod 호출됨!")
-        form = PostForm(data=request.POST, files=request.FILES, instance=post)
-    
-        if form.is_valid():
-            post = form.save(commit=False)
-
-            location = form.cleaned_data.get("location")
-            location = get_fixed_location(location)
-            post.location = location
-
-            post.complete = True
-            post.save()
-
-            save_or_clear_images(post, request, clear_list='delete_images')
-            
-            try:
-                # AI로 해시태그 자동 생성
-                tags = ai_tags(post.content, '')   # 두번째인자 공백 아니고 원래 location
-
-                # 해시태그 저장
-                for tag_name in tags:
-                    if tag_name.strip():
-                        tag, created = Hashtag.objects.get_or_create(name=tag_name.strip())
-                        post.hashtags.add(tag)
-                    
-            except Exception as e:
-                print(f"해시태그 생성 실패: {e}")
-            
-            messages.success(request, '게시글이 수정되었습니다.')
-            print("post_mod 수정 완료 호출됨!")
-
-            return redirect('moong:post_detail', post_id=post.id)
-        
-        else:
-            print("="*50)
-            print("폼 유효성 검사 실패!")
-            print("에러:", form.errors)
-            print("에러 (JSON):", form.errors.as_json())
-            print("="*50)
-
-            messages.error(request, '입력 내용을 확인하세요.')
-            # 각 필드별 에러도 메시지로 추가
-            for field, errors in form.errors.items():
-                for error in errors:
-                    messages.error(request, f'{field}: {error}')
-
-            print("post_mod 입력값 확인으로 빠짐!")
-    else:
-        print("post_mod GET 호출됨!")
-        form = PostForm(instance=post)
-
-    # 기존 이미지 목록
-    existing_images = post.images.all()
-
-    context = {
-        'form': form,
-        'post': post,
-        'existing_images': existing_images,
-    }
-
-    return render(request, 'moong/post_mod.html', context)
 
 # ==================== 게시글 삭제 ====================
 @login_required

@@ -151,13 +151,15 @@
                         <li>
                             {{ participant.user.nick_name|default:participant.user.username }}
                             {% if user == post.author %}
-                                <form action="{% url 'moong:participant_manage' participant.id %}" method="post">
+                                <form action="{% url 'moong:participation_manage' participant.id %}" method="post">
                                     {% csrf_token %}
                                     {% if participant.status == 'APPROVED' %}
-                                        <button type="submit" name="action_complete" value="reject"> 승인취소 </button> 
+                                        <button type="submit" name="action_complete" value="reject"> 승인취소 </button>
+                                    {% elif participant.status == 'COMPLETED' %}
+                                        <button type="submit" name="action_complete" disabled> 최종 완료 </button> 
                                     {% else %}
                                         <button type="submit" name="action_complete" value="approve"> 승인 </button>
-                                    {% endif %}                 
+                                    {% endif %}             
                                 </form>
                             {% endif %}   
                             {% if participant.user == post.author %}

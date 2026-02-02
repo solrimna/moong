@@ -568,7 +568,7 @@ def moim_finished(request, post_id):
 
 #참여 신청, 참여 취소
 @login_required
-def post_apply(request, post_id):
+def participation_apply(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     # 이미 신청했는지 확인 후 없으면 생성    
     
@@ -584,7 +584,7 @@ def post_apply(request, post_id):
     return redirect('moong:post_detail', post_id = post.id) # 다시 상세페이지로!
 
 @login_required
-def participant_manage(request, participation_id):
+def participation_manage(request, participation_id):
     participation = get_object_or_404(Participation, id=participation_id)
     #print(f"승인여부 :  {action_comple}")
     # 주최자만 권한 허용
@@ -605,7 +605,7 @@ def participant_manage(request, participation_id):
 
 
 @login_required
-def post_cancel(request, post_id):
+def participation_cancel(request, post_id):
     print("참여 취소 호출")
     post = get_object_or_404(Post, id=post_id)
     # 해당 신청 내역 찾아서 삭제

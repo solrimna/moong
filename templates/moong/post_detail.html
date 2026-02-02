@@ -91,24 +91,24 @@
 
                     {% else %}          
                         {% if not user_participation %}
-                            <form action="{% url 'moong:post_apply' post.id %}" method="post">
+                            <form action="{% url 'moong:참여신청' post.id %}" method="post">
                                 {% csrf_token %}
                                 <button type="submit">참여 신청</button>
                             </form>
 
                         {% elif user_participation.status == 'PENDING' %}
-                            <form action="{% url 'moong:post_cancel' post.id %}" method="post">
+                            <form action="{% url 'moong:참여취소' post.id %}" method="post">
                                 {% csrf_token %}
                                 <button type="submit">{% if post.is_full %}정원 초과{% else %}참여 신청 중{% endif %}</button>
                             </form>
                         {% elif user_participation.status == 'APPROVED' %}
-                            <form action="{% url 'moong:post_cancel' post.id %}" method="post">
+                            <form action="{% url 'moong:참여취소' post.id %}" method="post">
                                 {% csrf_token %}
                                 <button type="submit">참여 취소</button>
                             </form>
         
                         {% elif user_participation.status == 'REJECTED' %}
-                            <form action="{% url 'moong:post_apply' post.id %}" method="post">
+                            <form action="{% url 'moong:참여신청' post.id %}" method="post">
                                 {% csrf_token %}
                                 <button type="submit">{% if post.is_full %}정원 초과{% else %}참여 신청 (재신청){% endif %}</button>
                             </form>

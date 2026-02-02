@@ -16,44 +16,35 @@
     --moong-text-light: #5D6D7E;
 }
 
-/* 전체 배경 - 번개 패턴 */
+/* html, body 전체 높이 설정 - 빈 영역 방지 */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+/* 전체 배경 - moong5.png 풀스크린 */
 .moong-body {
-    background: linear-gradient(135deg, #3B7DD8 0%, #5A9BE8 50%, #7EB5E3 100%);
-    background-attachment: fixed;
     min-height: 100vh;
     position: relative;
 }
 
-/* 번개 패턴 오버레이 - custom_property 스타일 (부드럽고 자연스럽게) */
+/* 배경 이미지를 화면 전체에 고정 */
 .moong-body::before {
     content: '';
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpath d='M50 15 L60 40 L52 40 L65 70 L42 45 L52 45 L40 15 Z' fill='%23ffffff' fill-opacity='0.18'/%3E%3C/svg%3E"),
-                        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cpath d='M80 50 L88 70 L82 70 L92 95 L75 73 L82 73 L72 50 Z' fill='%23A8D4F5' fill-opacity='0.15'/%3E%3C/svg%3E");
-    background-size: 150px 150px, 180px 180px;
-    background-position: 0 0, 60px 40px;
-    pointer-events: none;
-    z-index: 0;
+    inset: 0;
+    background: url('../images/moong5.png') center / cover no-repeat;
+    z-index: -2;
 }
 
-/* 두번째 번개 레이어 (살짝 다른 위치에 겹쳐서 풍성하게) */
+/* 글자 가독성을 위한 어두운 오버레이 */
 .moong-body::after {
     content: '';
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M45 20 L52 38 L47 38 L56 58 L40 42 L47 42 L38 20 Z' fill='%23ffffff' fill-opacity='0.12'/%3E%3C/svg%3E"),
-                        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cpath d='M70 30 L80 55 L72 55 L85 85 L62 60 L72 60 L58 30 Z' fill='%237EB5E3' fill-opacity='0.1'/%3E%3C/svg%3E");
-    background-size: 200px 200px, 220px 220px;
-    background-position: 80px 30px, 20px 80px;
+    inset: 0;
+    background: rgba(10, 20, 50, 0.25);
     pointer-events: none;
-    z-index: 0;
+    z-index: -1;
 }
 
 /* 컨텐츠가 배경 위에 오도록 */
@@ -63,7 +54,7 @@
 }
 
 /* ========================================
-    네비게이션 - 배경과 통합 (투명)
+    네비게이션 - 완전 투명
     ======================================== */
 #navigation {
     display: flex !important;
@@ -71,6 +62,7 @@
     align-items: center !important;
     padding: 30px 20px 20px 65px !important; /* 상(30) 우(20) 하(20) 좌(65) */
     background: transparent !important;
+    backdrop-filter: none !important;
     border: none !important;
     box-shadow: none !important;
     min-height: 120px !important;
@@ -284,6 +276,7 @@
     margin: 20px auto !important;
     max-width: 600px;
     padding: 0 20px;
+    transform: translateX(50px);
 }
 
 .search-bar form {
@@ -1666,7 +1659,7 @@
     justify-content: center;
     align-items: center;
     min-height: calc(100vh - 100px);
-    padding: 40px 20px;
+    padding: 20px 20px **300px** 20px;
 }
 
 #login form {
@@ -1678,6 +1671,7 @@
     width: 100%;
     max-width: 420px;
     text-align: center;
+    margin-bottom: 150px;
 }
 
 #login h1 {
@@ -1743,7 +1737,7 @@
 #signup {
     display: flex;
     justify-content: center;
-    padding: 40px 20px;
+    padding: 20px 20px;
 }
 
 #signup .signup-logo{

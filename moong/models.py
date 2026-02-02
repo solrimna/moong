@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
-
+from django.db.models import Q
 
 class Post(models.Model):
     """게시글 모델"""
@@ -82,7 +82,9 @@ class Post(models.Model):
     def get_approved_count(self):
         """승인된 참여자 수"""
         return self.participations.filter(status='APPROVED').count()
-    
+    def get_wait_count(self):
+        """ 대기자 수"""
+        return self.participations.filter(Q(status='PENDING') | Q(status='CANCELLED')).count() 
     def get_pending_count(self):
         """승인 대기 중인 신청자 수"""
         return self.participations.filter(status='PENDING').count()
@@ -361,3 +363,30 @@ class Image(models.Model):
     
     def __str__(self):
         return f'{self.post.title} - 이미지 {self.order}'    
+    
+class Ddomoong(models.Model):
+    """참가자에게 또뭉 주기"""
+    participation = models.ForeignKey(
+        'Participation',
+        on_delete=models.CASCADE,
+        related_name='ddomoongs',
+        db_column='participation_id'
+    )
+    from_user = models.ForeignKey(
+        'users.User',  # users 앱의 User 모델
+        on_delete=models.CASCADE,
+        related_name='given_ddomoongs',
+        db_column='from_user_id'
+    )
+    created_at = models.DateTimeField(auto_now_add=True, db_column='create_time')
+    
+    class Meta:
+        db_table = 'Ddomoong'  # 다른 테이블명 스타일에 맞춤
+        unique_together = ('participation', 'from_user')
+        indexes = [
+            models.Index(fields=['participation']),
+            models.Index(fields=['from_user']),
+        ]
+    
+    def __str__(self):
+        return f"{self.from_user.nick_name} -> {self.participation.user.nick_name}"

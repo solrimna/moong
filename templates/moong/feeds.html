@@ -1,7 +1,11 @@
+{% load static %}
 <div class="feeds-container" style="max-width: 600px; margin: 0 auto;">
     {% for post in posts %}
         {% include 'moong/a_post.html' with post=post %}
     {% empty %}
-        <p>아직 올라온 모임 게시글이 없어요. 첫 모임을 만들어보세요!</p>
+        <div class="empty-state-moong">
+            <img src="{% static 'images/moong4.png' %}" alt="뭉이">
+            <p class="empty-state-text">아직 올라온 모임 게시글이 없어요.<br>첫 모임을 만들어보세요!</p>
+        </div>
     {% endfor %}
 </div>

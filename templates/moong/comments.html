@@ -135,15 +135,31 @@
 document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".reply-toggle").forEach(function (btn) {
         btn.addEventListener("click", function () {
+
             const commentId = this.dataset.commentId;
             const form = document.getElementById("reply-form-" + commentId);
 
             if (!form) return;
 
-            form.style.display =
-                (form.style.display === "none" || form.style.display === "")
-                ? "block"
-                : "none";
+            // 1️⃣ 다른 대댓글 폼 닫기 (UX)
+            document.querySelectorAll(".reply-form").forEach(f => {
+                f.style.display = "none";
+            });
+
+            // 2️⃣ 현재 폼 열기
+            form.style.display = "block";
+
+            // 3️⃣ ⭐ 렌더링 이후 input에 포커스 (핵심)
+            requestAnimationFrame(() => {
+                const input = form.querySelector("input[type='text']");
+                if (input) {
+                    input.focus({ preventScroll: true });
+                    input.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center"
+                    });
+                }
+            });
         });
     });
 });

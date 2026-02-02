@@ -1,13 +1,14 @@
 from django.contrib.auth import authenticate, login, logout
-from .forms import SignupForm, LoginForm, ProfileEditForm  # ProfileEditForm 추가
+from .forms import SignupForm, LoginForm, ProfileEditForm
 from .models import User
-from django.shortcuts import render,redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from locations.models import Location
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from moong.models import Post, Participation
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 def signup_view(request):
@@ -31,8 +32,6 @@ def signup_view(request):
             user.location = location
             user.save()
 
-
-
             print("✅ USER SAVED:", user)
             return redirect("users:login")
         else:
@@ -41,17 +40,16 @@ def signup_view(request):
     else:
         form = SignupForm()
        
-    context = {"form":form}
+    context = {"form": form}
 
     return render(request, "users/signup.html", context)
 
 
-
 # 마이페이지 조회
-@login_required  # 로그인한 사용자만 접근 가능
+@login_required
 def mypage(request):
     """마이페이지 - 프로필 조회"""
-    user = request.user  # 현재 로그인한 사용자
+    user = request.user
     
     context = {
         'user': user,
@@ -60,7 +58,7 @@ def mypage(request):
     return render(request, 'users/mypage.html', context)
 
 
-# 프로필 수정 (ProfileEditForm 사용)
+# 프로필 수정
 @login_required
 def mypage_edit(request):
     """마이페이지 - 프로필 수정"""
@@ -102,16 +100,16 @@ def mypage_edit(request):
     return render(request, 'users/mypage_edit.html', context)
 
 
-# 활동 이력
+# 활동 이력 (메인)
 @login_required
 def mypage_activity(request):
-    """마이페이지 - 활동 이력"""
+    """마이페이지 - 활동 이력 메인"""
     user = request.user
     
     # 내가 만든 모임 (임시저장 제외, 완성된 글만)
     my_posts = Post.objects.filter(
         author=user,
-        complete=True  # 완성된 글만 (임시저장 제외)
+        complete=True
     ).order_by('-create_time')
     
     # 내가 참여한 모임 
@@ -124,24 +122,39 @@ def mypage_activity(request):
     total_created = my_posts.count()
     total_participated = my_participations.count()
 
-    # 나 외의 참여자 리스트 정리 (ddo_count 포함, 모임 완료된 것만)
-    for participation in my_participations:
-        if participation.post.moim_finished:
-            other_participants = list(
-                participation.post.participations.filter(
-                    status='COMPLETED'
-                ).select_related('user').exclude(
-                    user=request.user
-                )
-            )
-            for p in other_participants:
-                p.is_ddo_by_me = p.ddomoongs.filter(from_user=request.user).exists()
-            participation.other_participants = other_participants
-        else:
-            participation.other_participants = []
+    context = {
+        'user': user,
+        'total_created': total_created,
+        'total_participated': total_participated,
+    }
+    
+    return render(request, 'users/mypage_activity.html', context)
 
-    # 내가 만든 모임에도 또뭉 참여자 세팅 (모임 완료된 것만)
-    for post in my_posts:
+
+# 개최한 모임 리스트 (페이지네이션)
+@login_required
+def mypage_created_list(request):
+    """내가 개최한 모임 리스트 (페이지네이션)"""
+    
+    # 내가 만든 모임 가져오기
+    my_posts = Post.objects.filter(
+        author=request.user,
+        complete=True  # 완성된 글만 (임시저장 제외)
+    ).order_by('-create_time')  # ✅ create_time으로 수정!
+    
+    # 페이지네이션 (5개씩)
+    paginator = Paginator(my_posts, 5)
+    page_number = request.GET.get('page', 1)
+    
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+    
+    # 나 외의 참여자 리스트 정리 (ddo_moong 포함, 모임 완료된 것만)
+    for post in page_obj:
         if post.moim_finished:
             other_participants = list(
                 post.participations.filter(
@@ -155,16 +168,58 @@ def mypage_activity(request):
             post.other_participants = other_participants
         else:
             post.other_participants = []
-
+    
     context = {
-        'user': user,
-        'my_posts': my_posts,
-        'my_participations': my_participations,
-        'total_created': total_created,
-        'total_participated': total_participated,
+        'page_obj': page_obj,
+        'total_count': my_posts.count(),
     }
     
-    return render(request, 'users/mypage_activity.html', context)
+    return render(request, 'users/mypage_created_list.html', context)
+
+
+# 참여한 모임 리스트 (페이지네이션)
+@login_required
+def mypage_participated_list(request):
+    """내가 참여한 모임 리스트 (페이지네이션)"""
+    
+    # 내가 참여 신청한 모임 가져오기
+    my_participations = Participation.objects.filter(
+        user=request.user
+    ).select_related('post', 'post__author').order_by('-create_time')  # ✅ create_time으로 수정!
+    
+    # 페이지네이션 (10개씩)
+    paginator = Paginator(my_participations, 10)
+    page_number = request.GET.get('page', 1)
+    
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+    
+    # 나 외의 참여자 리스트 정리
+    for participation in page_obj:
+        if participation.post.moim_finished:
+            other_participants = list(
+                participation.post.participations.filter(
+                    status='COMPLETED'
+                ).select_related('user').exclude(
+                    user=request.user
+                )
+            )
+            for p in other_participants:
+                p.is_ddo_by_me = p.ddomoongs.filter(from_user=request.user).exists()
+            participation.other_participants = other_participants
+        else:
+            participation.other_participants = []
+    
+    context = {
+        'page_obj': page_obj,
+        'total_count': my_participations.count(),
+    }
+    
+    return render(request, 'users/mypage_participated_list.html', context)
 
 
 # 다른 사용자 프로필 조회
@@ -202,13 +257,14 @@ def login_view(request):
             else:
                 my_form.add_error(None, "이메일과 비밀번호를 확인하세요.")
 
-        context = {'form':my_form}
+        context = {'form': my_form}
         return render(request, "users/login.html", context)
     
     else:
         my_form = LoginForm()
-        context = {'form':my_form}
+        context = {'form': my_form}
         return render(request, "users/login.html", context)
+
     
 def logout_view(request):
     logout(request)

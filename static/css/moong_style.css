@@ -1746,21 +1746,29 @@
     padding: 40px 20px;
 }
 
+#signup .signup-logo{
+  text-align: center;
+  background: #ffffff;   /* 원하는 색 */
+  padding: 40px 0;       /* 위/아래 여백 */
+  border-radius: 16px;   /* 둥글게 */
+  margin-bottom: 12px;   /* 아래 간격 */
+}
+
 #signup form {
     background: rgba(255, 255, 255, 0.98);
     border-radius: 24px;
     box-shadow: 0 8px 32px rgba(59, 125, 216, 0.2);
     border: 2px solid var(--moong-secondary);
-    padding: 50px 40px;
+    padding: 10px 40px;
     width: 100%;
     max-width: 500px;
 }
 
 #signup h1 {
     color: var(--moong-primary);
-    font-size: 32px;
+    font-size: 25px;
     font-weight: 700;
-    margin-bottom: 30px;
+    margin-bottom: 1px;
     text-align: center;
 }
 

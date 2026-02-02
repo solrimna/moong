@@ -1617,15 +1617,28 @@ label[for="images"]:hover {
 }
 
 .a-post-card .a-post-content h4 a {
-    color: var(--moong-text);
+    color: var(--moong-primary);
     text-decoration: none;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
-    transition: color 0.3s;
+    transition: color 0.3s, transform 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.a-post-card .a-post-content h4 a::after {
+    content: '→';
+    font-size: 18px;
+    transition: transform 0.2s;
 }
 
 .a-post-card .a-post-content h4 a:hover {
-    color: var(--moong-primary);
+    color: var(--moong-primary-dark);
+}
+
+.a-post-card .a-post-content h4 a:hover::after {
+    transform: translateX(4px);
 }
 
 .a-post-card .a-post-content p {

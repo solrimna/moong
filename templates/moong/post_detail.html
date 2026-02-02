@@ -58,7 +58,7 @@
                         {% else %}
                             <a href="{% url 'users:user_profile' post.author.id %}" class="post-detail-author-name">{{ post.author.nick_name }}</a>
                         {% endif %}
-                        <div class="post-detail-date">{{ post.create_time }}</div>
+                        <div class="post-detail-date">{{ post.display_time }}</div>
                     </div>
                 </div>
             </div>
@@ -168,13 +168,12 @@
                             
                             {% if participant.status == 'APPROVED' %}
                                 {% if not approval %}
-                                    <small>- {{ participant.create_time|date:"Y-m-d H:i" }} 참여 완료</small>
+                                    <small>- {{ participant.approve_time|date:"Y-m-d H:i" }} 참여 완료</small>
                                 {% else %}
-                                    <small>- {{ participant.create_time|date:"Y-m-d H:i" }} 대기자 {{ index }}</small>
+                                    <small>- {{ participant.update_time|date:"Y-m-d H:i" }} 대기자 {{ index }}</small>
                                 {% endif %}
-                            {% endif %}
-                            {% if participant.status == 'PENDING' %}
-                                <small>- {{ participant.create_time|date:"Y-m-d H:i" }} 참여 신청 중</small>
+                            {% elif participant.status == 'PENDING' or participant.status == 'CANCELLED' %}
+                                <small>- {{ participant.update_time|date:"Y-m-d H:i" }} 참여 신청 중</small>
                             {% endif %}
 
                             </li>

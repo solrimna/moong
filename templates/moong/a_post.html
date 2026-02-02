@@ -25,7 +25,7 @@
         <a href="{% url 'users:user_profile' post.author.id %}" class="author-link">
             {{ post.author.nick_name }}
         </a>
-        <span class="post-date">{{ post.create_time|date:"Y-m-d" }}</span>
+        <span class="post-date">{{ post.display_time }}</span>
     </div>
 
     <div class="a-post-content">

@@ -294,10 +294,13 @@ def post_form(request, post_id=None):
                 
                 
                 if not is_edit:
+                    # 게시글 작성자는 게시글 작성과 동시에 승인이기에 승인 & 승인시간 처리가 필요하다
                     Participation.objects.get_or_create(
                         post=post,
                         user=request.user,
-                        defaults={'status': 'APPROVED'}
+                        defaults={'status': 'APPROVED',
+                        'approve_time' : timezone.now()
+                        }
                     )
                     messages.success(request, '게시 완료!')
                 else:
@@ -419,8 +422,9 @@ def post_detail(request, post_id):
         Post.objects.select_related('author', 'location'),
         id=post_id
     )
-    approved_participants = post.participations.select_related('user')
-    
+    participants = post.participations.filter(
+                        status__in=['APPROVED', 'PENDING', 'COMPLETED', 'CANCELLED']
+                    ).select_related('user').order_by('approve_time', 'update_time')  
     user_participation = None
     if request.user.is_authenticated:
         user_participation = Participation.objects.filter(
@@ -442,17 +446,33 @@ def post_detail(request, post_id):
     # 참여자 리스트 (승인 & 승인 리스트 & 대기 list)
     approval_list = []
     index_participant_list = []
-    index_indicator = False
-    index_participant = 0
-    print(user_participation)
-    for user in list(approved_participants):
-        for index, item in enumerate(list(approved_participants)):
-            if item == user and ((index + 1) > post.max_people):
-                index_participant = (index + 1) - post.max_people
+    index_indicator = False     # 대기자인경우 True
+    index_participant = 0       # 대기자번호
+
+    # 2. 승인된 사람은 순서대로 정렬되어야한다 (승인 시간대로)
+    # 1. 승인된 사람 중에 max_people이 넘치면 그 참여자에게 index를 부여하고 싶다. 
+
+    approved_count = 0
+    for p in participants:
+        if p.status in ('APPROVED', 'COMPLETED'):
+            approved_count += 1
+            if post.max_people and approved_count > post.max_people:
+                index_participant = approved_count - post.max_people
                 index_indicator = True
+            else:
+                index_participant = 0
+                index_indicator = False
+        else:
+            index_participant = 0
+            index_indicator = False
+
         index_participant_list.append(index_participant)
         approval_list.append(index_indicator)
-    
+
+    print(f'participants 출력 : {participants}')
+    print(f'approval_list 출력 : {approval_list}')
+    print(f'index_participant_list 출력 : {index_participant_list}')
+
     # 또뭉 참여자 리스트 (모임 완료 + COMPLETED + 본인 제외)
     ddomoong_participants = []
     if post.moim_finished and request.user.is_authenticated:
@@ -470,7 +490,7 @@ def post_detail(request, post_id):
         'post': post,
         'comments':comments,
         'comment_form':comment_form,
-        'approved_participants_and_approval': zip(approved_participants,approval_list, index_participant_list),
+        'approved_participants_and_approval': zip(participants,approval_list, index_participant_list),
         'user_participation': user_participation,
         'index_participant': index_participant,
                 'ddomoong_participants': ddomoong_participants,
@@ -586,9 +606,7 @@ def participation_apply(request, post_id):
     participation, created =Participation.objects.get_or_create(
         post=post, 
         user=request.user, 
-        defaults={'status': 'PENDING',
-                  'approve_time' : timezone.now()
-                  }, 
+        defaults={'status': 'PENDING'}, 
         )
     print(f"참여 확인 :  {participation}, created : {created}")
     messages.success(request, '참여 신청이 완료되었습니다.')
@@ -606,8 +624,7 @@ def participation_manage(request, participation_id):
         action_complete = request.POST.get('action_complete')
         print(f"승인여부 :  {action_complete}")
         if action_complete == 'approve':
-            participation.status = 'APPROVED' # 수락 시 승인 상태로 변경
-            participation.save()
+            participation.approve()
         elif action_complete == 'reject':
             # 거절 시 다시 신청할 수 있도록 아예 삭제하거나 상태를 REJECTED로 변경
             participation.cancel() 

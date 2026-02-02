@@ -1863,3 +1863,140 @@
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
+
+/* ========================================
+    또뭉 섹션
+   ======================================== */
+.ddo-moong-section {
+    margin-top: 20px;
+    padding: 20px;
+    border: 2px solid var(--moong-secondary);
+    border-radius: 12px;
+    background: var(--moong-white);
+}
+
+.ddo-moong-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.ddo-moong-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--moong-text);
+}
+
+.ddo-moong-help-wrap {
+    position: relative;
+    display: inline-flex;
+}
+
+.ddo-moong-help {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--moong-primary);
+    color: var(--moong-white);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.ddo-moong-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 8px);
+    transform: translateX(-50%);
+    width: max-content;
+    max-width: 260px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: var(--moong-text);
+    color: var(--moong-white);
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: center;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.ddo-moong-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: var(--moong-text);
+}
+
+.ddo-moong-help-wrap:hover .ddo-moong-tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+.ddo-moong-desc {
+    margin: 0 0 14px 0;
+    font-size: 13px;
+    color: var(--moong-text-light);
+}
+
+.ddo-moong-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ddo-moong-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: var(--moong-bg-light);
+    transition: background 0.15s ease;
+}
+
+.ddo-moong-item:hover {
+    background: var(--moong-secondary);
+}
+
+.ddo-moong-nick {
+    font-weight: 600;
+    color: var(--moong-text);
+    min-width: 0;
+    flex-shrink: 1;
+}
+
+.ddo-moong-item .ddo-count {
+    font-size: 13px;
+    color: var(--moong-text-light);
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+.ddo-moong-item .btn-ddo {
+    padding: 6px 14px;
+    border: 1.5px solid var(--moong-primary);
+    border-radius: 20px;
+    background: var(--moong-white);
+    color: var(--moong-primary);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.ddo-moong-item .btn-ddo:hover {
+    background: var(--moong-primary);
+    color: var(--moong-white);
+}

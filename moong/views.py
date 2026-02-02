@@ -261,7 +261,7 @@ def post_form(request, post_id=None):
                         location, 
                         complete=True
                     )             
-                    save_or_clear_images(post, request, clear_all=True)
+                    save_or_clear_images(post, request, clear_list='delete_images')
 
                 # 해시태그 저장
                 selected_tags = request.POST.getlist('tags')

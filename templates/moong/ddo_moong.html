@@ -1,31 +1,41 @@
-<div class="participants-list">
-
 {% if participants %}
-    또뭉 줄 사람들 - 모임이 완료된 경우에만 줄 수 있어요!
-{% endif %}
+    <div class="ddo-moong-section">
+        <div class="ddo-moong-header">
+            <span class="ddo-moong-title">또뭉 주기</span>
+            <span class="ddo-moong-help-wrap">
+                <span class="ddo-moong-help">?</span>
+                <span class="ddo-moong-tooltip">또뭉이란? 또 뭉치고 싶은 사람에게 주는 좋아요 버튼입니다</span>
+            </span>
+        </div>
 
-{% for p in participants %}
-    <div class="participant-item">
-        <span>{{ p.user.nick_name }}</span>
-        <span class="ddo-count" id="ddo-count-{{ p.id }}">
-            또뭉 {{ p.user.ddomoong }}개
-        </span>
+        
+            <p class="ddo-moong-desc">모임이 완료된 경우에만 줄 수 있어요!</p>
+        
 
-        {% if user.is_authenticated %}
-            <button
-                type="button"
-                class="btn-ddo"
-                id="ddo-btn-{{ p.id }}"
-                onclick="toggleDdomoong({{ p.id }})"
-            >
-                {% if p.is_ddo_by_me %}
-                    <span id="ddo-text-{{ p.id }}">❤️ 또뭉 취소</span>
-                {% else %}
-                    <span id="ddo-text-{{ p.id }}">🤍 또뭉 주기</span>
-                {% endif %}
-            </button>
-        {% endif %}
+        <div class="ddo-moong-list">
+            {% for p in participants %}
+                <div class="ddo-moong-item">
+                    <span class="ddo-moong-nick">{{ p.user.nick_name }}</span>
+                    <span class="ddo-count" id="ddo-count-{{ p.id }}">
+                        또뭉 {{ p.user.ddomoong }}개
+                    </span>
+
+                    {% if user.is_authenticated %}
+                        <button
+                            type="button"
+                            class="btn-ddo"
+                            id="ddo-btn-{{ p.id }}"
+                            onclick="toggleDdomoong({{ p.id }})"
+                        >
+                            {% if p.is_ddo_by_me %}
+                                <span id="ddo-text-{{ p.id }}">❤️ 또뭉 취소</span>
+                            {% else %}
+                                <span id="ddo-text-{{ p.id }}">🤍 또뭉 주기</span>
+                            {% endif %}
+                        </button>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
     </div>
-{% endfor %}
-
-</div>
+{% endif %}

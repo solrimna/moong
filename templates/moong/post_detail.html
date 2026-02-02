@@ -228,11 +228,17 @@
                 {% if post.is_closed %}
                     <form method="POST" action="{% url 'moong:moim_finished' post.id %}" >
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-danger" onclick="return confirm('모집글을 삭제하시겠습니까?\r\n확정 참여자가 없는 경우에만 삭제가 가능합니다');">
-                            모임 삭제
+                        <button type="submit">
+                            모임 완료
                         </button>
                     </form>
                 {% endif %}
+                <form method="POST" action="{% url 'moong:post_delete' post.id %}" >
+                    {% csrf_token %}
+                    <button type="submit" onclick="return confirm('모집글을 삭제하시겠습니까?\r\n확정 참여자가 없는 경우에만 삭제가 가능합니다');">
+                        모임 삭제 
+                    </button>
+                </form>
             {% endif %}
             </div>
         </div>

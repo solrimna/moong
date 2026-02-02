@@ -187,9 +187,9 @@
             </div>
         </div>
         
-        <div class="post-tags" style="margin-top: 10px;">
+        <div class="post-tags">
             {% for tag in post.hashtags.all %}
-                <a href="{% url 'moong:tag_feeds' tag.name %}" style="text-decoration: none; color: #007bff; font-size: 0.9rem;">#{{ tag.name }}</a>
+                <a href="{% url 'moong:tag_feeds' tag.name %}">#{{ tag.name }}</a>
             {% endfor %}
         </div>
 

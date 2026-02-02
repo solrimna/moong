@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404, reverse
 from django.db.models import Count
-from .models import Post, Hashtag, Image, Participation, Comment
+from .models import Post, Hashtag, Image, Participation, Comment, Ddomoong
 from locations.models import Location
 from django.contrib.auth.decorators import login_required
 from .forms import PostForm, CommentForm
@@ -390,7 +390,7 @@ def post_detail(request, post_id):
     hashtags = post.hashtags.all()
 
     comment_form = CommentForm()
-
+    # 참여자 리스트 (승인 & 승인 리스트 & 대기 list)
     approval_list = []
     index_participant_list = []
     index_indicator = False
@@ -404,6 +404,19 @@ def post_detail(request, post_id):
         index_participant_list.append(index_participant)
         approval_list.append(index_indicator)
     
+    # 또뭉 참여자 리스트 (모임 완료 + COMPLETED + 본인 제외)
+    ddomoong_participants = []
+    if post.moim_finished and request.user.is_authenticated:
+        ddomoong_participants = list(
+            post.participations.filter(
+                status='COMPLETED'
+            ).select_related('user').exclude(
+                user=request.user
+            )
+        )
+        for p in ddomoong_participants:
+            p.is_ddo_by_me = p.ddomoongs.filter(from_user=request.user).exists()
+
     context = {
         'post': post,
         'comments':comments,
@@ -411,9 +424,10 @@ def post_detail(request, post_id):
         'approved_participants_and_approval': zip(approved_participants,approval_list, index_participant_list),
         'user_participation': user_participation,
         'index_participant': index_participant,
-            }
+                'ddomoong_participants': ddomoong_participants,
+    }
     
-        
+    
     return render(request, 'moong/post_detail.html', context)
 
 # ==================== 게시글 수정 ====================
@@ -526,63 +540,36 @@ def post_delete(request, post_id):
         # GET 요청은 거부
         return redirect('moong:post_detail', post_id=post_id)
 
+# ==================== 모집 확정 / 확정 취소 ====================
 @login_required
-def post_closed_cancel(request, post_id):
-    print("post_closed_cancel 모집 확정 취소 호출됨!")
+def post_closed_toggle(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    
+
     # 권한 체크
     if post.author != request.user:
-        messages.error(request, '모집 확정 취소 권한이 없습니다.')
+        messages.error(request, '권한이 없습니다.', extra_tags='alert_popup')
         return redirect('moong:post_detail', post_id=post_id)
-    
+
     # POST 요청만 허용
     if request.method == 'POST':
-
-        print(f"게시글 모집 확정 취소 처리")
-        post.is_closed = False
-        post.save()
-        messages.warning(request, f'모집 확정이 취소되었습니다.')
-        print("게시글 모집 확정 취소 완료!")
-
-        # 모임이 확정되던 아니던 post_detail로 
-        return redirect('moong:post_detail', post_id=post_id)
-    else:
-        # GET 요청은 거부
-        return redirect('moong:post_detail', post_id=post_id)
-
-# ==================== 모집 확정 ====================
-@login_required
-def post_closed(request, post_id):
-    print("post_closed 모집 확정 호출됨!")
-    post = get_object_or_404(Post, id=post_id)
-    
-    # 권한 체크
-    if post.author != request.user:
-        messages.error(request, '모집 확정 권한이 없습니다.')
-        return redirect('moong:post_detail', post_id=post_id)
-    
-    # POST 요청만 허용
-    if request.method == 'POST':
-        approved_count = post.get_approved_count()
-
-        # # case1. 승인된 참여자가 없는 case
-        if approved_count == 0:
-            print(f"게시글 모집 확정 불가 - 확정 참여자 없음")
-            messages.warning(request, f'모임 참여자가 없어 모집 확정이 불가능합니다.')
-        # case2. 승인된 참여자가 있는 case
-        else:
-            print(f"게시글 모집 확정 처리 - (확정 참여자: {approved_count}명)으로 진행")
-            post.is_closed = True
+        if post.is_closed:
+            # 확정 취소
+            post.is_closed = False
             post.save()
-            messages.warning(request, f'확정 참여자({approved_count}명) 상태로 모임이 확정되었습니다.')
-            print("게시글 모집 확정 완료!")
+            messages.warning(request, '모집 확정이 취소되었습니다.', extra_tags='alert_popup')
+            print("게시글 모집 확정 취소 완료!")
+        else:
+            # 확정
+            approved_count = post.get_approved_count()
+            if approved_count == 0:
+                messages.warning(request, '모임 참여자가 없어 모집 확정이 불가능합니다.', extra_tags='alert_popup')
+            else:
+                post.is_closed = True
+                post.save()
+                messages.warning(request, f'확정 참여자({approved_count}명) 상태로 모임이 확정되었습니다.', extra_tags='alert_popup')
+                print("게시글 모집 확정 완료!")
 
-        # 모임이 확정되던 아니던 post_detail로 
-        return redirect('moong:post_detail', post_id=post_id)
-    else:
-        # GET 요청은 거부
-        return redirect('moong:post_detail', post_id=post_id)
+    return redirect('moong:post_detail', post_id=post_id)
 
 # ==================== 모임 완료(확정 뒤에) ====================
 @login_required
@@ -602,9 +589,12 @@ def moim_finished(request, post_id):
     
     # POST 요청만 허용
     if request.method == 'POST':
-        post.moim_finished = True  # 모임 완료 필드 (추가 필요)
+        post.moim_finished = True
         post.save()
-        
+
+        # 참여자들 상태도 바꿔줘야함  APPROVED > COMPLETED
+        post.participations.filter(status='APPROVED').update(status='COMPLETED')
+
         messages.success(request, '모임이 완료 처리되었습니다.')
         print("모임 완료 처리 완료!")
         return redirect('moong:main')
@@ -720,11 +710,50 @@ def comment_delete(request, comment_id):
 #     return redirect("moong:post_detail", post_id=post_id)    
 
 
-
-
-
-
-
+# ==================== 또뭉 주기 ====================   
+@login_required
+def give_ddomoong(request, participation_id):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST만 가능'}, status=400)
+    participation = get_object_or_404(Participation, id=participation_id)
+    
+    # 자기 자신에게는 못 줌
+    if participation.user == request.user:
+        return JsonResponse({
+            'success': False,
+            'message': '자기 자신에게는 또뭉을 줄 수 없어요!'
+        })
+    
+    # 별도 table에 저장
+    ddomoong = Ddomoong.objects.filter(
+        participation=participation,
+        from_user=request.user
+    )
+    
+    if ddomoong.exists():
+        ddomoong.delete()
+        participation.user.decrease_ddomoong()
+        is_ddo = False
+        message = '또뭉을 취소했어요!'
+    else:
+        Ddomoong.objects.create(
+            participation=participation,
+            from_user=request.user
+        )
+        participation.user.increase_ddomoong()
+        is_ddo = True
+        message = '또뭉을 줬어요! 👍'
+    
+    # 현재 또뭉 개수 
+    participation.user.refresh_from_db(fields=['ddomoong'])
+    ddo_count = participation.user.ddomoong
+    print(f'또뭉 카운트 : {ddo_count}')
+    return JsonResponse({
+        'success': True,
+        'is_ddo': is_ddo,
+        'ddo_count': ddo_count,
+        'message': message
+    })
 
 # ===============================================================================================================================================================================
 # ==================== 공통 사용용 def ============================================================================================================================================

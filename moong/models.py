@@ -363,3 +363,30 @@ class Image(models.Model):
     
     def __str__(self):
         return f'{self.post.title} - 이미지 {self.order}'    
+    
+class Ddomoong(models.Model):
+    """참가자에게 또뭉 주기"""
+    participation = models.ForeignKey(
+        'Participation',
+        on_delete=models.CASCADE,
+        related_name='ddomoongs',
+        db_column='participation_id'
+    )
+    from_user = models.ForeignKey(
+        'users.User',  # users 앱의 User 모델
+        on_delete=models.CASCADE,
+        related_name='given_ddomoongs',
+        db_column='from_user_id'
+    )
+    created_at = models.DateTimeField(auto_now_add=True, db_column='create_time')
+    
+    class Meta:
+        db_table = 'Ddomoong'  # 다른 테이블명 스타일에 맞춤
+        unique_together = ('participation', 'from_user')
+        indexes = [
+            models.Index(fields=['participation']),
+            models.Index(fields=['from_user']),
+        ]
+    
+    def __str__(self):
+        return f"{self.from_user.nick_name} -> {self.participation.user.nick_name}"

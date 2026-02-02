@@ -90,7 +90,7 @@
                 <span class="error-text">{{ form.location.errors }}</span>
             {% endif %}
 
-            {% if is_edit and existing_images %}
+            {% if existing_images %}
                 <label>기존 이미지</label>
                 <div class="existing-images-wrap">
                     {% for image in existing_images %}

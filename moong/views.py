@@ -1,5 +1,7 @@
+from datetime import datetime
+
 from django.shortcuts import render, redirect, get_object_or_404, reverse
-from django.db.models import Count
+from django.db.models import Count, Q
 from .models import Post, Hashtag, Image, Participation, Comment, Ddomoong
 from locations.models import Location
 from django.contrib.auth.decorators import login_required
@@ -55,11 +57,15 @@ def categorize_hashtags(active_tags, location_keywords):
 # url 연결된 찐 main 함수
 def main(request):
     search = request.GET.get('search', '')
-    
+    now = datetime.now()
+
     posts = Post.objects.filter(
         complete=True,
         is_cancelled=False,
         moim_finished=False
+    ).exclude(
+        Q(moim_date__lt=now.date()) |
+        Q(moim_date=now.date(), moim_time__lt=now.time())
     ).prefetch_related('images', 'hashtags')
 
     if search:
@@ -88,9 +94,15 @@ def main(request):
 
 # 해시태그별 게시물 보기
 def tag_feeds(request, tag_name):
+    now = datetime.now()
     posts = Post.objects.filter(
         hashtags__name=tag_name,
-        complete=True
+        complete=True,
+        is_cancelled=False,
+        moim_finished=False,
+    ).exclude(
+        Q(moim_date__lt=now.date()) |
+        Q(moim_date=now.date(), moim_time__lt=now.time())
     ).prefetch_related('images', 'hashtags').order_by('-create_time')
     
     return render(request, 'moong/tag_feeds.html', {
@@ -261,7 +273,7 @@ def post_form(request, post_id=None):
                         location, 
                         complete=True
                     )             
-                    save_or_clear_images(post, request, clear_all=True)
+                    save_or_clear_images(post, request, clear_list='delete_images')
 
                 # 해시태그 저장
                 selected_tags = request.POST.getlist('tags')

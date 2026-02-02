@@ -16,7 +16,7 @@
     <div class="post-container">
         <div class="post-detail-card">
             <!-- 상태 배너 -->
-            {% if post.is_closed %}
+            {% if post.is_closed and not post.moim_finished %}
                 <div class="status-banner confirmed">
                     <h2>모집이 확정되었습니다</h2>
                     <p>확정 인원: <strong>{{ post.get_approved_count }}명</strong>{% if post.max_people %} / {{ post.max_people }}명{% endif %}</p>
@@ -189,9 +189,9 @@
             </div>
         </div>
         
-        <div class="post-tags" style="margin-top: 10px;">
+        <div class="post-tags">
             {% for tag in post.hashtags.all %}
-                <a href="{% url 'moong:tag_feeds' tag.name %}" style="text-decoration: none; color: #007bff; font-size: 0.9rem;">#{{ tag.name }}</a>
+                <a href="{% url 'moong:tag_feeds' tag.name %}">#{{ tag.name }}</a>
             {% endfor %}
         </div>
 

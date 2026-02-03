@@ -124,7 +124,7 @@ html, body {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    text-shadow: 0 2px 4px rgba(28, 100, 207, 2);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 2);
 }
 
 #navigation > div a:hover {
@@ -1059,6 +1059,35 @@ html, body {
     font-weight: bold;
 }
 
+/* 지도 + 이미지 반반 레이아웃 */
+.a-post-media-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.a-post-media-col {
+    flex: 1;
+    min-width: 0;
+}
+
+.kakao-map {
+    width: 100%;
+    height: 200px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.a-post-media-row .tap-slider {
+    height: 200px;
+}
+
+.a-post-media-row .post-image.tap-slide {
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
 /* 태그 */
 .a-post-tags {
     margin-top: 10px;
@@ -1630,7 +1659,7 @@ label[for="images"]:hover {
 .a-post-card .title-banner h4 {
     margin: 0;
     padding: 16px 20px;
-    font-size: 26px;
+    font-size: 24px;
     font-weight: 700;
     color: #fff;
     display: flex;

@@ -28,10 +28,21 @@
         <br>
         <p>{{ post.content|truncatechars:100 }}</p>
     </div>
-    <br>
-    {% if post.images.first %}
-    <div class="a-post-images">
+    <div class="a-post-info">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <span>{{ post.location }}</span>
+        </div>
+    </div>
+
+    {% if post.location or post.images.first %}
+    <div class="a-post-media-row">
+        {% if post.location %}
+        <div class="a-post-media-col">
+            <div class="kakao-map" data-kakao-address="{{ post.location }}"></div>
+        </div>
+        {% endif %}
         {% if post.images.first %}
+        <div class="a-post-images a-post-media-col">
             <div class="tap-slider">
                 {% for image in post.images.all %}
                     <img src="{{ image.image.url }}"
@@ -47,22 +58,16 @@
                     </div>
                 {% endif %}
             </div>
+        </div>
         {% endif %}
     </div>
     {% endif %}
-
-    <div class="a-post-info">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-            <span>{{ post.location }}</span>
-        </div>
-    </div>
-
+    <br>
     <div class="a-post-tags">
         {% for tag in post.hashtags.all %}
             <a href="{% url 'moong:tag_feeds' tag.name %}" class="tag-link">#{{ tag.name }}</a>
         {% endfor %}
     </div>
-
     <hr>
     {% include "moong/comments.html" with is_a_post=True comments=post.comments.filter parent__isnull=True %}
 </div>

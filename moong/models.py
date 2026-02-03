@@ -81,7 +81,7 @@ class Post(models.Model):
     
     def get_approved_count(self):
         """승인된 참여자 수"""
-        return self.participations.filter(status='APPROVED').count()
+        return self.participations.filter(Q(status='APPROVED') | Q(status='COMPLETED')).count()
     def get_wait_count(self):
         """ 대기자 수"""
         return self.participations.filter(Q(status='PENDING') | Q(status='CANCELLED')).count() 

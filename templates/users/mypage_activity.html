@@ -3,6 +3,16 @@
 
 {% block title %}활동 이력 - 뭉이{% endblock %}
 
+{% block myHead %}
+{% if current_tab == 'created' or current_tab == 'participated' %}
+<script>
+    const DDOMOONG_URL_BASE = "{% url 'moong:give_ddomoong' participation_id=0 %}";
+    const CSRF_TOKEN = "{{ csrf_token }}";
+</script>
+<script src="{% static 'js/ddo_moong.js' %}"></script>
+{% endif %}
+{% endblock %}
+
 {% block myBlock %}
 {% include 'moong/navigation.html' %}
 
@@ -13,18 +23,147 @@
     </div>
 
     <div class="stats-container">
-        <a href="{% url 'users:mypage_created_list' %}" class="stat-box-link">
-            <div class="stat-box">
+        <a href="{% url 'users:mypage_activity' %}?tab=created" class="stat-box-link">
+            <div class="stat-box {% if current_tab == 'created' %}stat-box-active{% endif %}">
                 <div class="stat-number">{{ total_created }}</div>
                 <div class="stat-label">개최한 모임</div>
             </div>
         </a>
-        <a href="{% url 'users:mypage_participated_list' %}" class="stat-box-link">
-            <div class="stat-box">
+        <a href="{% url 'users:mypage_activity' %}?tab=participated" class="stat-box-link">
+            <div class="stat-box {% if current_tab == 'participated' %}stat-box-active{% endif %}">
                 <div class="stat-number">{{ total_participated }}</div>
                 <div class="stat-label">참여한 모임</div>
             </div>
         </a>
+    </div>
+
+    {# 탭 콘텐츠 영역 #}
+    <div class="content-section">
+        {% if current_tab == 'created' %}
+            {# ===== 개최한 모임 탭 ===== #}
+            <div class="tab-content-header">🎯 내가 만든 모임 <span class="tab-content-count">총 {{ total_created }}개</span></div>
+            <div class="post-list">
+                {% if page_obj %}
+                    {% for post in page_obj %}
+                    <div class="post-card">
+                        <a href="{% url 'moong:post_detail' post.id %}">
+                            <div class="post-title">{{ post.title }}</div>
+                        </a>
+                        <div class="post-info">
+                            <div class="post-info-item">📅 {{ post.moim_date|date:"Y년 m월 d일" }}</div>
+                            <div class="post-info-item">⏰ {{ post.moim_time|time:"H:i" }}</div>
+                            <div class="post-info-item">📍 {{ post.location|default:"장소 미정" }}</div>
+                            <div class="post-info-item">👥 {{ post.get_approved_count }}/{{ post.max_people|default:"∞" }}명</div>
+                        </div>
+                        {% if post.is_cancelled %}
+                            <span class="status-badge status-cancelled">취소됨</span>
+                        {% elif post.is_closed %}
+                            <span class="status-badge status-closed">마감</span>
+                        {% else %}
+                            <span class="status-badge status-open">모집중</span>
+                        {% endif %}
+                        {% if post.moim_finished %}
+                            {% include "moong/ddo_moong.html" with participants=post.other_participants %}
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    <!-- 페이지네이션 -->
+                    <div class="pagination">
+                        {% if page_obj.has_previous %}
+                            <a href="?tab=created&page=1" class="page-link">처음</a>
+                            <a href="?tab=created&page={{ page_obj.previous_page_number }}" class="page-link">이전</a>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <span class="page-link active">{{ num }}</span>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <a href="?tab=created&page={{ num }}" class="page-link">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <a href="?tab=created&page={{ page_obj.next_page_number }}" class="page-link">다음</a>
+                            <a href="?tab=created&page={{ page_obj.paginator.num_pages }}" class="page-link">마지막</a>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📝</div>
+                        <div class="empty-state-text">아직 개최한 모임이 없어요</div>
+                    </div>
+                {% endif %}
+            </div>
+
+        {% elif current_tab == 'participated' %}
+            {# ===== 참여한 모임 탭 ===== #}
+            <div class="tab-content-header">🤝 내가 참여한 모임 <span class="tab-content-count">총 {{ total_participated }}개</span></div>
+            <div class="post-list">
+                {% if page_obj %}
+                    {% for participation in page_obj %}
+                    <div class="post-card">
+                        <a href="{% url 'moong:post_detail' participation.post.id %}">
+                            <div class="post-title">{{ participation.post.title }}</div>
+                        </a>
+                        <div class="post-info">
+                            <div class="post-info-item">📅 {{ participation.post.moim_date|date:"Y년 m월 d일" }}</div>
+                            <div class="post-info-item">📍 {{ participation.post.location|default:"장소 미정" }}</div>
+                            <div class="post-info-item">👤 주최자: {{ participation.post.author.nick_name }}</div>
+                        </div>
+
+                        {% if participation.status == 'APPROVED' %}
+                            <span class="status-badge status-open">✅ 참여 확정</span>
+                        {% elif participation.status == 'PENDING' %}
+                            <span class="status-badge status-waiting">⏳ 승인 대기중</span>
+                        {% elif participation.status == 'REJECTED' %}
+                            <span class="status-badge status-cancelled">❌ 참여 거절</span>
+                        {% elif participation.status == 'CANCELLED' %}
+                            <span class="status-badge status-cancelled">🚫 참여 취소</span>
+                        {% elif participation.status == 'COMPLETED' %}
+                            <span class="status-badge status-completed">🎉 모임 완료</span>
+                        {% endif %}
+
+                        <br><br>
+                        {% include "moong/ddo_moong.html" with participants=participation.other_participants %}
+                    </div>
+                    {% endfor %}
+
+                    <!-- 페이지네이션 -->
+                    <div class="pagination">
+                        {% if page_obj.has_previous %}
+                            <a href="?tab=participated&page=1" class="page-link">처음</a>
+                            <a href="?tab=participated&page={{ page_obj.previous_page_number }}" class="page-link">이전</a>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <span class="page-link active">{{ num }}</span>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <a href="?tab=participated&page={{ num }}" class="page-link">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                            <a href="?tab=participated&page={{ page_obj.next_page_number }}" class="page-link">다음</a>
+                            <a href="?tab=participated&page={{ page_obj.paginator.num_pages }}" class="page-link">마지막</a>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🤝</div>
+                        <div class="empty-state-text">아직 참여 신청한 모임이 없어요.</div>
+                    </div>
+                {% endif %}
+            </div>
+
+        {% else %}
+            {# ===== 기본 상태: 탭 선택 안내 ===== #}
+            <div class="empty-state">
+                <div class="empty-state-icon">👆</div>
+                <div class="empty-state-text">위 탭을 눌러서 활동 이력을 확인해보세요!</div>
+            </div>
+        {% endif %}
     </div>
 
     <div class="button-section">

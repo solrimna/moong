@@ -79,6 +79,9 @@
                         {% endif %}
                     </span>
                 </div>
+                {% if post.location %}
+                <div class="kakao-map" data-kakao-address="{{ post.location }}"></div>
+                {% endif %}
                 {% if post.max_people %}
                 <div class="post-info-item">
                     <strong>최대 인원</strong>

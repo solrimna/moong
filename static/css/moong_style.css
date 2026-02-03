@@ -2038,6 +2038,31 @@ label[for="images"]:hover {
 }
 
 /* ========================================
+    활동이력 - 선택된 stat-box 강조
+    ======================================== */
+.stat-box-active {
+    background: var(--moong-bg-light);
+    border-color: var(--moong-primary);
+    box-shadow: 0 4px 12px rgba(59, 125, 216, 0.25);
+}
+
+.tab-content-header {
+    font-size: 16px;
+    font-weight: 700;
+    color: #424242;
+    padding: 16px 16px 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tab-content-count {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--moong-text-light);
+}
+
+/* ========================================
     댓글 섹션 스타일
     ======================================== */
 

@@ -100,24 +100,25 @@ def mypage_edit(request):
     return render(request, 'users/mypage_edit.html', context)
 
 
-# 활동 이력 (메인)
+# 활동 이력 (메인 - 탭 방식)
 @login_required
 def mypage_activity(request):
-    """마이페이지 - 활동 이력 메인"""
+    """마이페이지 - 활동 이력 (탭 전환 방식)"""
     user = request.user
-    
+    tab = request.GET.get('tab', '')  # 'created' or 'participated'
+
     # 내가 만든 모임 (임시저장 제외, 완성된 글만)
     my_posts = Post.objects.filter(
         author=user,
         complete=True
     ).order_by('-create_time')
-    
-    # 내가 참여한 모임 
+
+    # 내가 참여한 모임
     my_participations = Participation.objects.filter(
         user=user,
-        post__complete=True 
-    ).select_related('post').order_by('-create_time')
-    
+        post__complete=True
+    ).select_related('post', 'post__author').order_by('-create_time')
+
     # 통계
     total_created = my_posts.count()
     total_participated = my_participations.count()
@@ -126,8 +127,64 @@ def mypage_activity(request):
         'user': user,
         'total_created': total_created,
         'total_participated': total_participated,
+        'current_tab': tab,
     }
-    
+
+    # 탭별 데이터 로드 + 페이지네이션
+    if tab == 'created':
+        paginator = Paginator(my_posts, 3)
+        page_number = request.GET.get('page', 1)
+        try:
+            page_obj = paginator.page(page_number)
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)
+
+        for post in page_obj:
+            if post.moim_finished:
+                other_participants = list(
+                    post.participations.filter(
+                        status='COMPLETED'
+                    ).select_related('user').exclude(
+                        user=request.user
+                    )
+                )
+                for p in other_participants:
+                    p.is_ddo_by_me = p.ddomoongs.filter(from_user=request.user).exists()
+                post.other_participants = other_participants
+            else:
+                post.other_participants = []
+
+        context['page_obj'] = page_obj
+
+    elif tab == 'participated':
+        paginator = Paginator(my_participations, 3)
+        page_number = request.GET.get('page', 1)
+        try:
+            page_obj = paginator.page(page_number)
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)
+
+        for participation in page_obj:
+            if participation.post.moim_finished:
+                other_participants = list(
+                    participation.post.participations.filter(
+                        status='COMPLETED'
+                    ).select_related('user').exclude(
+                        user=request.user
+                    )
+                )
+                for p in other_participants:
+                    p.is_ddo_by_me = p.ddomoongs.filter(from_user=request.user).exists()
+                participation.other_participants = other_participants
+            else:
+                participation.other_participants = []
+
+        context['page_obj'] = page_obj
+
     return render(request, 'users/mypage_activity.html', context)
 
 

@@ -1612,38 +1612,97 @@ label[for="images"]:hover {
     margin-left: auto;
 }
 
-.a-post-card .a-post-content h4 {
-    margin: 0 0 10px 0;
-}
-
-.a-post-card .a-post-content h4 a {
-    color: var(--moong-primary);
+/* 제목 + 상태 배너 통합 블록 */
+.a-post-card .title-banner {
+    display: block;
     text-decoration: none;
-    font-size: 20px;
-    font-weight: 700;
-    transition: color 0.3s, transform 0.2s;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+    border-radius: 14px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.a-post-card .a-post-content h4 a::after {
-    content: '→';
+.a-post-card .title-banner:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.a-post-card .title-banner h4 {
+    margin: 0;
+    padding: 16px 20px;
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.a-post-card .title-banner .title-arrow {
     font-size: 18px;
     transition: transform 0.2s;
+    opacity: 0.6;
 }
 
-.a-post-card .a-post-content h4 a:hover {
+.a-post-card .title-banner:hover .title-arrow {
+    transform: translateX(4px);
+    opacity: 1;
+}
+
+.a-post-card .title-banner .banner-info {
+    padding: 12px 20px;
+}
+
+.a-post-card .title-banner .banner-main {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: right;
+}
+
+.a-post-card .title-banner .banner-sub {
+    margin: 4px 0 0 0;
+    font-size: 13px;
+    opacity: 0.7;
+    text-align: right;
+}
+
+/* 상태별 색상 - 위: 진한색(타이틀) / 아래: 연한색(상태) */
+.a-post-card .title-banner.recruiting h4 {
+    background: linear-gradient(135deg, #3B7DD8, #2E63B0);
+}
+.a-post-card .title-banner.recruiting .banner-info {
+    background: var(--moong-bg-light);
     color: var(--moong-primary-dark);
 }
 
-.a-post-card .a-post-content h4 a:hover::after {
-    transform: translateX(4px);
+.a-post-card .title-banner.confirmed h4 {
+    background: linear-gradient(135deg, #43A047, #2E7D32);
+}
+.a-post-card .title-banner.confirmed .banner-info {
+    background: #E8F5E9;
+    color: #2E7D32;
+}
+
+.a-post-card .title-banner.cancelled h4 {
+    background: linear-gradient(135deg, #E53935, #C62828);
+}
+.a-post-card .title-banner.cancelled .banner-info {
+    background: #FFEBEE;
+    color: #C62828;
+}
+
+.a-post-card .title-banner.finished h4 {
+    background: linear-gradient(135deg, #AB47BC, #7B1FA2);
+}
+.a-post-card .title-banner.finished .banner-info {
+    background: #F3E5F5;
+    color: #7B1FA2;
 }
 
 .a-post-card .a-post-content p {
     color: var(--moong-text-light);
-    font-size: 14px;
+    font-size: 18px;
     line-height: 1.6;
     margin: 0;
 }

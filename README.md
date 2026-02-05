@@ -4,11 +4,22 @@
 [프로젝트 발표자료](https://docs.google.com/presentation/d/13RiIDvLdFT1VZj0Q3EYMLUbsCBPHW3Pq-bJ6WHqiBQ8/edit?usp=sharing)
 
 ## 스크린샷 및 데모 실행 화면
-![메인화면](docs/images/main.png)
+### 메인화면
+![메인화면](docs/images/main.PNG)
+
+### 모임생성
 ![모임생성](docs/images/new_moim.gif)
+
+### 모임마감
 ![모임마감](docs/images/moim_close.gif)
+
+### 댓글
 ![댓글](docs/images/comment.gif)
+
+### 마이페이지-또뭉(좋아요)
 ![마이페이지-또뭉(좋아요)](docs/images/mypage_ddomoong.gif)
+
+-----
 
 ## 초기 실행 방법(필수)
 회원가입 화면의 '활동 지역' 목록은 초기 데이터 적재 후 정상 노출됩니다.

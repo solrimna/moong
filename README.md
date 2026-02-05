@@ -37,14 +37,14 @@
 5. pillow : 이미지 표기 시 사용
 
 #### 1-2) API KEY 입력하기 : .env파일 생성 후 api key 입력
-클론 받은 경로에 .env 파일을 생성합니다 (moong dir 바로 아래)
-파일 내용 설정 : 
-OPENAI_API_KEY="자신의 api key 입력"
-KAKAO_APP_KEY="자신의 카카오 map api key 입력"
+- 클론 받은 경로에 .env 파일을 생성합니다 (moong dir 바로 아래)
+- 파일 내용 설정 : 
+- OPENAI_API_KEY="자신의 api key 입력"
+- KAKAO_APP_KEY="자신의 카카오 map api key 입력"
 
 ##### KAKAO_APP_KEY 생성하여 얻어오기 (없다면..)
 1. https://developers.kakao.com/console/app 접속
-2. + 앱생성(이름이) 후 생성한 앱 클릭(추가 설정을 해주기 위해 앱 설정으로 진입)
+2. + 앱생성 이후 생성한 앱 클릭(추가 설정을 해주기 위해 앱 설정으로 진입)
 3. 왼쪽 메뉴 앱 > 플랫폼 키 > JavaScript 키 > Default JS Key 키 클릭 > JavaScript SDK 도메인 설정 
 - http://127.0.0.1:8000 추가 
     (python manage.py runserver했을 때 사용되는 url 기재)

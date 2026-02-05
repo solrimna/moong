@@ -16,7 +16,6 @@ users/tests.py
 
 # 마이그레이션 캐시는 제외
 */migrations/__pycache__/
-*/migrations/
 
 # open ai key 파일 제외 ^^
 .env

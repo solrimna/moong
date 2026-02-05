@@ -10,7 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 AUTH_USER_MODEL = "users.User"
 
@@ -66,6 +71,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'config.context_processors.kakao_app_key',
             ],
         },
     },
@@ -124,3 +130,5 @@ MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 LOGIN_URL = '/users/login/'
+
+KAKAO_APP_KEY = os.getenv("KAKAO_APP_KEY", "")

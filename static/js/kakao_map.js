@@ -1,6 +1,4 @@
 (function() {
-    var KAKAO_APP_KEY = '480058f96b58da4bae7e2e8ae398a476';
-
     function renderMaps() {
         var mapElements = document.querySelectorAll('[data-kakao-address]');
         if (mapElements.length === 0) return;

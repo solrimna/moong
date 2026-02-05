@@ -9,6 +9,7 @@
     <!-- style -->
     <link rel="stylesheet" href="{% static 'css/moong_style.css' %}">
     <!-- Kakao Map -->
+    <script>var KAKAO_APP_KEY = "{{ KAKAO_APP_KEY }}";</script>
     <script src="{% static 'js/kakao_map.js' %}" defer></script>
     <!-- 각 페이지 고유 CSS, Js.. -->
     {% block myHead %}{% endblock %}

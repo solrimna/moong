@@ -1,6 +1,14 @@
 # MOONG! 번개모임 SNS
 - 사용자가 즉시 모임을 생성하고 참여할 수 있는 ‘벙개 만남 중심 플랫폼’
 - 단순한 인스타그램 클론 코딩에서 벗어난, SNS 플랫폼 프로젝트 수행.
+[프로젝트 발표자료](https://docs.google.com/presentation/d/13RiIDvLdFT1VZj0Q3EYMLUbsCBPHW3Pq-bJ6WHqiBQ8/edit?usp=sharing)
+
+## 스크린샷 및 데모 실행 화면
+![메인화면](docs/images/main.png)
+![모임생성](docs/images/new_moim.gif)
+![모임마감](docs/images/moim_close.gif)
+![댓글](docs/images/comment.gif)
+![마이페이지-또뭉(좋아요)](docs/images/mypage_ddomoong.gif)
 
 ## 초기 실행 방법(필수)
 회원가입 화면의 '활동 지역' 목록은 초기 데이터 적재 후 정상 노출됩니다.
@@ -23,7 +31,7 @@
 OPENAI_API_KEY="자신의 api key 입력"
 KAKAO_APP_KEY="자신의 카카오 map api key 입력"
 
-##### 1-2-1) KAKAO_APP_KEY 생성하여 얻어오기 (없다면..)
+##### KAKAO_APP_KEY 생성하여 얻어오기 (없다면..)
 1. https://developers.kakao.com/console/app 접속
 2. + 앱생성(이름이) 후 생성한 앱 클릭(추가 설정을 해주기 위해 앱 설정으로 진입)
 3. 왼쪽 메뉴 앱 > 플랫폼 키 > JavaScript 키 > Default JS Key 키 클릭 > JavaScript SDK 도메인 설정 
@@ -36,11 +44,9 @@ KAKAO_APP_KEY="자신의 카카오 map api key 입력"
 python manage.py migrate
 
 ### 3) 지역 데이터 적재 (생략 가능)
-<!--
 python manage.py import_locations 
 runserver 시 자동으로 실행되어 생략 가능 (처리 내용 : apps.py)
 - 실행 시마다 수행되지만, 이미 저장되어있는 경우에는 skip되므로 중복저장되지않음.
--->
 
 ### 4) 관리자 계정 생성
 python manage.py createsuperuser
